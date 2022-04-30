@@ -1,0 +1,94 @@
+﻿@page "/DrawSelection"
+@using XtremeModels
+@inject IWebApiService ApiService
+<PageTitle>Draw Selection</PageTitle>
+<AuthorizeView>
+
+    <Authorized>
+        <MudText Typo="Typo.h4">Draw Selection</MudText>
+        @if (ErrorsList?.Any() == true)
+        {
+            foreach (var item in ErrorsList)
+            {
+                <MudText Color="@Color.Error">@item</MudText>
+            }
+        }
+
+        @if (schedules is null)
+        {
+            <MudText Typo="Typo.h5">Loading....</MudText>
+        }
+        else
+        {
+            if (schedules.Any())
+            {
+                <MudSimpleTable Style="overflow-x: auto;">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th><b>Draw - Bond</b></th>
+                            <th><b>Date</b></th>
+                            <th><b>Category</b></th>
+                            <th><b>City</b></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 0;
+                        }
+                        @foreach (var row in schedules)
+                        {
+                            int currCount = count;
+                            <tr @onclick="@(()=>onRowSelection(currCount))">
+                                
+                                <td><MudIcon Icon="@(row.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Color="@(row.Uac?Color.Success:Color.Error)" Title="Pencil" /></td>
+                                
+                                <td style="min-width:120px;">@(row.DId+" - "+ row.BId)</td>
+                                <td>@row.Date.ToShortDateString()</td>
+                                <td style="min-width:150px;">@row.Cat</td>
+                                <td>@row.City</td>
+                            </tr>
+                            count++;
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+            else
+            {
+                <MudText Typo="Typo.h5">No draws</MudText>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+@code {
+
+    public IList<string> ErrorsList;
+    IList<Schedule> schedules;
+    protected override async Task OnInitializedAsync()
+    {
+        schedules = await ApiService.GetAllSch();
+        if (schedules is null)
+        {
+            schedules = await ApiService.GetScheduleList();
+        }
+    }
+    private async Task onRowSelection(int rowIndex)
+    {
+        var currSel = schedules[rowIndex];
+        if (currSel.Uac)
+        {
+            var res = await ApiService.ChangeSchedule(currSel);
+            if (!res)
+            {
+                ErrorsList = new List<string>() { "Either the draw is closed, or there was an error" };
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            ErrorsList = new List<string>() { "Either the draw is closed, or there was an error" };
+
+            StateHasChanged();
+        }
+    }
+}

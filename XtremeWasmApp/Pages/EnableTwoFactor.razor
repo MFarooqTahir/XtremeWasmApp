@@ -1,0 +1,31 @@
+﻿@page "/EnableTwoFactor"
+@inject HttpClient client
+
+@using Blazorise.QRCode
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorage;
+<AuthorizeView>
+	<Authorized>
+		<MudPaper Class="pa-4 mx-auto" Style="max-width:400px; min-width:300px;">
+			@if (string.IsNullOrWhiteSpace(qr.AuthenticatorUri))
+			{
+				<MudText>Loading...</MudText>
+			}
+			else
+			{
+				<QRCode Value="@(qr.AuthenticatorUri)" Style="height:370px;width:370px;margin:auto" />
+				<EditForm Model="qr" Context="NewName" OnValidSubmit="HandleLogin" >
+					
+					<MudText Typo="Typo.h5" Class="text-center">Enable Two Factor Code</MudText>
+					<DataAnnotationsValidator />
+					<MudTextField Label="Verification Code"
+							  @bind-Value="qr.Code" For="@(() => qr.Code)" />
+
+					<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2 ml-auto">Login</MudButton>
+
+
+				</EditForm>
+			}
+		</MudPaper>
+	</Authorized>
+</AuthorizeView>

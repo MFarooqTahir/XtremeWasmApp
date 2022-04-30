@@ -1,0 +1,15 @@
+﻿<AuthorizeView>
+    <Authorized>
+        @*<a class="nav-link text-decoration-none" href="">
+           @* Hello, @context.User.Identity.Name!
+           <MudIcon Color=Color.Dark Size=Size.Small Icon="@(Icons.Material.Filled.Settings)"></MudIcon>
+        </a>*@
+        <a class="nav-link text-decoration-none" href="LogOut"><MudIcon Color=Color.Dark Size=Size.Small Icon="@(Icons.Material.Filled.Logout)"></MudIcon></a>
+
+    </Authorized>
+    <NotAuthorized>
+        <a class="nav-link text-dark" href="Register">Register</a>
+        <a class="nav-link text-dark" href="Login">Login</a>
+        
+    </NotAuthorized>
+</AuthorizeView>

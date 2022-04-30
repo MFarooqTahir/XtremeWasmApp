@@ -1,0 +1,91 @@
+﻿@page "/CompanySelection"
+@using System.Diagnostics
+@using System.Text.RegularExpressions
+<PageTitle>Company Selection</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <MudText Align="Align.Center"><b>Reg ID: @acCode</b></MudText>
+        @if (ErrorsList?.Any() == true)
+        {
+            foreach (var item in ErrorsList)
+            {
+                <MudText Color="@Color.Error">@item</MudText>
+            }
+        }
+
+        @if (CompanyList is null)
+        {
+            <MudText Typo="Typo.h5">Loading....</MudText>
+        }
+        else
+        {
+            if (CompanyList.Any())
+            {
+                <MudSimpleTable Style="overflow-x: auto;">
+                    <thead>
+                    </thead>
+                    <tbody>
+                        @{
+                            int count = 0;
+                            var RegRemovePoint = new Regex(@"\W");
+                        }
+                        @foreach (var row in CompanyList)
+                        {
+                            int currCount = count;
+                            string IconName = RegRemovePoint.Replace(row.Pcode, "");
+                            <tr style="@trStyle(row.Enabled,row.Block,row.Active,row.rBlocked)" @onclick="@(()=>onRowSelection(currCount))">
+
+                                <td style="width:110px;"><MudImage Src=@("Images/AAA.gif") Width="90" Height="90" Alt="Icon" Elevation="25" Class="rounded-lg" /></td>
+                                @*<td style="width:110px;"><MudImage Src=@("Images/"+IconName+".gif") Width="75" Height="75" Alt="icon" Elevation="25" Class="rounded-lg" /></td>*@
+
+                                <td style="min-width:100px;max-width:100px;font-size:18px;"><b>@row.Pcode</b></td>
+                                <td style="font-size:18px;"><b>@row.City</b></td>
+                                <td style="font-size:18px;"><b>@row.Limit.ToString("F2")</b></td>
+                                <td style="font-size:18px;word-wrap: break-word;"><b>@row.UName</b></td>
+                            </tr>
+                            count++;
+                            @*<tr style="@trStyle(row.Lock)" @onclick="onRowSelection">
+                                <td style="width:110px;"><MudImage Src=@("Images/"+row.icon+".gif") Width="90" Height="90" Alt="Swedish Farm House" Elevation="25" Class="rounded-lg" /></td>
+                                <td>@row.Code</td>
+                                <td style="word-wrap: break-word;">@row.Name</td>
+                                <td>@row.limit</td>
+                                </tr>
+                            *@
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+            else
+            {
+                <MudText Typo="Typo.h5">Not Registered with any company yet, Your account code is @acCode</MudText>
+            }
+        }
+    </Authorized>
+</AuthorizeView>
+
+@{
+    string trStyle(bool Enabled, bool Block, bool Active, bool rBlocked)
+    {
+        if (Enabled)
+        {
+            return "background:transparent;";
+        }
+        else if (Block || rBlocked)
+        {
+            return "background:rgba(255,0,0,0.4);";
+        }
+        else if (Active)
+        {
+            return "background:transparent;";
+        }
+        else if (Active)
+        {
+            return "background:rgba(128,128,0,0.2);";
+
+        }
+        else
+        {
+            return "background:transparent;";
+        }
+    }
+}

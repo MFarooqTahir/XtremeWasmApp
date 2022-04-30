@@ -1,0 +1,47 @@
+﻿@page "/"
+@inject IWebApiService Api
+<PageTitle>Index</PageTitle>
+<AuthorizeView>
+    <Authorized>
+        <div align-center style="text-align:center;display: flex;
+  justify-content: center;
+  align-items: center;">
+            <MudStack Spacing=0>
+        <h5>Welcome to Xtreme Traders</h5>
+        <MudImage Src="Images/defImg/logo.png" ObjectFit="ObjectFit.None" Class="rounded-lg"/>
+        <hr/>
+        <MudText Typo="Typo.h5"><b>@CompanyDetails @CurrCity</b></MudText>
+       
+        <hr/>
+        <MudText Typo="Typo.h6">Reg ID: <b>@MBM</b></MudText>
+        <hr/>
+        <div style="text-align:left;margin: 0 auto;">
+        
+        <MudText>A/C: @CurrCode - @CurrName</MudText>
+        <MudText>Relation ID: @RelID</MudText>
+        <MudText>Sale Limit: @CurrLimit</MudText>
+        </div>
+        </MudStack>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <h1>You are not logged in</h1>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    string CurrName = string.Empty;
+    string CurrCity = string.Empty;
+    string CurrCode = string.Empty;
+    string CurrLimit = string.Empty;
+    string CompanyDetails = string.Empty;
+    string RelID = string.Empty;
+    string MBM = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        await Api.UnsetAllSch();
+                MBM = await Api.GetMbm();
+        
+        (CurrName,CurrCity,CurrCode,CurrLimit,CompanyDetails,RelID)=await Api.GetDashboardData();
+    }
+}

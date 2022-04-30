@@ -1,0 +1,33 @@
+﻿@*@page "/FALogin"*@
+@inject HttpClient client
+@inject NavigationManager NavigationManager
+@inject IWebApiService AuthService
+@inject ILocalStorageService LocalStorage;
+<AuthorizeView>
+	<Authorized>
+		<MudPaper Class="pa-4 mx-auto" Style="max-width:400px; min-width:300px;">
+
+			<EditForm Model="Model" Context="NewName" OnValidSubmit="HandleLogin">
+
+				<DataAnnotationsValidator />
+				@if (errors.Any())
+				{
+					@foreach (var error in errors)
+					{
+						<MudText Color="@Color.Error">
+							@error
+						</MudText>
+					}
+				}
+				<MudText Typo="Typo.h5" Class="text-center">Enter Two Factor Code</MudText>
+				<MudDivider />
+				<MudText Class="text-center"><small>@EmailVerificationStatus</small></MudText>
+				<MudTextField Label="Code" HelperText="Verification Code"
+							  @bind-Value="Model.Code" For="@(() => Model.Code)" />
+
+				<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2 ml-auto">Login</MudButton>
+				
+			</EditForm>
+		</MudPaper>
+	</Authorized>
+</AuthorizeView>

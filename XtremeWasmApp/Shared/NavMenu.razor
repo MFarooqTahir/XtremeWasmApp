@@ -1,0 +1,28 @@
+﻿@inject IWebApiService AuthService
+<AuthorizeView>
+    <Authorized>
+        <MudText Align="Align.Center" Class="my-2"><b>REG ID: @MBM</b></MudText>
+        <MudNavMenu>
+            
+            <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            <MudNavLink Href="/Mix" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.StackedBarChart">Mix Trans</MudNavLink>
+            <MudNavLink Href="/Scheme" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.StackedLineChart">Scheme Trans</MudNavLink>
+            <MudNavLink Href="/Scheme" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Percent">Scheme % Trans</MudNavLink>
+            <MudNavLink Href="/Search" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Search Digit</MudNavLink>
+            <MudNavLink Href="/Win" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.PriceCheck">Win Prize</MudNavLink>
+            <MudNavLink Href="/View" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CreditCard">View Invoice</MudNavLink>
+            <MudNavLink Href="/Bill" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceChange">Party Bill</MudNavLink>
+            <MudNavLink Href="/Ledger" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.FileFormats.FileDocument">A/C Ledger</MudNavLink>
+            <MudNavLink Href="/CompanySelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Warehouse">Company Selection</MudNavLink>
+            <MudNavLink Href="/DrawSelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CardMembership">Draw Selection</MudNavLink>
+        </MudNavMenu>
+    </Authorized>
+</AuthorizeView>
+@code {
+    string MBM = string.Empty;
+    protected override async Task OnInitializedAsync()
+    {
+        MBM = await AuthService.GetMbm();
+
+    }
+}

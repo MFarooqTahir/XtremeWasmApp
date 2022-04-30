@@ -1,0 +1,25 @@
+﻿namespace XtremeModels
+{
+    public class TransSearch
+    {
+        public string Vid { get; set; }
+        public int Vno { get; set; }
+        public int prize1 { get; set; }
+        public int prize2 { get; set; }
+        public PrizeType Type { get; set; }
+        public LimDem LB { get; set; }
+    }
+
+    public enum LimDem
+    {
+        L = 0,
+        D = 1,
+        M = 2,
+    }
+
+    public enum PrizeType
+    {
+        S = 0,
+        P = 1,
+    }
+}

@@ -1,0 +1,33 @@
+﻿@page "/login"
+@inject IWebApiService AuthService
+@inject NavigationManager NavigationManager
+
+
+
+
+<MudPaper Outlined="true" Class="pa-4 mx-auto" Style="max-width:400px; min-width:300px;">
+	
+	<EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+
+		<DataAnnotationsValidator />
+		@*<MudText Color="@Color.Error">
+                    <ValidationSummary />
+                </MudText>*@
+		<MudText Typo="Typo.h3" Class="text-center">Login</MudText>
+		<MudDivider/>
+		@if (ShowErrors)
+		{
+			<MudText Color="@Color.Error" Class="text-center">
+				<p>@Error</p>
+			</MudText>
+		}
+		<MudTextField Label="Email" HelperText="Your Gmail ID"
+					  @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" />
+		<MudTextField Label="Password" HelperText="" InputType="InputType.Password"
+					  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" />
+		<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2 ml-auto">Login</MudButton>
+
+		
+	</EditForm>
+</MudPaper>
+

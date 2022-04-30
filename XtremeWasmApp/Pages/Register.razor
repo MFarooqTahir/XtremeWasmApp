@@ -1,0 +1,40 @@
+﻿@page "/Register"
+@using System.Diagnostics
+
+@inject IWebApiService AuthService
+@inject NavigationManager NavigationManager
+
+<MudPaper Outlined="true" Class="pa-4 mx-auto" Style="max-width:400px; min-width:300px;">
+
+    <EditForm Model="RegisterModel" OnValidSubmit="HandleRegistration">
+
+        <DataAnnotationsValidator />
+        @* <MudText Color="@Color.Error">
+            <ValidationSummary />
+            </MudText>*@
+        <MudText Typo="Typo.h3" Class="text-center">Register</MudText>
+        <MudDivider />
+        @if (ShowErrors)
+        {
+            <MudText Color="@Color.Error" Class="text-center">
+                @foreach (var error in Errors)
+                {
+                    <p>@error</p>
+                }
+            </MudText>
+        }
+        <MudTextField Label="Email" HelperText="Your Gmail ID"
+                      @bind-Value="RegisterModel.Email" For="@(() => RegisterModel.Email)" />
+        <MudTextField Label="Phone Number" HelperText="Your Phone Number"
+                      @bind-Value="RegisterModel.Phone" For="@(() => RegisterModel.Phone)" />
+        <MudTextField Label="Password" HelperText="" InputType="InputType.Password"
+                      @bind-Value="RegisterModel.Password" For="@(() => RegisterModel.Password)" />
+        <MudTextField Label="Confirm Password" InputType="InputType.Password" HelperText=""
+                      @bind-Value="RegisterModel.ConfirmPassword" For="@(() => RegisterModel.ConfirmPassword)" />
+        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2 ml-auto">Register</MudButton>
+
+
+    </EditForm>
+</MudPaper>
+
+

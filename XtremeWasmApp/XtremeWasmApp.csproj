@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Pages\EnableTwoFactor.razor.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="Pages\EnableTwoFactor.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+		<PackageReference Include="Meziantou.Analyzer" Version="1.0.700">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.4" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.4" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+		<PackageReference Include="MudBlazor" Version="6.0.9" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+		<PackageReference Include="Toolbelt.Blazor.LoadingBar" Version="13.1.2" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\fonts\" />
+	  <Folder Include="wwwroot\img\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\XtremeModels\XtremeModels.csproj" />
+	</ItemGroup>
+	
+	
+</Project>
