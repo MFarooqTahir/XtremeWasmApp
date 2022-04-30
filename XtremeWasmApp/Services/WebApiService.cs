@@ -295,6 +295,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<(string Name, string city, string Code, string Balance, string CompanyDetails, string pname)> GetDashboardData()
         {
+
             var party = await GetParty().ConfigureAwait(false) ?? new();
             var comp = await GetCompany().ConfigureAwait(false) ?? new();
             var cdRel = await GetCdrel().ConfigureAwait(false) ?? new();
