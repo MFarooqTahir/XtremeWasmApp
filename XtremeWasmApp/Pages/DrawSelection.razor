@@ -26,10 +26,10 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th><b>Draw - Bond</b></th>
+                            <th><b>Draw</b></th>
                             <th><b>Date</b></th>
-                            <th><b>Category</b></th>
                             <th><b>City</b></th>
+                            <th><b>Category</b></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,12 +41,12 @@
                             int currCount = count;
                             <tr @onclick="@(()=>onRowSelection(currCount))">
                                 
-                                <td><MudIcon Icon="@(row.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Color="@(row.Uac?Color.Success:Color.Error)" Title="Pencil" /></td>
+                                <td style="max-width:30px;"><MudIcon Icon="@(row.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Color="@(row.Uac?Color.Success:Color.Error)" Title="Pencil" /></td>
                                 
-                                <td style="min-width:120px;">@(row.DId+"-"+ row.BId)</td>
+                                <td style="min-width:110px;">@(row.DId+" - "+ row.BId)</td>
                                 <td>@row.Date.ToShortDateString()</td>
-                                <td style="min-width:150px;">@row.Cat</td>
                                 <td>@row.City</td>
+                                <td style="min-width:150px;">@row.Cat</td>
                             </tr>
                             count++;
                         }
