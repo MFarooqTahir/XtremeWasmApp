@@ -21,7 +21,7 @@
 				<p>@Error</p>
 			</MudText>
 		}
-		<MudTextField Label="Email" HelperText="Your Gmail ID"
+		<MudTextField Label="Email" HelperText="Your Gmail ID" InputType="InputType.Email"
 					  @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" />
 		<MudTextField Label="Password" HelperText="" InputType="InputType.Password"
 					  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" />

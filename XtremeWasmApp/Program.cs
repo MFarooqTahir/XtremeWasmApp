@@ -14,9 +14,13 @@ using XtremeWasmApp;
 using XtremeWasmApp.Models;
 using XtremeWasmApp.Services;
 
+#if DEBUG
 //var HttpDataVar = new HttpData() { BaseAddress = new("http://localhost:2144/") };
 var HttpDataVar = new HttpData() { BaseAddress = new("https://xt.discreetnotation.com:8445/") };
 
+#elif RELEASE
+var HttpDataVar = new HttpData() { BaseAddress = new("https://xt.discreetnotation.com:8445/") };
+#endif
 var cli = new HttpClient();
 cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
