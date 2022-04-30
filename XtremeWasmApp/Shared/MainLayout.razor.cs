@@ -42,7 +42,7 @@ namespace XtremeWasmApp.Shared
             MarqSet = false;
             if (firstRender)
             {
-                await Auth.Logout();
+                //await Auth.Logout();
                 var pal = _mudThemeProvider.Theme.Palette;
                 var palD = _mudThemeProvider.Theme.PaletteDark;
                 palD.Primary = pal.Primary = "#D2B48C";
