@@ -12,8 +12,7 @@ namespace XtremeWasmApp.Models
         [Required(ErrorMessage = "Phone Number is required"), DataType(DataType.PhoneNumber, ErrorMessage = "Not a valid phone number")]
         public string Phone { get; set; }
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+        [Required, RegularExpression("[0-9]{6}", ErrorMessage = "Enter a valid 6 digit pin")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }

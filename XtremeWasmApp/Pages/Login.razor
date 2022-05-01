@@ -23,7 +23,7 @@
 		}
 		<MudTextField Label="Email" HelperText="Your Gmail ID" InputType="InputType.Email"
 					  @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" />
-		<MudTextField Label="Password" HelperText="" InputType="InputType.Password"
+        <MudTextField Label="Password" HelperText="" InputType="InputType.Password" type="number"
 					  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" />
 		<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2 ml-auto">Login</MudButton>
 

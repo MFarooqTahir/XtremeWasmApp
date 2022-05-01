@@ -234,13 +234,19 @@ namespace XtremeWasmApp.Services
             if (await IsCompanySelected().ConfigureAwait(false) && await IsDrawSelected().ConfigureAwait(false))
             {
                 var comp = await GetCompany().ConfigureAwait(false) ?? new();
-                var party = await GetParty().ConfigureAwait(false) ?? new();
+                var party = await GetParty().ConfigureAwait(false);
                 var sch = await GetSch().ConfigureAwait(false) ?? new();
-                var cdRel = await GetCdrel().ConfigureAwait(false) ?? new();
+                var cdRel = await GetCdrel().ConfigureAwait(false);
+                string ret = string.Empty;
+                if (party is not null && cdRel is not null)
+                {
+                    ret = await UpdateBalance(cdRel, party).ConfigureAwait(false);
+                }
+                cdRel ??= new();
                 return new TopMarqueData
                 {
                     Active = cdRel.Active,
-                    Balance = party.Balance,
+                    Balance = ret,
                     BId = sch.BId,
                     DId = sch.DId,
                     Category = sch.Cat,
@@ -293,14 +299,29 @@ namespace XtremeWasmApp.Services
             }
         }
 
+        private async Task<string> UpdateBalance(CDRelation cdrel, Party part)
+        {
+            var amt = (await SendHttpRequest<ResultSet<int>>($"api/DataSet/Login/GetPartyLimit/{cdrel.CompanyID}/{cdrel.rCode}", RequestType.Get, linkType: LinkType.Login).ConfigureAwait(false))?.ResultObj ?? 0;
+            var amt2 = (await SendHttpRequest<ResultSet<int>>($"api/Data/GetPartyBalance/{cdrel.rCode}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false))?.ResultObj ?? 0;
+
+            part.Balance = double.Parse(amt2.ToString(), CultureInfo.InvariantCulture);
+            await SetParty(part).ConfigureAwait(false);
+            cdrel.Limit = amt;
+            await SetCdrel(cdrel).ConfigureAwait(false);
+            if (amt > 0)
+            {
+                return $"Bal: {amt - amt2}";
+            }
+            return $"Sale: {amt2}";
+        }
+
         public async Task<(string Name, string city, string Code, string Balance, string CompanyDetails, string pname)> GetDashboardData()
         {
-
             var party = await GetParty().ConfigureAwait(false) ?? new();
             var comp = await GetCompany().ConfigureAwait(false) ?? new();
             var cdRel = await GetCdrel().ConfigureAwait(false) ?? new();
 
-            return (party.Name, comp.City, party.Code, party.Balance.ToString("F2", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
+            return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F2", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
         }
 
         public async Task<IList<Schedule>> GetScheduleList()

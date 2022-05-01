@@ -1,5 +1,6 @@
 ﻿@page "/DrawSelection"
 @using XtremeModels
+@inject IJSRuntime JsRuntime
 @inject IWebApiService ApiService
 <PageTitle>Draw Selection</PageTitle>
 <AuthorizeView>
@@ -26,10 +27,12 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th><b>Draw</b></th>
-                            <th><b>Date</b></th>
-                            <th><b>City</b></th>
-                            <th><b>Category</b></th>
+                            <th style="text-align:center;font-size:large;"><b>Draw</b></th>
+                            <th style="text-align:center;font-size:large;"><b>Date</b></th>
+                            <th style="text-align:center;font-size:large;"><b>City</b></th>
+                             @if(windowWidth>500){
+                            <th style="text-align:center;font-size:large;"><b>Category</b></th>
+                             }                            
                         </tr>
                     </thead>
                     <tbody>
@@ -41,12 +44,14 @@
                             int currCount = count;
                             <tr @onclick="@(()=>onRowSelection(currCount))">
                                 
-                                <td style="max-width:30px;"><MudIcon Icon="@(row.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Color="@(row.Uac?Color.Success:Color.Error)" Title="Pencil" /></td>
+                                <td style="text-align:center;max-width:30px;"><MudIcon Icon="@(row.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Color="@(row.Uac?Color.Success:Color.Error)" Title="Pencil" /></td>
                                 
-                                <td style="min-width:110px;">@(row.DId+" - "+ row.BId)</td>
-                                <td>@row.Date.ToShortDateString()</td>
-                                <td>@row.City</td>
-                                <td style="min-width:150px;">@row.Cat</td>
+                                <td style="text-align:center;min-width:105px;">@(row.DId+" - "+ row.BId)</td>
+                                <td style="text-align:center;max-width:90px;">@row.Date.ToString("dd/MM/yyyy")</td>
+                                <td style="text-align:center;font-size:large;min-width:100px;">@row.City</td>
+                                @if(windowWidth>500){
+                                <td style="text-align:center;font-size:large;">@row.Cat</td>
+                                }
                             </tr>
                             count++;
                         }
@@ -64,12 +69,35 @@
 
     public IList<string> ErrorsList;
     IList<Schedule> schedules;
+
+    private IJSObjectReference jsModule;
+
+    public int windowHeight, windowWidth;
+
+    public class WindowDimensions
+    {
+        public int Width { get; set; }
+        public int Height { get; set; }
+    }
     protected override async Task OnInitializedAsync()
     {
         schedules = await ApiService.GetAllSch();
         if (schedules is null)
         {
             schedules = await ApiService.GetScheduleList();
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Dimentions.js");
+        }
+        if (jsModule is not null)
+        {
+            var dimension = await jsModule.InvokeAsync<WindowDimensions>("getWindowSize");
+            windowHeight = dimension.Height;
+            windowWidth = dimension.Width;
         }
     }
     private async Task onRowSelection(int rowIndex)

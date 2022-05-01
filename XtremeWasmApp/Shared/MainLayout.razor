@@ -25,10 +25,10 @@
             <MudStack Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Start">
                     <MudIcon Icon="@(MarqData.Active?Icons.Material.Filled.LockOpen:Icons.Material.Filled.Lock)" Size="Size.Small" Color="@(MarqData.Active?Color.Success:Color.Error)" />
                     <a href="/CompanySelection">
-                        <MudText Typo="Typo.body2" Style="color:#000000;"><b>@MarqData.PCode</b> - @MarqData.PName</MudText>
+                        <MudText Typo="Typo.body2" Style="color:#000000;font-size:small;padding-top:3px;"><b>@MarqData.PCode - @MarqData.PName</b></MudText>
                         </a>
                     
-                    <MudText Typo="Typo.body2" Style="color:#000000;">@MarqData.Balance</MudText>
+                    <MudText Typo="Typo.body2" Style="color:#000000;font-size:medium;"><b>@MarqData.Balance</b></MudText>
                 </MudStack>
         }
         else
@@ -36,7 +36,7 @@
         <div Class="ml-3">Xtreme Traders</div>
         }
         <MudSpacer />
-        <MudIconButton OnClick="@((e) => ThemeCh())" Class="me-2" Color="Color.Dark" Icon="@(_isDarkMode?Icons.Material.Outlined.DarkMode:Icons.Material.Outlined.LightMode)" />
+        <MudIconButton OnClick="@((e) => ThemeCh())" Color="Color.Dark" Size="Size.Small" Icon="@(_isDarkMode?Icons.Material.Outlined.DarkMode:Icons.Material.Outlined.LightMode)" />
         <LoginDisplay />
     </MudAppBar>
     @if (selectedCompDraw)

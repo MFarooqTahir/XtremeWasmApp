@@ -5,7 +5,7 @@
         public string? PCode { get; set; }
         public string? PName { get; set; }
         public bool Active { get; set; }
-        public double Balance { get; set; }
+        public string Balance { get; set; }
         public int? DId { get; set; }
         public string? BId { get; set; }
         public string? City { get; set; }

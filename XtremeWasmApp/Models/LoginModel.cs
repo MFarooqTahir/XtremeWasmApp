@@ -7,7 +7,7 @@ namespace XtremeWasmApp.Models
         [Required]
         public string Email { get; set; }
 
-        [Required]
+        [Required, RegularExpression("[0-9]{6}", ErrorMessage = "Enter a valid 6 digit pin")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }
