@@ -1,7 +1,30 @@
 ﻿@page "/Search"
 
-<h3>SearchDigit</h3>
+<h3 style="text-align:center;">Digit Search</h3>
+<div align-center style="max-width:600px;
+  margin: auto;">
 
-@code {
+    <MudStack Row="true">
+        <MudText Align="Align.Right" Style="margin-top: 25px;padding-right:0px;margin-right:0px;">@CurrentDigit</MudText>
+        <MudNumericField HideSpinButtons="true" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true" Style="padding-left:0px;margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit" Variant="Variant.Outlined" />
+        <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl" Style="min-width:120px;" FullWidth="false">
+            <MudSelectItem Value=1>مکس</MudSelectItem>
+            <MudSelectItem Value=2>کلوز</MudSelectItem>
+            <MudSelectItem Value=3>سینٹر</MudSelectItem>
+            <MudSelectItem Value=4>بیک اوپن</MudSelectItem>
+            <MudSelectItem Value=5>سینٹر آکڑا</MudSelectItem>
+            <MudSelectItem Value=6>بیک آکڑا</MudSelectItem>
+            <MudSelectItem Value=7>بیک ٹنڈیلا</MudSelectItem>
+            <MudSelectItem Value=8>فائف ڈاٹ</MudSelectItem>
+            <MudSelectItem Value=9>سکس ڈاٹ</MudSelectItem>
+        </MudSelect>
+    </MudStack>
+    <MudStack Row="true">
+        <MudCheckBox @bind-Checked="@Limit" Size="Size.Small" Color="Color.Primary"><small>Limit</small></MudCheckBox>
+        <MudCheckBox @bind-Checked="@Demand" Size="Size.Small" Color="Color.Primary"><small>Demand</small></MudCheckBox>
+        @*<MudButton Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Search" Class="ml-2" Color="Color.Primary"></MudButton>*@
+        <MudIconButton Icon="@Icons.Material.Filled.Search" Size="Size.Large" Style="margin-left:auto;margin-right: 0;"></MudIconButton>
+    </MudStack>
+</div>
 
-}
+

@@ -5,7 +5,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager nav
 @inject IWebApiService AuthService
-
+<MudRTLProvider>
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -69,9 +69,10 @@
             </Authorized>
         </AuthorizeView>
         }
-        <MudContainer Class="mt-10 px-8" MaxWidth="MaxWidth.False">
+        <MudContainer Class="mt-5 px-8" MaxWidth="MaxWidth.False">
             @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
+</MudRTLProvider>
