@@ -66,8 +66,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td id="prz">@(TransListMixSale.Sum(x=>x.prize1)+TransListMixSchemeSale.Sum(x=>x.prize1)+TransListMixSchemePercSale.Sum(x=>x.prize1))</td>
-                                <td id="prz">@(TransListMixSale.Sum(x=>x.prize2)+TransListMixSchemeSale.Sum(x=>x.prize2)+TransListMixSchemePercSale.Sum(x=>x.prize2))</td>
+                                <td id="prz">@((TransListMixSale.Sum(x=>x.prize1)+TransListMixSchemeSale.Sum(x=>x.prize1)+TransListMixSchemePercSale.Sum(x=>x.prize1)).ToString("C",numberFormat))</td>
+                                <td id="prz">@((TransListMixSale.Sum(x=>x.prize2)+TransListMixSchemeSale.Sum(x=>x.prize2)+TransListMixSchemePercSale.Sum(x=>x.prize2)).ToString("C",numberFormat))</td>
                             </tr>
                         </tbody>
                     </MudSimpleTable>
@@ -90,8 +90,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td id="prz">@(TransListMixPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1))</td>
-                                <td id="prz">@(TransListMixPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2))</td>
+                                <td id="prz">@((TransListMixPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)).ToString("C",numberFormat))</td>
+                                <td id="prz">@((TransListMixPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)).ToString("C",numberFormat))</td>
                             </tr>
                         </tbody>
                     </MudSimpleTable>
@@ -110,8 +110,8 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td id="prz">@((TransListMixSale.Sum(x=>x.prize1)+TransListMixSchemeSale.Sum(x=>x.prize1)+TransListMixSchemePercSale.Sum(x=>x.prize1))-(TransListMixPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)))</td>
-                                <td id="prz">@((TransListMixSale.Sum(x=>x.prize2)+TransListMixSchemeSale.Sum(x=>x.prize2)+TransListMixSchemePercSale.Sum(x=>x.prize2))-(TransListMixPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)))</td>
+                                <td id="prz">@(((TransListMixSale.Sum(x=>x.prize1)+TransListMixSchemeSale.Sum(x=>x.prize1)+TransListMixSchemePercSale.Sum(x=>x.prize1))-(TransListMixPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1))).ToString("C",numberFormat))</td>
+                                <td id="prz">@(((TransListMixSale.Sum(x=>x.prize2)+TransListMixSchemeSale.Sum(x=>x.prize2)+TransListMixSchemePercSale.Sum(x=>x.prize2))-(TransListMixPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2))).ToString("C",numberFormat))</td>
                             </tr>
                         </tbody>
                     </MudSimpleTable>

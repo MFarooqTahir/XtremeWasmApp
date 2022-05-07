@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 
+using System.Globalization;
+
 using XtremeModels;
 
 using XtremeWasmApp.Services;
@@ -17,7 +19,8 @@ namespace XtremeWasmApp.Pages
         private IEnumerable<TransSearch> TransListMixPurc { get; set; }
         private IEnumerable<TransSearch> TransListMixSchemePurc { get; set; }
         private IEnumerable<TransSearch> TransListMixSchemePercPurc { get; set; }
-
+        private CultureInfo Curr = new CultureInfo("hi-IN");
+        private NumberFormatInfo numberFormat { get; set; }
         private bool ResultNotFound = false;
         private string CurrentDigit;
         private string? SearchText;
@@ -87,6 +90,14 @@ namespace XtremeWasmApp.Pages
             }
         }
 
+        protected override void OnInitialized()
+        {
+            numberFormat = Curr.NumberFormat;
+
+            numberFormat.CurrencySymbol = "";
+            base.OnInitialized();
+        }
+
         private async Task OnSearchClick()
         {
             //        { "1SL", "S Mix" },
@@ -114,8 +125,8 @@ namespace XtremeWasmApp.Pages
                 TransListMixSchemePurc = TransListPurchase.Where(x => string.Equals(x.Vid, "P M.Sc", StringComparison.OrdinalIgnoreCase));
                 TransListMixSchemePercPurc = TransListPurchase.Where(x => string.Equals(x.Vid, "P P.Sc", StringComparison.OrdinalIgnoreCase));
                 Anypurchase = TransListPurchase.Any();
-                Anypurchase = TransListSale.Any();
-                ResultNotFound = !Anypurchase && !Anypurchase;
+                AnySale = TransListSale.Any();
+                ResultNotFound = !Anypurchase && !AnySale;
 
                 duplicate();
             }

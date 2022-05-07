@@ -1,4 +1,5 @@
-﻿@using XtremeModels
+﻿@using System.Globalization
+@using XtremeModels
 <style>
     tfoot tr{
             background-color: var(--mud-palette-surface);
@@ -19,9 +20,9 @@
         <thead>
             <tr>
                 <th style="width:40px; max-width:40px;">L/D</th>
-                <th class="ml-n5">Vno</th>
-                <th>Prize 1</th>
-                <th>Prize 2</th>
+                <th style="text-align:center" class="ml-n5">Inv#</th>
+                <th style="text-align:right">1<sup>st</sup> Prize</th>
+                <th style="text-align:right">2<sup>nd</sup> Prize</th>
             </tr>
         </thead>
         <tbody>
@@ -29,19 +30,19 @@
             {
                 <tr>
                     <td>@TransSearchItem.lb</td>
-                    <td class="ml-n1">@TransSearchItem.Vno</td>
-                    <td>@TransSearchItem.prize1</td>
-                    <td>@TransSearchItem.prize2</td>
+                    <td style="text-align:center" class="ml-n1">@TransSearchItem.Vno</td>
+                    <td style="text-align:right">@TransSearchItem.prize1.ToString("C",numberFormat)</td>
+                    <td style="text-align:right">@TransSearchItem.prize2.ToString("C",numberFormat)</td>
                 </tr>
             }
-
+            
         </tbody>
         <tfoot>
             <tr>
                 <td></td>
                 <td></td>
-                <td>@SourceList.Sum(x=>x.prize1)</td>
-                <td>@SourceList.Sum(x=>x.prize1)</td>
+                <td style="text-align:right">@SourceList.Sum(x=>x.prize1).ToString("C",numberFormat)</td>
+                <td style="text-align:right">@SourceList.Sum(x=>x.prize1).ToString("C",numberFormat)</td>
             </tr>
         </tfoot>
     </MudSimpleTable>
@@ -51,4 +52,13 @@
     public IEnumerable<TransSearch>? SourceList { get; set; }
     [Parameter]
     public string Title { get; set; }
+    private CultureInfo Curr = new CultureInfo("hi-IN");
+    private NumberFormatInfo numberFormat { get; set; }
+    protected override void OnInitialized()
+		{
+			numberFormat = Curr.NumberFormat;
+
+			numberFormat.CurrencySymbol = "";
+			base.OnInitialized();
+		}
 }
