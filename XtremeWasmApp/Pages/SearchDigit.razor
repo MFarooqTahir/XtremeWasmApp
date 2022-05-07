@@ -1,30 +1,154 @@
 ﻿@page "/Search"
+@using XtremeModels
 
-<h3 style="text-align:center;">Digit Search</h3>
-<div align-center style="max-width:600px;
+<style>
+    #prz {
+  text-align: center;
+}
+</style>
+<AuthorizeView>
+    <Authorized>
+        <h3 style="text-align:center;">Digit Search(Sample Data)</h3>
+        <div align-center style="max-width:650px;
   margin: auto;">
 
-    <MudStack Row="true">
-        <MudText Align="Align.Right" Style="margin-top: 25px;padding-right:0px;margin-right:0px;">@CurrentDigit</MudText>
-        <MudNumericField HideSpinButtons="true" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true" Style="padding-left:0px;margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit" Variant="Variant.Outlined" />
-        <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl" Style="min-width:120px;" FullWidth="false">
-            <MudSelectItem Value=1>مکس</MudSelectItem>
-            <MudSelectItem Value=2>کلوز</MudSelectItem>
-            <MudSelectItem Value=3>سینٹر</MudSelectItem>
-            <MudSelectItem Value=4>بیک اوپن</MudSelectItem>
-            <MudSelectItem Value=5>سینٹر آکڑا</MudSelectItem>
-            <MudSelectItem Value=6>بیک آکڑا</MudSelectItem>
-            <MudSelectItem Value=7>بیک ٹنڈیلا</MudSelectItem>
-            <MudSelectItem Value=8>فائف ڈاٹ</MudSelectItem>
-            <MudSelectItem Value=9>سکس ڈاٹ</MudSelectItem>
-        </MudSelect>
-    </MudStack>
-    <MudStack Row="true">
-        <MudCheckBox @bind-Checked="@Limit" Size="Size.Small" Color="Color.Primary"><small>Limit</small></MudCheckBox>
-        <MudCheckBox @bind-Checked="@Demand" Size="Size.Small" Color="Color.Primary"><small>Demand</small></MudCheckBox>
-        @*<MudButton Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Search" Class="ml-2" Color="Color.Primary"></MudButton>*@
-        <MudIconButton Icon="@Icons.Material.Filled.Search" Size="Size.Large" Style="margin-left:auto;margin-right: 0;"></MudIconButton>
-    </MudStack>
-</div>
+            <MudStack Row="true">
+                @*<MudText Align="Align.Right" Style="margin-top: 25px;padding-right:0px;margin-right:0px;">@CurrentDigit</MudText>*@
 
+                <MudTextField HideSpinButtons="true" Mask="@(new PatternMask(new string('0', @SearchLimit)))" Adornment="Adornment.Start"
+                              Clearable="true" AdornmentColor="Color.Surface" AdornmentText="@(CurrentDigit)" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true"
+                              Style="margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit"
+                              Variant="Variant.Outlined" />
 
+                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl" Style="min-width:120px;" FullWidth="false">
+                    <MudSelectItem Value=1>مکس</MudSelectItem>
+                    <MudSelectItem Value=2>کلوز</MudSelectItem>
+                    <MudSelectItem Value=3>سینٹر</MudSelectItem>
+                    <MudSelectItem Value=4>بیک اوپن</MudSelectItem>
+                    <MudSelectItem Value=5>سینٹر آکڑا</MudSelectItem>
+                    <MudSelectItem Value=6>بیک آکڑا</MudSelectItem>
+                    <MudSelectItem Value=7>بیک ٹنڈیلا</MudSelectItem>
+                    <MudSelectItem Value=8>فائف ڈاٹ</MudSelectItem>
+                    <MudSelectItem Value=9>سکس ڈاٹ</MudSelectItem>
+                </MudSelect>
+            </MudStack>
+            <MudStack Row="true">
+                <MudCheckBox @bind-Checked="@Limit" Size="Size.Small" Color="Color.Primary"><small>Limit</small></MudCheckBox>
+                <MudCheckBox @bind-Checked="@Demand" Size="Size.Small" Color="Color.Primary"><small>Demand</small></MudCheckBox>
+                @*<MudButton Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Search" Class="ml-2" Color="Color.Primary"></MudButton>*@
+                <MudIconButton OnClick="OnSearchClick" Icon="@Icons.Material.Filled.Search" Size="Size.Large" Style="margin-left:auto;margin-right: 0;"></MudIconButton>
+            </MudStack>
+            @if (loading)
+            {
+                <MudText Typo="Typo.h4" Align="Align.Center">Loading...</MudText>
+            }
+            else if (ResultNotFound)
+            {
+                <MudText Typo="Typo.h4" Align="Align.Center">No Results</MudText>
+            }
+            else
+            {
+                @if (AnySale)
+                {
+                <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                <XtremeWasmApp.Components.TransSearchTable Title="Mix Sale" SourceList="@TransListMixSale" />
+                <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Sale" SourceList="@TransListMixSchemeSale" />
+                <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Sale" SourceList="@TransListMixSchemePercSale" />
+
+                
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Sales Total</MudText>
+                    <MudSimpleTable Bordered="true">
+                        <thead>
+                            <tr>
+                                <th id="prz">Prize 1</th>
+                                <th id="prz">Prize 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="prz">@(TransListMixSale.Sum(x=>x.prize1)+TransListMixSchemeSale.Sum(x=>x.prize1)+TransListMixSchemePercSale.Sum(x=>x.prize1))</td>
+                                <td id="prz">@(TransListMixSale.Sum(x=>x.prize2)+TransListMixSchemeSale.Sum(x=>x.prize2)+TransListMixSchemePercSale.Sum(x=>x.prize2))</td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudPaper>
+                }
+                 @if (Anypurchase)
+                {
+                <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                <XtremeWasmApp.Components.TransSearchTable Title="Mix Purchase" SourceList="@TransListMixPurc" />
+                <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Purchase" SourceList="@TransListMixSchemePurc" />
+                <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Purchase" SourceList="@TransListMixSchemePercPurc" />
+               
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Sales Total</MudText>
+                    <MudSimpleTable Bordered="true">
+                        <thead>
+                            <tr>
+                                <th id="prz">Prize 1</th>
+                                <th id="prz">Prize 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="prz">@(TransListMixPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1))</td>
+                                <td id="prz">@(TransListMixPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2))</td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudPaper>
+                }
+                
+                @if (Anypurchase || AnySale)
+                {
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;margin-bottom:5px;">Update Digit</MudText>
+                    <MudSimpleTable Style="margin-bottom:15px;" Bordered="true">
+                        <thead>
+                            <tr>
+                                <th id="prz">Prize 1</th>
+                                <th id="prz">Prize 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="prz">@((TransListMixSale.Sum(x=>x.prize1)+TransListMixSchemeSale.Sum(x=>x.prize1)+TransListMixSchemePercSale.Sum(x=>x.prize1))-(TransListMixPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)+TransListMixSchemePercPurc.Sum(x=>x.prize1)))</td>
+                                <td id="prz">@((TransListMixSale.Sum(x=>x.prize2)+TransListMixSchemeSale.Sum(x=>x.prize2)+TransListMixSchemePercSale.Sum(x=>x.prize2))-(TransListMixPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)+TransListMixSchemePercPurc.Sum(x=>x.prize2)))</td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                }
+            }
+            @*<MudDataGrid T="TransSearch" Items="@TransListPurchase" Hideable="true" Pa>
+                <ToolBarContent>
+                <MudText Typo="Typo.h6" Align=Align.Center>Sales List</MudText>
+                <MudSpacer />
+                </ToolBarContent>
+                <Columns>
+                <Column T="TransSearch" Field="@nameof(TransSearch.Vid)" Title="Category" />
+                <Column T="TransSearch" Field="@nameof(TransSearch.lb)" Title="Limt / Demand">
+                <CellTemplate Context="conx">
+                @(
+                conx.Item.lb switch
+                {
+                LimDem.L=> "Limit",
+
+                LimDem.D=> "Demand",
+                _=> "Mix"
+                }
+                )
+                </CellTemplate>
+                </Column>
+                <Column T="TransSearch" Field="@nameof(TransSearch.Vno)" Title="Vno" />
+                <Column T="TransSearch" Field="@nameof(TransSearch.prize1)" Title="Prize 1" />
+                <Column T="TransSearch" Field="@nameof(TransSearch.prize2)" Title="Prize 2" />
+                </Columns>
+                <PagerContent>
+                <MudDataGridPager DisableRowsPerPage=true PageSizeOptions="@(new int[]{5})" T="TransSearch" />
+                </PagerContent>
+                </MudDataGrid>
+                <MudText Align=Align.Right>
+                <b>Total Prize 1: </b>@TransListPurchase.Sum(x => x.prize1), <b>Total Prize 2: </b>@TransListPurchase.Sum(x => x.prize2), <b>Grand Total: </b>@TransListPurchase.Sum(x => x.prize1+x.prize2)
+                </MudText>*@
+        </div>
+    </Authorized>
+
+</AuthorizeView>

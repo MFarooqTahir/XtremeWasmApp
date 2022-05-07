@@ -1,0 +1,54 @@
+﻿@using XtremeModels
+<style>
+    tfoot tr{
+            background-color: var(--mud-palette-surface);
+        
+    }
+        tfoot tr td
+        {
+            border-top: 1px solid var(--mud-palette-table-lines);
+            background-color: var(--mud-palette-surface);
+            position: sticky;
+            bottom: 0;
+        }
+</style>
+@if (SourceList?.Any() == true)
+{
+    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">@Title</MudText>
+    <MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="height:250px;margin-top:5px;" Class="rounded-0">
+        <thead>
+            <tr>
+                <th style="width:40px; max-width:40px;">L/D</th>
+                <th class="ml-n5">Vno</th>
+                <th>Prize 1</th>
+                <th>Prize 2</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var TransSearchItem in SourceList)
+            {
+                <tr>
+                    <td>@TransSearchItem.lb</td>
+                    <td class="ml-n1">@TransSearchItem.Vno</td>
+                    <td>@TransSearchItem.prize1</td>
+                    <td>@TransSearchItem.prize2</td>
+                </tr>
+            }
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>@SourceList.Sum(x=>x.prize1)</td>
+                <td>@SourceList.Sum(x=>x.prize1)</td>
+            </tr>
+        </tfoot>
+    </MudSimpleTable>
+}
+@code {
+    [Parameter]
+    public IEnumerable<TransSearch>? SourceList { get; set; }
+    [Parameter]
+    public string Title { get; set; }
+}

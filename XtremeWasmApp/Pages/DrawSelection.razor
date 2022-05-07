@@ -23,7 +23,7 @@
         {
             if (schedules.Any())
             {
-                <MudSimpleTable Style="overflow-x: auto;">
+                <MudSimpleTable Striped="true" Hover="true" FixedHeader="true" Style="overflow-x: auto;">
                     <thead>
                         <tr>
                             <th></th>
@@ -95,9 +95,14 @@
         }
         if (jsModule is not null)
         {
+            var (prevHeight, prevWidth) = (windowHeight, windowWidth);
             var dimension = await jsModule.InvokeAsync<WindowDimensions>("getWindowSize");
             windowHeight = dimension.Height;
             windowWidth = dimension.Width;
+            if((prevHeight, prevWidth) != (windowHeight, windowWidth))
+            {
+                StateHasChanged();
+            }
         }
     }
     private async Task onRowSelection(int rowIndex)

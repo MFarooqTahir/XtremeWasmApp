@@ -7,7 +7,7 @@
         public int prize1 { get; set; }
         public int prize2 { get; set; }
         public PrizeType Type { get; set; }
-        public LimDem LB { get; set; }
+        public LimDem lb { get; set; }
     }
 
     public enum LimDem

@@ -112,7 +112,7 @@ namespace XtremeWasmApp.Services
 
                         case LinkType.Invoice:
                             ur = await GetInvLink().ConfigureAwait(false);
-                            await SetDataLink(ur).ConfigureAwait(false);
+                            await SetInvLink(ur).ConfigureAwait(false);
                             baseUri = _httpData.InvoiceLink;
                             break;
                     }
@@ -256,6 +256,29 @@ namespace XtremeWasmApp.Services
                     PName = cdRel.UName,
                     Uac = sch.Uac,
                 };
+            }
+            return null;
+        }
+
+        public async Task<IEnumerable<TransSearch>?> GetTransSearch(string searchText, LimDem limDem)
+        {
+            return new List<TransSearch>()
+            {
+                new(){
+                    lb=LimDem.L,
+                    prize1=12341,
+                    prize2=91151,
+                    Type=PrizeType.S,
+                    Vid="S Mix",
+                    Vno=9,
+                },
+            };
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                var cdrel = await GetCdrel().ConfigureAwait(false);
+
+                var res = await SendHttpRequest<ResultSet<List<TransSearch>?>?>($"api/Inv/SearchTrans/{cdrel.rCode}/{searchText}/{(int)limDem}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                return res?.ResultObj;
             }
             return null;
         }

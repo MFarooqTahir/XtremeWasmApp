@@ -37,6 +37,7 @@ namespace XtremeWasmApp.Services
         Task<bool> ChangeSchedule(Schedule CurrSelectedSch);
 
         Task<IEnumerable<CDRelation>?> GetCdRelations();
+        Task<IEnumerable<TransSearch>?> GetTransSearch(string searchText, LimDem limDem);
 
         //Task<bool?> GetFALoggedIn();
 
