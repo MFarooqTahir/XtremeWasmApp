@@ -13,12 +13,14 @@ namespace XtremeWasmApp.Pages
         [Inject]
         private IWebApiService _api { get; set; }
 
-        private IEnumerable<TransSearch> TransListMixSale { get; set; }
-        private IEnumerable<TransSearch> TransListMixSchemeSale { get; set; }
-        private IEnumerable<TransSearch> TransListMixSchemePercSale { get; set; }
-        private IEnumerable<TransSearch> TransListMixPurc { get; set; }
-        private IEnumerable<TransSearch> TransListMixSchemePurc { get; set; }
-        private IEnumerable<TransSearch> TransListMixSchemePercPurc { get; set; }
+        private IEnumerable<TransSearch>? TransListSale { get; set; }
+        private IEnumerable<TransSearch>? TransListPurchase { get; set; }
+        private IEnumerable<TransSearch>? TransListMixSale { get; set; }
+        private IEnumerable<TransSearch>? TransListMixSchemeSale { get; set; }
+        private IEnumerable<TransSearch>? TransListMixSchemePercSale { get; set; }
+        private IEnumerable<TransSearch>? TransListMixPurc { get; set; }
+        private IEnumerable<TransSearch>? TransListMixSchemePurc { get; set; }
+        private IEnumerable<TransSearch>? TransListMixSchemePercPurc { get; set; }
         private CultureInfo Curr = new CultureInfo("hi-IN");
         private NumberFormatInfo numberFormat { get; set; }
         private bool ResultNotFound = false;
@@ -109,13 +111,21 @@ namespace XtremeWasmApp.Pages
             //        { "1SM", "S M.Sc" },
             //        { "2SM", "P M.Sc" },
             loading = true;
+            TransListPurchase = null;
+            TransListSale = null;
+            TransListMixSchemeSale = null;
+            TransListMixSchemePercSale = null;
+            TransListMixPurc = null;
+            TransListMixSale = null;
+            TransListMixSchemePurc = null;
+            TransListMixSchemePercPurc = null;
 
             var transSearches = await _api.GetTransSearch(CurrentDigit + SearchText, LimDemVal);
             loading = false;
             if (transSearches is not null)
             {
-                var TransListPurchase = transSearches.Where(x => x.Type == PrizeType.P);
-                var TransListSale = transSearches.Where(x => x.Type == PrizeType.S);
+                TransListPurchase = transSearches.Where(x => x.Type == PrizeType.P);
+                TransListSale = transSearches.Where(x => x.Type == PrizeType.S);
 
                 TransListMixSale = TransListSale.Where(x => string.Equals(x.Vid, "S Mix", StringComparison.OrdinalIgnoreCase));
                 TransListMixSchemeSale = TransListSale.Where(x => string.Equals(x.Vid, "S M.Sc", StringComparison.OrdinalIgnoreCase));
@@ -127,8 +137,6 @@ namespace XtremeWasmApp.Pages
                 Anypurchase = TransListPurchase.Any();
                 AnySale = TransListSale.Any();
                 ResultNotFound = !Anypurchase && !AnySale;
-
-                duplicate();
             }
             else
             {
@@ -172,94 +180,6 @@ namespace XtremeWasmApp.Pages
 
                 _demand = value;
             }
-        }
-
-        private void duplicate()
-        {
-            AnySale = true;
-            Anypurchase = true;
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-            TransListMixSale = TransListMixSale.Append(TransListMixSale.First());
-
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-            TransListMixSchemeSale = TransListMixSchemeSale.Append(TransListMixSchemeSale.First());
-
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-            TransListMixSchemePercSale = TransListMixSchemePercSale.Append(TransListMixSchemePercSale.First());
-
-            TransListMixPurc = TransListMixPurc.Append(TransListMixSale.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-            TransListMixPurc = TransListMixPurc.Append(TransListMixPurc.First());
-
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSale.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-            TransListMixSchemePurc = TransListMixSchemePurc.Append(TransListMixSchemePurc.First());
-
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSale.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
-            TransListMixSchemePercPurc = TransListMixSchemePercPurc.Append(TransListMixSchemePercPurc.First());
         }
     }
 }

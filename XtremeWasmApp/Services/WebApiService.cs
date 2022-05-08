@@ -262,17 +262,6 @@ namespace XtremeWasmApp.Services
 
         public async Task<IEnumerable<TransSearch>?> GetTransSearch(string searchText, LimDem limDem)
         {
-            return new List<TransSearch>()
-            {
-                new(){
-                    lb=LimDem.L,
-                    prize1=12341,
-                    prize2=91151,
-                    Type=PrizeType.S,
-                    Vid="S Mix",
-                    Vno=9,
-                },
-            };
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 var cdrel = await GetCdrel().ConfigureAwait(false);
