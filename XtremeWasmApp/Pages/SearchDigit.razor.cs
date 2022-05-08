@@ -118,6 +118,7 @@ namespace XtremeWasmApp.Pages
             TransListMixPurc = null;
             TransListMixSale = null;
             TransListMixSchemePurc = null;
+
             TransListMixSchemePercPurc = null;
 
             var transSearches = await _api.GetTransSearch(CurrentDigit + SearchText, LimDemVal);
