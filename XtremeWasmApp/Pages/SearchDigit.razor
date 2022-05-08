@@ -80,7 +80,7 @@
                 <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Purchase" SourceList="@TransListMixSchemePurc" />
                 <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Purchase" SourceList="@TransListMixSchemePercPurc" />
                
-                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Sales Total</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Purchase Total</MudText>
                     <MudSimpleTable Bordered="true">
                         <thead>
                             <tr>
@@ -91,7 +91,7 @@
                         <tbody>
                             <tr>
                                 <td id="prz">@((TransListPurchase?.Sum(x=>x.prize1)??0).ToString("C",numberFormat))</td>
-                                <td id="prz">@((TransListPurchase?.Sum(x=>x.prize1)??0).ToString("C",numberFormat))</td>
+                                <td id="prz">@((TransListPurchase?.Sum(x=>x.prize2)??0).ToString("C",numberFormat))</td>
                             </tr>
                         </tbody>
                     </MudSimpleTable>

@@ -265,8 +265,8 @@ namespace XtremeWasmApp.Services
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 var cdrel = await GetCdrel().ConfigureAwait(false);
-
-                var res = await SendHttpRequest<ResultSet<List<TransSearch>?>?>($"api/Inv/SearchTrans/{cdrel.rCode}/{searchText}/{(int)limDem}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                var inl = (int)limDem;
+                var res = await SendHttpRequest<ResultSet<List<TransSearch>?>?>($"api/Inv/SearchTrans/{cdrel.rCode}/{searchText}/{inl}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                 return res?.ResultObj;
             }
             return null;
