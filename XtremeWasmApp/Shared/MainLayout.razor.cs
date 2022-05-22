@@ -36,6 +36,11 @@ namespace XtremeWasmApp.Shared
             return true;
         }
 
+        private void ontopclick()
+        {
+            nav.NavigateTo("/DrawSelection?onlyactive=true", true);
+        }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             var currMarq = MarqSet;

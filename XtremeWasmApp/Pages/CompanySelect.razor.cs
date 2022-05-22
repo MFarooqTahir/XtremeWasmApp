@@ -63,8 +63,8 @@ namespace XtremeWasmApp.Pages
 
         private async Task onRowSelection(int rowIndex)
         {
+            await ApiService.SetDrawSelected(value: false);
             var currSel = CompanyList[rowIndex];
-            await ApiService.SetDrawSelected(false);
             var res = await ApiService.ChangeCompany(currSel);
             if (!res.Item1)
             {

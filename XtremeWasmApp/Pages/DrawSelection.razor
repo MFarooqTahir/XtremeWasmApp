@@ -67,7 +67,8 @@
 </AuthorizeView>
 @code {
     [Parameter]
-    public bool OnlyActive{ get; set; }
+    public string onlyactive{ get; set; }
+    
     public IList<string> ErrorsList;
     IList<Schedule> schedules;
 
@@ -85,7 +86,7 @@
         schedules = await ApiService.GetAllSch();
         if (schedules is null)
         {
-            bool GetAll = OnlyActive || !await ApiService.IsDrawSelected();
+            bool GetAll = string.Equals(onlyactive,"true",StringComparison.CurrentCultureIgnoreCase) || !await ApiService.IsDrawSelected();
             
             schedules = await ApiService.GetScheduleList(GetAll);
         }

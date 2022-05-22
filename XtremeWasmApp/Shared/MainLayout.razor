@@ -55,14 +55,14 @@
         {
             <AuthorizeView>
             <Authorized>
-            <MudPaper onclick="@(()=>nav.NavigateTo("/DrawSelection?OnlyActive=true",true))" Elevation="3" Class="py-3" Outlined="true">
+            <MudPaper onclick="@ontopclick" Elevation="3" Class="py-3" Outlined="true">
                 
-                <MudStack Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Center">
-                <MudIcon Icon="@(MarqData.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Size="Size.Small" Color="@(MarqData.Uac?Color.Success:Color.Error)" Title="Pencil" />
-                    <MudText Typo="Typo.body2"><b>@MarqData.DId - @MarqData.BId</b></MudText>
-                    <MudText Typo="Typo.body2"><b>@MarqData.Category</b></MudText>
-                    <MudText Typo="Typo.body2"><b>@MarqData.City</b></MudText>
-                    <MudText Typo="Typo.body2"><b>@MarqData.Date</b></MudText>
+                <MudStack onclick="@ontopclick" Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Center">
+                <MudIcon onclick="@ontopclick" Icon="@(MarqData.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Size="Size.Small" Color="@(MarqData.Uac?Color.Success:Color.Error)" Title="Pencil" />
+                    <MudText onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.DId - @MarqData.BId</b></MudText>
+                    <MudText onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Category</b></MudText>
+                    <MudText onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.City</b></MudText>
+                    <MudText onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Date</b></MudText>
                 </MudStack>
             </MudPaper>
             
