@@ -16,10 +16,10 @@ using XtremeWasmApp.Services;
 
 #if DEBUG
 //var HttpDataVar = new HttpData() { BaseAddress = new("http://localhost:2144/") };
-var HttpDataVar = new HttpData() { BaseAddress = new("https://xt.discreetnotation.com:8445/") };
+var HttpDataVar = new HttpData() { BaseAddress = new("http://localhost:2144/") };
 
 #elif RELEASE
-var HttpDataVar = new HttpData() { BaseAddress = new("https://xt.discreetnotation.com:8445/") };
+var HttpDataVar = new HttpData() { BaseAddress = new("https://pbtsweb.azurewebsites.net/") };
 #endif
 var cli = new HttpClient();
 cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
