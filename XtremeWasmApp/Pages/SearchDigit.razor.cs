@@ -28,7 +28,7 @@ namespace XtremeWasmApp.Pages
         private string? SearchText;
         private int _dropSel = 1;
         private int SearchLimit = 4;
-        private bool SearchingDisabled => SearchText?.Length != SearchLimit;
+        private bool SearchingDisabled => DropSel == 1 ? SearchText?.Length == 0 : SearchText?.Length < SearchLimit;
         private bool _limit = true, _demand = false, loading = false, AnySale = false, Anypurchase = false;
         private LimDem LimDemVal => CalculateLimDem();
 
