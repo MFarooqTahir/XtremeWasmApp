@@ -404,7 +404,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<bool> IsCompanySelected() => await _localStorage.GetItemAsync<bool>("IsCompSel").ConfigureAwait(false);
 
-        private async Task SetDrawSelected(bool value) => await _localStorage.SetItemAsync("IsDrawSel", value).ConfigureAwait(false);
+        public async Task SetDrawSelected(bool value) => await _localStorage.SetItemAsync("IsDrawSel", value).ConfigureAwait(false);
 
         public async Task<bool> IsDrawSelected()
         {
