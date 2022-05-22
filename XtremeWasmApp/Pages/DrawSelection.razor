@@ -66,7 +66,6 @@
     </Authorized>
 </AuthorizeView>
 @code {
-
     public IList<string> ErrorsList;
     IList<Schedule> schedules;
 
@@ -84,7 +83,9 @@
         schedules = await ApiService.GetAllSch();
         if (schedules is null)
         {
-            schedules = await ApiService.GetScheduleList();
+            bool GetAll = !await ApiService.IsDrawSelected();
+            
+            schedules = await ApiService.GetScheduleList(GetAll);
         }
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)

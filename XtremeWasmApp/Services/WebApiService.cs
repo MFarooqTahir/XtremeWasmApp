@@ -336,11 +336,11 @@ namespace XtremeWasmApp.Services
             return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F2", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
         }
 
-        public async Task<IList<Schedule>> GetScheduleList()
+        public async Task<IList<Schedule>> GetScheduleList(bool notall)
         {
             try
             {
-                var getting = await SendHttpRequest<ResultSet<List<Schedule>>>("api/Data/GetScheduleList/false", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                var getting = await SendHttpRequest<ResultSet<List<Schedule>>>($"api/Data/GetScheduleList/{notall}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var resObj = getting.ResultObj;
                 await SetAllSch(resObj).ConfigureAwait(false);
                 return resObj;
