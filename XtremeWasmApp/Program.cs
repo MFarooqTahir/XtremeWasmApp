@@ -16,7 +16,7 @@ using XtremeWasmApp.Services;
 
 #if DEBUG
 //var HttpDataVar = new HttpData() { BaseAddress = new("http://localhost:2144/") };
-var HttpDataVar = new HttpData() { BaseAddress = new("http://localhost:2144/") };
+var HttpDataVar = new HttpData() { BaseAddress = new("https://pbtsweb.azurewebsites.net/") };
 
 #elif RELEASE
 var HttpDataVar = new HttpData() { BaseAddress = new("https://pbtsweb.azurewebsites.net/") };

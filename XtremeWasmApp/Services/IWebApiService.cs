@@ -28,7 +28,7 @@ namespace XtremeWasmApp.Services
 
         Task<bool> IsDrawSelected();
 
-        Task<bool> ChangeCompany(CDRelation cDRelation);
+        Task<(bool, string)> ChangeCompany(CDRelation cDRelation);
 
         Task<IList<Schedule>> GetAllSch();
 

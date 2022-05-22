@@ -149,7 +149,7 @@ namespace XtremeWasmApp.Services
             }
         }
 
-        public async Task<bool> ChangeCompany(CDRelation cDRelation)
+        public async Task<(bool, string)> ChangeCompany(CDRelation cDRelation)
         {
             try
             {
@@ -162,13 +162,13 @@ namespace XtremeWasmApp.Services
                 var res = await SendHttpRequest<ResultSet<Company>>($"api/Company/GetCompanyDetails/{cDRelation.CompanyID}", RequestType.Get).ConfigureAwait(false);
                 if (res?.ResultObj is null)
                 {
-                    return false;
+                    return (false, "Error in changing company");
                 }
                 var Company = res.ResultObj;
                 var newToken = await SendHttpRequest<string>($"api/Login/ChangeCompany/0/{cDRelation.CompanyID}", RequestType.Get).ConfigureAwait(false);
                 if (newToken is null)
                 {
-                    return false;
+                    return (false, "Error in changing company");
                 }
                 await ChangeToken(newToken).ConfigureAwait(false);
 
@@ -179,11 +179,11 @@ namespace XtremeWasmApp.Services
                 var DashData = DashDataRes?.ResultObj;
                 if (DashData is null)
                 {
-                    return false;
+                    return (false, "Error. There might be no active draws for this company");
                 }
                 if (DashData.party is null || DashData.sch is null)
                 {
-                    return false;
+                    return (false, "There was an error in getting the data. Please try again later");
                 }
                 await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
                 bool SelShedule = DashData.sch?.Count > 1;
@@ -200,7 +200,7 @@ namespace XtremeWasmApp.Services
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                         if (!resl.ResultObj)
                         {
-                            return false;
+                            return (false, "Error occured, the draw is not available");
                         }
                         ExtraBalance = (await SendHttpRequest<ResultSet<int>>($"api/Inv/GetOtherBalance/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false)).ResultObj;
                     }
@@ -221,11 +221,11 @@ namespace XtremeWasmApp.Services
                 {
                     _navigationManager.NavigateTo("/");
                 }
-                return true;
+                return (true, "");
             }
             catch (Exception ex)
             {
-                return false;
+                return (false, "Critical error occured");
             }
         }
 

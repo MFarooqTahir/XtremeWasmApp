@@ -65,9 +65,9 @@ namespace XtremeWasmApp.Pages
         {
             var currSel = CompanyList[rowIndex];
             var res = await ApiService.ChangeCompany(currSel);
-            if (!res)
+            if (!res.Item1)
             {
-                ErrorsList = new List<string>() { "Error changing company" };
+                ErrorsList = new List<string>() { res.Item2 };
                 StateHasChanged();
             }
             //if (currSel.Block || currSel.rBlocked)
