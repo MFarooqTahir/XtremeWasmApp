@@ -7,7 +7,7 @@ namespace XtremeWasmApp.Models
         [Required]
         public string Email { get; set; }
 
-        [Required, RegularExpression(@"\w{6}", ErrorMessage = "Password must be atleast 6 characters long")]
+        [Required, RegularExpression(".{6,}", ErrorMessage = "Password must be atleast 6 characters long")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }
