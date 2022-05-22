@@ -28,6 +28,7 @@ namespace XtremeWasmApp.Pages
         private string? SearchText;
         private int _dropSel = 1;
         private int SearchLimit = 4;
+        private bool SearchingDisabled => DropSel == 5 && SearchText?.Length == SearchLimit;
         private bool _limit = true, _demand = false, loading = false, AnySale = false, Anypurchase = false;
         private LimDem LimDemVal => CalculateLimDem();
 
@@ -87,7 +88,8 @@ namespace XtremeWasmApp.Pages
                 }
                 if (SearchText?.Length > SearchLimit)
                 {
-                    SearchText = SearchText[0..SearchLimit];
+                    SearchText = SearchText[..SearchLimit];
+                    StateHasChanged();
                 }
             }
         }
@@ -110,6 +112,7 @@ namespace XtremeWasmApp.Pages
             //        { "2RS", "P R.Sc" },
             //        { "1SM", "S M.Sc" },
             //        { "2SM", "P M.Sc" },
+
             loading = true;
             TransListPurchase = null;
             TransListSale = null;

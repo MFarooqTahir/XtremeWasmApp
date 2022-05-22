@@ -36,7 +36,7 @@
                 <MudCheckBox @bind-Checked="@Limit" Size="Size.Small" Color="Color.Primary"><small>Limit</small></MudCheckBox>
                 <MudCheckBox @bind-Checked="@Demand" Size="Size.Small" Color="Color.Primary"><small>Demand</small></MudCheckBox>
                 @*<MudButton Variant="Variant.Filled" Size="Size.Small" StartIcon="@Icons.Material.Filled.Search" Class="ml-2" Color="Color.Primary"></MudButton>*@
-                <MudIconButton OnClick="OnSearchClick" Icon="@Icons.Material.Filled.Search" Size="Size.Large" Style="margin-left:auto;margin-right: 0;"></MudIconButton>
+                <MudIconButton OnClick="OnSearchClick" Disabled="@SearchingDisabled" Icon="@Icons.Material.Filled.Search" Size="Size.Large" Style="margin-left:auto;margin-right: 0;"></MudIconButton>
             </MudStack>
             @if (loading)
             {
@@ -60,8 +60,8 @@
                     <MudSimpleTable Bordered="true">
                         <thead>
                             <tr>
-                                <th id="prz">Prize 1</th>
-                                <th id="prz">Prize 2</th>
+                               <th id="prz">1<sup>st</sup> Prize</th>
+                                <th id="prz">2<sup>nd</sup> Prize</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -84,8 +84,8 @@
                     <MudSimpleTable Bordered="true">
                         <thead>
                             <tr>
-                                <th id="prz">Prize 1</th>
-                                <th id="prz">Prize 2</th>
+                                <th id="prz">1<sup>st</sup> Prize</th>
+                                <th id="prz">2<sup>nd</sup> Prize</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -104,8 +104,8 @@
                     <MudSimpleTable Style="margin-bottom:15px;" Bordered="true">
                         <thead>
                             <tr>
-                                <th id="prz">Prize 1</th>
-                                <th id="prz">Prize 2</th>
+                                <th id="prz">1<sup>st</sup> Prize</th>
+                                <th id="prz">2<sup>nd</sup> Prize</th>
                             </tr>
                         </thead>
                         <tbody>
