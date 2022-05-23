@@ -19,7 +19,13 @@ namespace XtremeWasmApp.Shared
         private bool _isDarkMode;
         private MudThemeProvider _mudThemeProvider = null!;
         private string Currpage { get; set; } = null!;
-        private bool selectedCompDraw { get; set; }
+        private bool _selectedCompDraw;
+
+        public bool selectedCompDraw {
+            get { return _selectedCompDraw; }
+            set { var old = selectedCompDraw; _selectedCompDraw = value; if (old != value) { StateHasChanged(); } }
+        }
+
         private bool compSel;
         private bool drawSel;
         private bool MarqSet;
@@ -38,7 +44,7 @@ namespace XtremeWasmApp.Shared
 
         private void ontopclick()
         {
-            nav.NavigateTo("/DrawSelection?onlyactive=true", true);
+            nav.NavigateTo("/DrawSelection?onlyactive=true");
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

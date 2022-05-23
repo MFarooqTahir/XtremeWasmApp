@@ -1,6 +1,7 @@
 ﻿@page "/DrawSelection"
 @using XtremeModels
 @inject IJSRuntime JsRuntime
+@inject ILocalStorageService _storage
 @inject IWebApiService ApiService
 <PageTitle>Draw Selection</PageTitle>
 <AuthorizeView>
@@ -98,6 +99,7 @@
         if (firstRender)
         {
             jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Dimentions.js");
+
         }
         if (jsModule is not null)
         {
@@ -116,9 +118,9 @@
         var currSel = schedules[rowIndex];
 
         var res = await ApiService.ChangeSchedule(currSel);
-        if (!res)
+        if (!res.Item1)
         {
-            ErrorsList = new List<string>() { "Either the draw is closed, or there was an error" };
+            ErrorsList = new List<string>() { res.Item2, "Either the draw is closed, or there was an error" };
             StateHasChanged();
         }
 

@@ -272,20 +272,20 @@ namespace XtremeWasmApp.Services
             return null;
         }
 
-        public async Task<bool> ChangeSchedule(Schedule CurrSelectedSch)
+        public async Task<(bool, string)> ChangeSchedule(Schedule CurrSelectedSch)
         {
             try
             {
                 await SetDrawSelected(value: false).ConfigureAwait(false);
-                if (CurrSelectedSch.Period < DateTime.Now)
-                {
-                    return false;
-                }
-                var resul = await SendHttpRequest<ResultSet<bool>>($"api/Data/checkUacCompleted/{CurrSelectedSch.mkey}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                if (!resul.ResultObj)
-                {
-                    return false;
-                }
+                //if (CurrSelectedSch.Period < DateTime.Now)
+                //{
+                //    return (false, "Period has ended");
+                //}
+                //var resul = await SendHttpRequest<ResultSet<bool>>($"api/Data/checkUacCompleted/{CurrSelectedSch.mkey}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                //if (!resul.ResultObj)
+                //{
+                //    return (false, "Cannot change the draw, the draw is not available");
+                //}
                 await SetSch(CurrSelectedSch).ConfigureAwait(false);
                 var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{CurrSelectedSch.mkey}", RequestType.Get).ConfigureAwait(false);
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
@@ -295,7 +295,7 @@ namespace XtremeWasmApp.Services
 
                 if (!res.ResultObj)
                 {
-                    return false;
+                    return (false, "Draw unavailable");
                 }
                 var ExtraBalance = await SendHttpRequest<ResultSet<int>>($"api/Inv/GetOtherBalance/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                 var part = await GetParty().ConfigureAwait(false);
@@ -303,13 +303,14 @@ namespace XtremeWasmApp.Services
                 await SetParty(part).ConfigureAwait(false);
                 await SetDrawSelected(value: true).ConfigureAwait(false);
                 _navigationManager.NavigateTo("/");
-                return true;
+                return (true, "");
             }
             catch (Exception ex)
             {
-                return false;
+                return (false, "Critical Error");
             }
         }
+
 
         private async Task<string> UpdateBalance(CDRelation cdrel, Party part)
         {
@@ -406,31 +407,33 @@ namespace XtremeWasmApp.Services
 
         public async Task SetDrawSelected(bool value) => await _localStorage.SetItemAsync("IsDrawSel", value).ConfigureAwait(false);
 
-        public async Task<bool> IsDrawSelected()
-        {
-            try
-            {
-                var sel = await _localStorage.GetItemAsync<bool>("IsDrawSel").ConfigureAwait(false);
-                if (sel)
-                {
-                    var sch = await GetSch().ConfigureAwait(false);
-                    if (sch.Period < DateTime.Now)
-                    {
-                        await SetDrawSelected(value: false).ConfigureAwait(false);
-                        return false;
-                    }
-                    var result = await SendHttpRequest<ResultSet<bool>>($"api/Data/checkUacCompleted/{sch.mkey}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                    await SetDrawSelected(value: result.ResultObj).ConfigureAwait(false);
+        public async Task<bool> IsDrawSelected() => await _localStorage.GetItemAsync<bool>("IsDrawSel").ConfigureAwait(false);
 
-                    return result.ResultObj;
-                }
-                return false;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
+        //public async Task<bool> IsDrawSelected()
+        //{
+        //    try
+        //    {
+        //        var sel = await _localStorage.GetItemAsync<bool>("IsDrawSel").ConfigureAwait(false);
+        //        if (sel)
+        //        {
+        //            var sch = await GetSch().ConfigureAwait(false);
+        //            if (sch.Period < DateTime.Now)
+        //            {
+        //                await SetDrawSelected(value: false).ConfigureAwait(false);
+        //                return false;
+        //            }
+        //            var result = await SendHttpRequest<ResultSet<bool>>($"api/Data/checkUacCompleted/{sch.mkey}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+        //            await SetDrawSelected(value: result.ResultObj).ConfigureAwait(false);
+
+        //            return result.ResultObj;
+        //        }
+        //        return false;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
+        //}
 
         public async Task<IEnumerable<CDRelation>?> GetCdRelations()
         {

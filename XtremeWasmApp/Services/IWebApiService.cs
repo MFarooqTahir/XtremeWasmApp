@@ -36,7 +36,7 @@ namespace XtremeWasmApp.Services
 
         Task<IList<Schedule>> GetScheduleList(bool notall);
 
-        Task<bool> ChangeSchedule(Schedule CurrSelectedSch);
+        Task<(bool, string)> ChangeSchedule(Schedule CurrSelectedSch);
 
         Task<IEnumerable<CDRelation>?> GetCdRelations();
 
