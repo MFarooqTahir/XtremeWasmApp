@@ -30,9 +30,10 @@
                             <th style="text-align:center;font-size:large;"><b>Draw</b></th>
                             <th style="text-align:center;font-size:large;"><b>Date</b></th>
                             <th style="text-align:center;font-size:large;"><b>City</b></th>
-                             @if(windowWidth>500){
-                            <th style="text-align:center;font-size:large;"><b>Category</b></th>
-                             }                            
+                            @if (windowWidth > 500)
+                            {
+                                <th style="text-align:center;font-size:large;"><b>Category</b></th>
+                            }
                         </tr>
                     </thead>
                     <tbody>
@@ -43,14 +44,15 @@
                         {
                             int currCount = count;
                             <tr @onclick="@(()=>onRowSelection(currCount))">
-                                
+
                                 <td style="text-align:center;max-width:30px;"><MudIcon Icon="@(row.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Color="@(row.Uac?Color.Success:Color.Error)" Title="Pencil" /></td>
-                                
+
                                 <td style="text-align:center;min-width:105px;">@(row.DId+" - "+ row.BId)</td>
                                 <td style="text-align:center;max-width:90px;">@row.Date.ToString("dd/MM/yyyy")</td>
                                 <td style="text-align:center;font-size:large;min-width:100px;">@row.City</td>
-                                @if(windowWidth>500){
-                                <td style="text-align:center;font-size:large;">@row.Cat</td>
+                                @if (windowWidth > 500)
+                                {
+                                    <td style="text-align:center;font-size:large;">@row.Cat</td>
                                 }
                             </tr>
                             count++;
@@ -67,8 +69,8 @@
 </AuthorizeView>
 @code {
     [Parameter]
-    public string onlyactive{ get; set; }
-    
+    public string onlyactive { get; set; }
+
     public IList<string> ErrorsList;
     IList<Schedule> schedules;
 
@@ -86,8 +88,8 @@
         schedules = await ApiService.GetAllSch();
         if (schedules is null)
         {
-            bool GetAll = string.Equals(onlyactive,"true",StringComparison.CurrentCultureIgnoreCase) || !await ApiService.IsDrawSelected();
-            
+            bool GetAll = string.Equals(onlyactive, "true", StringComparison.CurrentCultureIgnoreCase) || !await ApiService.IsDrawSelected();
+
             schedules = await ApiService.GetScheduleList(GetAll);
         }
     }
@@ -103,7 +105,7 @@
             var dimension = await jsModule.InvokeAsync<WindowDimensions>("getWindowSize");
             windowHeight = dimension.Height;
             windowWidth = dimension.Width;
-            if((prevHeight, prevWidth) != (windowHeight, windowWidth))
+            if ((prevHeight, prevWidth) != (windowHeight, windowWidth))
             {
                 StateHasChanged();
             }
@@ -112,20 +114,13 @@
     private async Task onRowSelection(int rowIndex)
     {
         var currSel = schedules[rowIndex];
-        if (currSel.Uac)
-        {
-            var res = await ApiService.ChangeSchedule(currSel);
-            if (!res)
-            {
-                ErrorsList = new List<string>() { "Either the draw is closed, or there was an error" };
-                StateHasChanged();
-            }
-        }
-        else
+
+        var res = await ApiService.ChangeSchedule(currSel);
+        if (!res)
         {
             ErrorsList = new List<string>() { "Either the draw is closed, or there was an error" };
-
             StateHasChanged();
         }
+
     }
 }
