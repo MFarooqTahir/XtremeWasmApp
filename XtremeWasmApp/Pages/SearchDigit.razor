@@ -3,8 +3,8 @@
 
 <style>
     #prz {
-  text-align: center;
-}
+        text-align: center;
+    }
 </style>
 <AuthorizeView>
     <Authorized>
@@ -16,15 +16,25 @@
                 @*<MudText Align="Align.Right" Style="margin-top: 25px;padding-right:0px;margin-right:0px;">@CurrentDigit</MudText>*@
 
                 @*<MudTextField InputMode="InputMode.numeric" Pattern="[0-9]*" Mask="@(new PatternMask(new string('0', @SearchLimit)))" Adornment="Adornment.Start"
-                              Clearable="true" AdornmentColor="Color.Surface" AdornmentText="@CurrentDigit" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true"
-                              Style="margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit"
-                              Variant="Variant.Outlined" />*@
-                              <label>
-                                  Digit
-                                  <input type="text" inputmode="numeric" pattern="[0-9]*" @bind-value="@SearchText"/>
-                              </label>
+                    Clearable="true" AdornmentColor="Color.Surface" AdornmentText="@CurrentDigit" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true"
+                    Style="margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit"
+                    Variant="Variant.Outlined" />*@
+                <MudText Align="Align.End" Class="mt-4">
+                    Digit:
+                </MudText>
 
-                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl" Style="min-width:120px;" FullWidth="false">
+                <div class="input-group shadow-none" style="max-width:200px;min-width:180px;">
+                    @if (DropSel != 1)
+                    {
+                        <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);">@CurrentDigit</span>
+                    }
+                    <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);"
+                    placeholder="@(new string('#', @SearchLimit))" inputmode="numeric" class="form-control shadow-none" pattern="[0-9]*" id="srchInput" @bind-value="@SearchText" maxlength="@SearchLimit" />
+                </div>
+
+                
+
+                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl mt-2" Style="min-width:80px;" FullWidth="false">
                     <MudSelectItem Value=1>مکس</MudSelectItem>
                     <MudSelectItem Value=2>کلوز</MudSelectItem>
                     <MudSelectItem Value=3>سینٹر</MudSelectItem>
@@ -54,54 +64,54 @@
             {
                 @if (AnySale)
                 {
-                <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
-                <XtremeWasmApp.Components.TransSearchTable Title="Mix Sale" SourceList="@TransListMixSale" />
-                <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Sale" SourceList="@TransListMixSchemeSale" />
-                <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Sale" SourceList="@TransListMixSchemePercSale" />
+                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                        <XtremeWasmApp.Components.TransSearchTable Title="Mix Sale" SourceList="@TransListMixSale" />
+                        <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Sale" SourceList="@TransListMixSchemeSale" />
+                        <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Sale" SourceList="@TransListMixSchemePercSale" />
 
-                
-                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Sales Total</MudText>
-                    <MudSimpleTable Bordered="true">
-                        <thead>
-                            <tr>
-                               <th id="prz">1<sup>st</sup> Prize</th>
-                                <th id="prz">2<sup>nd</sup> Prize</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="prz">@((TransListSale?.Sum(x=>x.prize1)??0).ToString("C",numberFormat))</td>
-                                <td id="prz">@((TransListSale?.Sum(x=>x.prize2)??0).ToString("C",numberFormat))</td>
-                            </tr>
-                        </tbody>
-                    </MudSimpleTable>
-                </MudPaper>
+
+                        <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Sales Total</MudText>
+                        <MudSimpleTable Bordered="true">
+                            <thead>
+                                <tr>
+                                    <th id="prz">1<sup>st</sup> Prize</th>
+                                    <th id="prz">2<sup>nd</sup> Prize</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="prz">@((TransListSale?.Sum(x=>x.prize1)??0).ToString("C",numberFormat))</td>
+                                    <td id="prz">@((TransListSale?.Sum(x=>x.prize2)??0).ToString("C",numberFormat))</td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudPaper>
                 }
-                 @if (Anypurchase)
+                @if (Anypurchase)
                 {
-                <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
-                <XtremeWasmApp.Components.TransSearchTable Title="Mix Purchase" SourceList="@TransListMixPurc" />
-                <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Purchase" SourceList="@TransListMixSchemePurc" />
-                <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Purchase" SourceList="@TransListMixSchemePercPurc" />
-               
-                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Purchase Total</MudText>
-                    <MudSimpleTable Bordered="true">
-                        <thead>
-                            <tr>
-                                <th id="prz">1<sup>st</sup> Prize</th>
-                                <th id="prz">2<sup>nd</sup> Prize</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td id="prz">@((TransListPurchase?.Sum(x=>x.prize1)??0).ToString("C",numberFormat))</td>
-                                <td id="prz">@((TransListPurchase?.Sum(x=>x.prize2)??0).ToString("C",numberFormat))</td>
-                            </tr>
-                        </tbody>
-                    </MudSimpleTable>
-                </MudPaper>
+                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                        <XtremeWasmApp.Components.TransSearchTable Title="Mix Purchase" SourceList="@TransListMixPurc" />
+                        <XtremeWasmApp.Components.TransSearchTable Title="Mix Scheme Purchase" SourceList="@TransListMixSchemePurc" />
+                        <XtremeWasmApp.Components.TransSearchTable Title="Scheme % Purchase" SourceList="@TransListMixSchemePercPurc" />
+
+                        <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Purchase Total</MudText>
+                        <MudSimpleTable Bordered="true">
+                            <thead>
+                                <tr>
+                                    <th id="prz">1<sup>st</sup> Prize</th>
+                                    <th id="prz">2<sup>nd</sup> Prize</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="prz">@((TransListPurchase?.Sum(x=>x.prize1)??0).ToString("C",numberFormat))</td>
+                                    <td id="prz">@((TransListPurchase?.Sum(x=>x.prize2)??0).ToString("C",numberFormat))</td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </MudPaper>
                 }
-                
+
                 @if (Anypurchase || AnySale)
                 {
                     <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;margin-bottom:5px;">Update Digit</MudText>
