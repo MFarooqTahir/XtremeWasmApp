@@ -15,10 +15,14 @@
             <MudStack Row="true">
                 @*<MudText Align="Align.Right" Style="margin-top: 25px;padding-right:0px;margin-right:0px;">@CurrentDigit</MudText>*@
 
-                <MudTextField inputmode="numeric" pattern="[0-9]*" Mask="@(new PatternMask(new string('0', @SearchLimit)))" Adornment="Adornment.Start"
+                @*<MudTextField InputMode="InputMode.numeric" Pattern="[0-9]*" Mask="@(new PatternMask(new string('0', @SearchLimit)))" Adornment="Adornment.Start"
                               Clearable="true" AdornmentColor="Color.Surface" AdornmentText="@CurrentDigit" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true"
                               Style="margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit"
-                              Variant="Variant.Outlined" />
+                              Variant="Variant.Outlined" />*@
+                              <label>
+                                  Digit
+                                  <input type="text" inputmode="numeric" pattern="[0-9]*" @bind-value="@SearchText"/>
+                              </label>
 
                 <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl" Style="min-width:120px;" FullWidth="false">
                     <MudSelectItem Value=1>مکس</MudSelectItem>
