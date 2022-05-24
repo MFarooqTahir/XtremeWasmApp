@@ -5,6 +5,14 @@
     #prz {
         text-align: center;
     }
+    input:focus, input.form-control:focus {
+
+    outline:none !important;
+    outline-width: 0 !important;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}
 </style>
 <AuthorizeView>
     <Authorized>
@@ -26,10 +34,10 @@
                 <div class="input-group shadow-none" style="max-width:200px;min-width:180px;">
                     @if (DropSel != 1)
                     {
-                        <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);">@CurrentDigit</span>
+                        <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);border-right:0px;margin-right:0px;padding-right:0px;">@CurrentDigit</span>
                     }
-                    <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);"
-                    placeholder="@(new string('#', @SearchLimit))" inputmode="numeric" class="form-control shadow-none" pattern="[0-9]*" id="srchInput" @bind-value="@SearchText" maxlength="@SearchLimit" />
+                    <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);@(DropSel!=1?"border-left:0px;margin-left:0px;padding-left:0px":"")"
+                    placeholder="@(new string('#', @SearchLimit))" inputmode="numeric" class="form-control" pattern="[0-9]*" id="srchInput" @bind-value="@SearchText" maxlength="@SearchLimit" />
                 </div>
 
                 
