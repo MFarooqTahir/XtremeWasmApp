@@ -64,7 +64,8 @@ namespace XtremeWasmApp.Pages
             set {
                 if ((value ?? 0) > prz2Limit)
                 {
-                    var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
+                    //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
+                    Js.InvokeAsync<object>("alert", "Limit Exceeded");
                     jsModule.InvokeVoidAsync("focusInput", "Prize2");
                 }
                 _Prize2 = value;
@@ -81,8 +82,6 @@ namespace XtremeWasmApp.Pages
         private IJSObjectReference jsModule;
         private int SearchLimit = 4;
         private string InvNo, Ref, Code, PartyName;
-
-        private double prz1 = 0, prz2 = 0;
         private int _dropSel = 1;
 
         public int DropSel {
@@ -247,6 +246,7 @@ namespace XtremeWasmApp.Pages
                         prz1Limit = (ret2.xamt1 - ret2.xuamt1) ?? 0;
                         prz2Limit = (ret2.xamt2 - ret2.xuamt2) ?? 0;
                     }
+                    await jsModule.InvokeVoidAsync("focusInput", "Prize1");
                 }
             }
             else
@@ -267,6 +267,7 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
+                await OnDoneClick(null);
             }
         }
 
@@ -368,7 +369,7 @@ namespace XtremeWasmApp.Pages
                     Ref = invInfo?.Ref;
                     Code = party.Code;
                     PartyName = party.Name;
-                    await GetTransList(5);
+                    await GetTransList(3);
                 }
             }
 
@@ -386,7 +387,7 @@ namespace XtremeWasmApp.Pages
                     Transactions = TransactionsInfo.Transactions;
                     if (amt < TransactionsInfo.TotalRows)
                     {
-                        snoCountStart = TransactionsInfo.TotalRows - amt - 1;
+                        snoCountStart = TransactionsInfo.TotalRows - amt;
                     }
                     else
                     {

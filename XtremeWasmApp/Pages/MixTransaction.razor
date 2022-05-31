@@ -6,78 +6,62 @@
 @inject IDialogService DialogService
 
 <style>
-    tfoot tr {
-        background-color: var(--mud-palette-surface);
-    }
 
-        tfoot tr td {
-            border-top: 1px solid var(--mud-palette-table-lines);
-            background-color: var(--mud-palette-surface);
-            position: sticky;
-            bottom: 0;
+        #numericinpdiv input:focus, #numericinpdiv input.form-control:focus {
+            outline: none !important;
+            outline-width: 0 !important;
+            box-shadow: none;
+            -moz-box-shadow: none;
+            -webkit-box-shadow: none;
         }
-
-    #numericinpdiv input:focus, #numericinpdiv input.form-control:focus {
-        outline: none !important;
-        outline-width: 0 !important;
-        box-shadow: none;
-        -moz-box-shadow: none;
-        -webkit-box-shadow: none;
-    }
-
+        
 </style>
 
 <AuthorizeView>
     <Authorized>
+
         <div align-center style="max-width:650px;margin: auto;">
-            <div style="display: flex;justify-content: space-between;">
+            <div style="display: flex;justify-content: space-between;" class="mx-1">
                 <MudText Style="align-self:center;" Align="Align.Center">Inv#: <span style="color:red;margin-right:10px;">@InvNo</span>A/c: <span style="color:darkcyan;margin-right:10px;">@Code</span>Ref: <span style="color:forestgreen">@Ref</span></MudText>
                 <MudIconButton Style="align-self:right" Icon="@Icons.Material.Filled.List" Color="@(Color.Tertiary)"></MudIconButton>
             </div>
-            <MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="height:250px;margin-bottom:15px;" Class="rounded-0">
+            <MudSimpleTable Dense="true" Bordered="true" Striped="true" Hover="true" FixedHeader="true" Style="height:150px;">
                 <thead>
                     <tr>
-                        <th>SNo</th>
-                        <th>Digit</th>
-                        <th style="text-align:right">1<sup>st</sup> Prize</th>
-                        <th style="text-align:right">2<sup>nd</sup> Prize</th>
+                        <th style="background-color: #ffe4b5;color:black">S #</th>
+                        <th style="background-color: #ffe4b5;color:black">Digit</th>
+                        <th style="text-align:right;background-color: #ffe4b5;color:black">1<sup>st</sup> Prize</th>
+                        <th style="text-align:right;background-color: #ffe4b5;color:black">2<sup>nd</sup> Prize</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (Transactions is not null && Transactions?.Any() == true)
                     {
-                        @if(Transactions[0].sNo is not "0" or "")
+                        var last = Transactions.IndexOf(Transactions[^1]);
+                        @if (Transactions[0].sNo is not "0" or "")
                         {
                             snoCountStart = int.Parse(Transactions[0].sNo);
                         }
-                        prz1 =prz2= 0;
+                        var cNow = -1;
                         @foreach (var transaction in Transactions)
                         {
-                            prz1 += transaction.Prize1;
-                            prz2 += transaction.Prize2;
-                            transaction.sNo = snoCountStart.ToString();
+                            transaction.sNo = snoCountStart.ToString("D6");
+
                             <tr>
-                                <td>@(snoCountStart)</td>
+                                <td>@transaction.sNo</td>
                                 <td>@transaction.Digit</td>
                                 <td style="text-align:right">@transaction.Prize1.ToString("C",numberFormat)</td>
                                 <td style="text-align:right">@transaction.Prize2.ToString("C",numberFormat)</td>
                             </tr>
+                            cNow++;
                             snoCountStart++;
                         }
                     }
 
                 </tbody>
-                <tfoot>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td style="text-align:right">@prz1.ToString("C",numberFormat)</td>
-                        <td style="text-align:right">@prz2.ToString("C",numberFormat)</td>
-                    </tr>
-                </tfoot>
             </MudSimpleTable>
             <MudStack Row="true" Class="my-3">
-                <MudText Class="mt-5 me-3">Total Sale: @Total</MudText>
+                <MudText Class="mt-5 me-1" Style="font-size:15">T: @Total</MudText>
                 <div style="align-content:center;margin: auto;display:inline-flex;">
                     @if (repeatData?.RelationPrint == true)
                     {
@@ -124,8 +108,8 @@
                 </div>
 
 
-                <MudNumericField id="Prize1" OnKeyPress="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="1st Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
-                <MudNumericField id="Prize2" OnKeyPress="@Prz2KeyDown" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="2nd Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize1" OnKeyUp="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="1st Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize2" OnKeyUp="@Prz2KeyDown" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="2nd Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
 
             </MudStack>
