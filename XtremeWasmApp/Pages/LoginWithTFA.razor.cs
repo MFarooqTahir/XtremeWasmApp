@@ -14,7 +14,7 @@ namespace XtremeWasmApp.Pages
         private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
 
         [Inject]
-        private IWebApiService? Auth { get; set; }
+        private WebApiService? Auth { get; set; }
 
         private List<string> errors = new();
         private string EmailVerificationStatus = "Verification code has been sent to your email address";

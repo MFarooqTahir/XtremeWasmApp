@@ -1,0 +1,135 @@
+﻿@page "/Mix"
+@using System.Globalization
+@using XtremeModels
+@inject NavigationManager nav
+@inject WebApiService Api
+@inject IDialogService DialogService
+
+<style>
+    tfoot tr {
+        background-color: var(--mud-palette-surface);
+    }
+
+        tfoot tr td {
+            border-top: 1px solid var(--mud-palette-table-lines);
+            background-color: var(--mud-palette-surface);
+            position: sticky;
+            bottom: 0;
+        }
+
+    #numericinpdiv input:focus, #numericinpdiv input.form-control:focus {
+        outline: none !important;
+        outline-width: 0 !important;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+    }
+
+</style>
+
+<AuthorizeView>
+    <Authorized>
+        <div align-center style="max-width:650px;margin: auto;">
+            <div style="display: flex;justify-content: space-between;">
+                <MudText Style="align-self:center;" Align="Align.Center">Inv#: <span style="color:red;margin-right:10px;">@InvNo</span>A/c: <span style="color:darkcyan;margin-right:10px;">@Code</span>Ref: <span style="color:forestgreen">@Ref</span></MudText>
+                <MudIconButton Style="align-self:right" Icon="@Icons.Material.Filled.List" Color="@(Color.Tertiary)"></MudIconButton>
+            </div>
+            <MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="height:250px;margin-bottom:15px;" Class="rounded-0">
+                <thead>
+                    <tr>
+                        <th>SNo</th>
+                        <th>Digit</th>
+                        <th style="text-align:right">1<sup>st</sup> Prize</th>
+                        <th style="text-align:right">2<sup>nd</sup> Prize</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Transactions is not null && Transactions?.Any() == true)
+                    {
+                        @if(Transactions[0].sNo is not "0" or "")
+                        {
+                            snoCountStart = int.Parse(Transactions[0].sNo);
+                        }
+                        prz1 =prz2= 0;
+                        @foreach (var transaction in Transactions)
+                        {
+                            prz1 += transaction.Prize1;
+                            prz2 += transaction.Prize2;
+                            transaction.sNo = snoCountStart.ToString();
+                            <tr>
+                                <td>@(snoCountStart)</td>
+                                <td>@transaction.Digit</td>
+                                <td style="text-align:right">@transaction.Prize1.ToString("C",numberFormat)</td>
+                                <td style="text-align:right">@transaction.Prize2.ToString("C",numberFormat)</td>
+                            </tr>
+                            snoCountStart++;
+                        }
+                    }
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td style="text-align:right">@prz1.ToString("C",numberFormat)</td>
+                        <td style="text-align:right">@prz2.ToString("C",numberFormat)</td>
+                    </tr>
+                </tfoot>
+            </MudSimpleTable>
+            <MudStack Row="true" Class="my-3">
+                <MudText Class="mt-5 me-3">Total Sale: @Total</MudText>
+                <div style="align-content:center;margin: auto;display:inline-flex;">
+                    @if (repeatData?.RelationPrint == true)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>
+                    }
+                    <MudToggleIconButton @bind-Toggled="@AutoPrize"
+                                         Icon="@Icons.Material.Outlined.ContentCopy" Color="@Color.Default"
+                                         ToggledIcon="@Icons.Material.TwoTone.ContentCopy" ToggledColor="@Color.Info" />
+                </div>
+                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl mt-2" Style="min-width:80px;width:80;max-width:200px;margin-right:0px;margin-left:auto;" FullWidth="false">
+                    <MudSelectItem Value=1>مکس</MudSelectItem>
+                    <MudSelectItem Value=2>کلوز</MudSelectItem>
+                    <MudSelectItem Value=3>سینٹر  </MudSelectItem>
+                    <MudSelectItem Value=4>بیک اوپن  </MudSelectItem>
+                    <MudSelectItem Value=5>سینٹر آکڑا  </MudSelectItem>
+                    <MudSelectItem Value=6>بیک آکڑا  </MudSelectItem>
+                    <MudSelectItem Value=7>بیک ٹنڈیلا  </MudSelectItem>
+                    <MudSelectItem Value=8>فائف ڈاٹ  </MudSelectItem>
+                    <MudSelectItem Value=9>سکس ڈاٹ  </MudSelectItem>
+                </MudSelect>
+            </MudStack>
+
+
+            <MudStack Row="true">
+                @*<MudText Align="Align.Right" Style="margin-top: 25px;padding-right:0px;margin-right:0px;">@CurrentDigit</MudText>*@
+
+                @*<MudTextField InputMode="InputMode.numeric" Pattern="[0-9]*" Mask="@(new PatternMask(new string('0', @SearchLimit)))" Adornment="Adornment.Start"
+                Clearable="true" AdornmentColor="Color.Surface" AdornmentText="@CurrentDigit" HelperText=@("Max Digits: "+@SearchLimit) FullWidth="true"
+                Style="margin-left:0px;" @bind-Value="SearchText" Immediate="true" MaxLength=@SearchLimit Label="Digit"
+                Variant="Variant.Outlined" />
+                <MudText Align="Align.End" Class="mt-4">
+                Digit:
+                </MudText>*@
+
+                <div id="numericinpdiv" class="input-group shadow-none" style="max-width:65px;height:55px;margin-top:6px;">
+                    @if (DropSel != 1)
+                    {
+                        <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);border-right:0px;margin-right:0px;padding-right:0px;">@CurrentDigit</span>
+                    }
+                    <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);@(DropSel!=1?"border-left:0px;margin-left:0px;padding-left:0px":"")"
+                           placeholder="@(new string('#', @SearchLimit))" inputmode="numeric" class="form-control" pattern="[0-9]*" id="MixDigitInput"
+                           disabled="@(DigitEnabled==false)" @onkeypress="@digitKeyDown" @onblur="@lostDigitFocus" @onfocus="@OnDigitFocus"
+                           @bind-value="@Digits" maxlength="@SearchLimit" />
+                </div>
+
+
+                <MudNumericField id="Prize1" OnKeyPress="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="1st Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize2" OnKeyPress="@Prz2KeyDown" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="2nd Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
+
+            </MudStack>
+        </div>
+    </Authorized>
+</AuthorizeView>
+

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace XtremeModels
+﻿namespace XtremeModels
 {
     public class Party
     {
@@ -54,5 +52,10 @@ namespace XtremeModels
         public double S_40000 { get; set; }
         public double S_own { get; set; }
         public List<string> Hset { get; set; }
+
+        public Party ShallowCopy()
+        {
+            return (Party)MemberwiseClone();
+        }
     }
 }

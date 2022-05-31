@@ -14,7 +14,13 @@ namespace XtremeWasmApp.Shared
         private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
 
         [Inject]
-        private IWebApiService Auth { get; set; } = null!;
+        private WebApiService Auth { get; set; } = null!;
+
+        public Timer _timer;
+
+        private RepeatDataReturnWA repeatData;
+
+        private bool RunTimer;
 
         private bool _isDarkMode;
         private MudThemeProvider _mudThemeProvider = null!;
@@ -31,7 +37,7 @@ namespace XtremeWasmApp.Shared
         private bool MarqSet;
         private TopMarqueData MarqData;
 
-        private async Task<bool> Check(bool authen)
+        private bool Check(bool authen)
         {
             bool page = string.Equals(Currpage, "Login", StringComparison.OrdinalIgnoreCase) || string.Equals(Currpage, "Register", StringComparison.OrdinalIgnoreCase);
             if (!authen && !page)
@@ -40,6 +46,33 @@ namespace XtremeWasmApp.Shared
                 return false;
             }
             return true;
+        }
+
+        protected override void OnInitialized()
+        {
+            _timer = new(async _ => {
+                if (RunTimer && await Auth.GetRepeatDataWeb())
+                {
+                    var newRepeat = await Auth.GetRepeatData();
+                    if (newRepeat is not null && newRepeat != repeatData)
+                    {
+                        repeatData = newRepeat;
+                        if (newRepeat.RelationBlocked)
+                        {
+                            RunTimer = false;
+                            await Auth.SetCompanySelected(value: false);
+                            nav.NavigateTo("/CompanySelection");
+                        }
+                        else if (newRepeat.DrawBlocked)
+                        {
+                            RunTimer = false;
+                            await Auth.SetDrawSelected(value: false);
+                            nav.NavigateTo("/DrawSelection");
+                        }
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }
+            }, state: null, 0, 10000);
         }
 
         private void ontopclick()
@@ -76,7 +109,8 @@ namespace XtremeWasmApp.Shared
             var authen = user?
                 .Identity?
                 .IsAuthenticated == true;
-            var res = await Check(authen);
+            RunTimer = authen;
+            var res = Check(authen);
             if (res && authen)
             {
                 compSel = await Auth.IsCompanySelected();
@@ -116,6 +150,11 @@ namespace XtremeWasmApp.Shared
         private void DrawerToggle()
         {
             _drawerOpen = !_drawerOpen;
+        }
+
+        public void Dispose()
+        {
+            _timer.Dispose();
         }
     }
 }

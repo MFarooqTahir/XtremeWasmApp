@@ -4,75 +4,85 @@
 @using System.Diagnostics
 @inherits LayoutComponentBase
 @inject NavigationManager nav
-@inject IWebApiService AuthService
+@inject WebApiService AuthService
+@implements IDisposable
 <MudRTLProvider>
-<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
-<MudDialogProvider />
-<MudSnackbarProvider />
+    <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
+    <MudDialogProvider />
+    <MudSnackbarProvider />
 
-<MudLayout>
-    <MudAppBar Dense="true" Color="Color.Primary" Elevation="1">
-        @if (selectedCompDraw)
-        {
+    <MudLayout>
+        <MudAppBar Dense="true" Color="Color.Primary" Elevation="1">
             <AuthorizeView>
                 <Authorized>
-                    <MudIconButton Color="Color.Dark" Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Size=Size.Small OnClick="@((e) => DrawerToggle())" />
-                </Authorized>
-            </AuthorizeView>
-        }
-        @if (MarqSet)
-        {
-            <MudStack Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Start">
-                    <MudIcon Icon="@(MarqData.Active?Icons.Material.Filled.LockOpen:Icons.Material.Filled.Lock)" Size="Size.Small" Color="@(MarqData.Active?Color.Success:Color.Error)" />
-                    <a href="/CompanySelection">
-                        <MudText Typo="Typo.body2" Style="color:#000000;font-size:small;padding-top:3px;"><b>@MarqData.PCode - @MarqData.PName</b></MudText>
-                        </a>
-                    
-                    <MudText Typo="Typo.body2" Style="color:#000000;font-size:medium;"><b>@MarqData.Balance</b></MudText>
-                </MudStack>
-        }
-        else
-        {
-        <div Class="ml-3">Xtreme Traders</div>
-        }
-        <MudSpacer />
-        <MudIconButton OnClick="@((e) => ThemeCh())" Color="Color.Dark" Size="Size.Small" Icon="@(_isDarkMode?Icons.Material.Outlined.DarkMode:Icons.Material.Outlined.LightMode)" />
-        <LoginDisplay />
-    </MudAppBar>
-    @if (selectedCompDraw)
-    {
-        <AuthorizeView>
-            <Authorized>
+                    @if (selectedCompDraw)
+                    {
+                        <MudIconButton Color="Color.Dark" Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Size=Size.Small OnClick="@((e) => DrawerToggle())" />
 
-                <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-                    <NavMenu />
-                </MudDrawer>
-            </Authorized>
-        </AuthorizeView>
-    }
-    <MudMainContent>
-        @if (MarqSet)
-        {
-            <AuthorizeView>
-            <Authorized>
-            <MudPaper @onclick="@ontopclick" Elevation="3" Class="py-3" Outlined="true">
-                
-                <MudStack @onclick="@ontopclick" Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Center">
-                <MudIcon @onclick="@ontopclick" Icon="@(MarqData.Uac?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Size="Size.Small" Color="@(MarqData.Uac?Color.Success:Color.Error)" Title="Pencil" />
-                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.DId - @MarqData.BId</b></MudText>
-                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Category</b></MudText>
-                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.City</b></MudText>
-                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Date</b></MudText>
-                </MudStack>
-            </MudPaper>
-            
-            </Authorized>
-        </AuthorizeView>
-        }
-        <MudContainer Class="mt-5 px-4" MaxWidth="MaxWidth.False">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-</MudLayout>
+                    }
+                    @if (MarqSet)
+                    {
+                        <MudStack Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Start">
+                            <MudIcon Icon="@(repeatData?.Uac==true?Icons.Material.Filled.LockOpen:Icons.Material.Filled.Lock)" Size="Size.Small" Color="@(repeatData?.RelationActive==true?Color.Success:Color.Error)" />
+                            <a href="/CompanySelection">
+                                <MudText Typo="Typo.body2" Style="color:#000000;font-size:small;padding-top:3px;"><b>@MarqData.PCode - @MarqData.PName</b></MudText>
+                            </a>
+
+                            <MudText Typo="Typo.body2" Style="color:#000000;font-size:medium;"><b>@MarqData.Balance</b></MudText>
+                        </MudStack>
+                    }
+                    else
+                    {
+                        <div Class="ml-3">Xtreme Traders</div>
+                    }
+                </Authorized>
+                <NotAuthorized>
+                    <div Class="ml-3">Xtreme Traders</div>
+
+                </NotAuthorized>
+            </AuthorizeView>
+            <MudSpacer />
+            <MudIconButton OnClick="@((e) => ThemeCh())" Color="Color.Dark" Size="Size.Small" Icon="@(_isDarkMode?Icons.Material.Outlined.DarkMode:Icons.Material.Outlined.LightMode)" />
+            <LoginDisplay />
+        </MudAppBar>
+        <CascadingValue TValue="Timer" Value="_timer">
+        <CascadingValue TValue="RepeatDataReturnWA" Value="repeatData">
+            @if (selectedCompDraw)
+            {
+                <AuthorizeView>
+                    <Authorized>
+
+                        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+                            <NavMenu />
+                        </MudDrawer>
+                    </Authorized>
+                </AuthorizeView>
+            }
+            <MudMainContent>
+                @if (MarqSet)
+                {
+                    <AuthorizeView>
+                        <Authorized>
+                            <MudPaper @onclick="@ontopclick" Elevation="3" Class="py-3" Outlined="true">
+
+                                <MudStack @onclick="@ontopclick" Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Center">
+                                    <MudIcon @onclick="@ontopclick" Icon="@(repeatData?.Uac==true && repeatData?.DrawCompleted==false?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Size="Size.Small" Color="@(repeatData?.Uac==true && repeatData?.DrawCompleted==false?Color.Success:Color.Error)" Title="Pencil" />
+                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.DId - @MarqData.BId</b></MudText>
+                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Category</b></MudText>
+                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.City</b></MudText>
+                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Date</b></MudText>
+                                </MudStack>
+                            </MudPaper>
+                            
+                        </Authorized>
+                    </AuthorizeView>
+                }
+                <MudContainer Class="mt-5 px-4" MaxWidth="MaxWidth.False">
+                    @Body
+                </MudContainer>
+            </MudMainContent>
+        </CascadingValue>
+        </CascadingValue>
+    </MudLayout>
 
 </MudRTLProvider>

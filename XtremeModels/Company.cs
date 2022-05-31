@@ -14,5 +14,7 @@
         public double Std1 { get; set; }
         public double Std2 { get; set; }
         public bool punjab { get; set; }
+        public int FCode { get; set; }
+        public char Stype { get; set; }
     }
 }

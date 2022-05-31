@@ -14,7 +14,7 @@ namespace XtremeWasmApp.Pages
         private IDialogService DialogService { get; set; }
 
         [Inject]
-        public IWebApiService ApiService { get; set; }
+        public WebApiService ApiService { get; set; }
 
         [Inject]
         public NavigationManager Nav { get; set; }
@@ -48,28 +48,33 @@ namespace XtremeWasmApp.Pages
         private async Task GetCDRelations()
         {
             var comp = (await ApiService.GetCdRelations().ConfigureAwait(false));
-
-            acCode = await ApiService.GetMbm().ConfigureAwait(false);
-            if (comp?.Any() == false)
+            if (comp?.Any() == true)
             {
-                await OnNoParties();
-            }
-            else
-            {
-                CompanyList = comp.ToList();
-                StateHasChanged();
+                acCode = await ApiService.GetMbm().ConfigureAwait(false);
+                if (comp?.Any() == false)
+                {
+                    await OnNoParties();
+                }
+                else
+                {
+                    CompanyList = comp.ToList();
+                    StateHasChanged();
+                }
             }
         }
 
         private async Task onRowSelection(int rowIndex)
         {
             await ApiService.SetDrawSelected(value: false);
-            var currSel = CompanyList[rowIndex];
-            var res = await ApiService.ChangeCompany(currSel);
-            if (!res.Item1)
+            if (CompanyList?.Any() == true)
             {
-                ErrorsList = new List<string>() { res.Item2 };
-                StateHasChanged();
+                var currSel = CompanyList[rowIndex];
+                var res = await ApiService.ChangeCompany(currSel);
+                if (!res.Item1)
+                {
+                    ErrorsList = new List<string>() { res.Item2 };
+                    StateHasChanged();
+                }
             }
             //if (currSel.Block || currSel.rBlocked)
             //{

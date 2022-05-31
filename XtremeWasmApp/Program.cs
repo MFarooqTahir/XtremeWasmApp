@@ -28,13 +28,13 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddLoadingBar(o => o.LoadingBarColor = "linear-gradient(90deg, rgba(227,0,0,1) 0%, rgba(37,33,98,1) 100%)");
-builder.Services.AddScoped<HttpData>(_ => HttpDataVar);
-builder.Services.AddScoped<HttpClient>(sp => cli.EnableIntercept(sp));
+builder.Services.AddScoped(_ => HttpDataVar);
+builder.Services.AddScoped(sp => cli.EnableIntercept(sp));
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<IWebApiService, WebApiService>();
+builder.Services.AddScoped<WebApiService>();
 builder.Services.AddMudServices();
 builder.UseLoadingBar();
 

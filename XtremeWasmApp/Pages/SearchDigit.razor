@@ -5,14 +5,7 @@
     #prz {
         text-align: center;
     }
-    input:focus, input.form-control:focus {
-
-    outline:none !important;
-    outline-width: 0 !important;
-    box-shadow: none;
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-}
+    
 </style>
 <AuthorizeView>
     <Authorized>
@@ -31,7 +24,7 @@
                     Digit:
                 </MudText>
 
-                <div class="input-group shadow-none" style="max-width:200px;min-width:180px;">
+                <div id="numericinpdiv" class="input-group shadow-none" style="max-width:200px;min-width:180px;">
                     @if (DropSel != 1)
                     {
                         <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);border-right:0px;margin-right:0px;padding-right:0px;">@CurrentDigit</span>
@@ -43,15 +36,15 @@
                 
 
                 <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl mt-2" Style="min-width:80px;" FullWidth="false">
-                    <MudSelectItem Value=1>مکس</MudSelectItem>
-                    <MudSelectItem Value=2>کلوز</MudSelectItem>
-                    <MudSelectItem Value=3>سینٹر</MudSelectItem>
-                    <MudSelectItem Value=4>بیک اوپن</MudSelectItem>
-                    <MudSelectItem Value=5>سینٹر آکڑا</MudSelectItem>
-                    <MudSelectItem Value=6>بیک آکڑا</MudSelectItem>
-                    <MudSelectItem Value=7>بیک ٹنڈیلا</MudSelectItem>
-                    <MudSelectItem Value=8>فائف ڈاٹ</MudSelectItem>
-                    <MudSelectItem Value=9>سکس ڈاٹ</MudSelectItem>
+                    <MudSelectItem Value=1>مکس  </MudSelectItem>
+                    <MudSelectItem Value=2>کلوز  </MudSelectItem>
+                    <MudSelectItem Value=3>سینٹر  </MudSelectItem>
+                    <MudSelectItem Value=4>بیک اوپن  </MudSelectItem>
+                    <MudSelectItem Value=5>سینٹر آکڑا  </MudSelectItem>
+                    <MudSelectItem Value=6>بیک آکڑا  </MudSelectItem>
+                    <MudSelectItem Value=7>بیک ٹنڈیلا  </MudSelectItem>
+                    <MudSelectItem Value=8>فائف ڈاٹ  </MudSelectItem>
+                    <MudSelectItem Value=9>سکس ڈاٹ  </MudSelectItem>
                 </MudSelect>
             </MudStack>
             <MudStack Row="true">

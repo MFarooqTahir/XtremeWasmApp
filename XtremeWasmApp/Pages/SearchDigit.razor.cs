@@ -11,7 +11,7 @@ namespace XtremeWasmApp.Pages
     public partial class SearchDigit
     {
         [Inject]
-        private IWebApiService _api { get; set; }
+        private WebApiService _api { get; set; }
 
         private IEnumerable<TransSearch>? TransListSale { get; set; }
         private IEnumerable<TransSearch>? TransListPurchase { get; set; }

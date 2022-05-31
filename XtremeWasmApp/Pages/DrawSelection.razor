@@ -2,7 +2,7 @@
 @using XtremeModels
 @inject IJSRuntime JsRuntime
 @inject ILocalStorageService _storage
-@inject IWebApiService ApiService
+@inject WebApiService ApiService
 <PageTitle>Draw Selection</PageTitle>
 <AuthorizeView>
 
@@ -70,7 +70,10 @@
 </AuthorizeView>
 @code {
     [Parameter]
-    public string onlyactive { get; set; }
+    [SupplyParameterFromQuery(Name = "onlyactive")]
+    public bool onlyactive { get; set; }
+    [CascadingParameter]
+    public Timer _timer { get; set; }
 
     public IList<string> ErrorsList;
     IList<Schedule> schedules;
@@ -86,12 +89,35 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        schedules = await ApiService.GetAllSch();
-        if (schedules is null)
+        IList<Schedule>? schT = null;
+        if (onlyactive)
         {
-            bool GetAll = string.Equals(onlyactive, "true", StringComparison.CurrentCultureIgnoreCase) || !await ApiService.IsDrawSelected();
+            schT = await ApiService.GetScheduleList(onlyactive);
 
-            schedules = await ApiService.GetScheduleList(GetAll);
+        }
+        else
+        {
+            schT = await ApiService.GetAllSch();
+            if (schT is null)
+            {
+                bool GetAll = !await ApiService.IsDrawSelected();
+
+                schT = await ApiService.GetScheduleList(GetAll);
+            }
+        }
+        if (schT.Count == 1)
+        {
+            var res = await ApiService.ChangeSchedule(schT[0],_timer);
+            if (!res.Item1)
+            {
+                ErrorsList = new List<string>() { res.Item2, "Either the draw is closed, or there was an error" };
+                schedules = schT;
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            schedules = schT;
         }
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -116,8 +142,8 @@
     private async Task onRowSelection(int rowIndex)
     {
         var currSel = schedules[rowIndex];
-
-        var res = await ApiService.ChangeSchedule(currSel);
+        
+        var res = await ApiService.ChangeSchedule(currSel,_timer);
         if (!res.Item1)
         {
             ErrorsList = new List<string>() { res.Item2, "Either the draw is closed, or there was an error" };

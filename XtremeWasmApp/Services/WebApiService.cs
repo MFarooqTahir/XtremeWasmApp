@@ -13,7 +13,7 @@ using XtremeWasmApp.Models;
 
 namespace XtremeWasmApp.Services
 {
-    public class WebApiService : IWebApiService
+    public class WebApiService
     {
         private readonly HttpData _httpData;
         private readonly HttpClient _httpClient;
@@ -149,6 +149,37 @@ namespace XtremeWasmApp.Services
             }
         }
 
+        public async Task<mixpktchkModel?> PktCheck(string? digits)
+        {
+            var res = await SendHttpRequest<ResultSet<mixpktchkModel?>>($"api/Transactions/MixPktChkWebApp/{digits}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            return res.ResultObj;
+        }
+
+        public async Task<Transaction?> MakeNewEntry(EntryData invD)
+        {
+            var isFranchise = await GetIsFranchise().ConfigureAwait(false);
+            var mkey = 0;
+            if (isFranchise)
+            {
+                mkey = (await GetFranMkeys())[0];
+            }
+            var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntry/{isFranchise}/{mkey}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
+
+        public async Task<bool> GetDigitEnabled()
+        {
+            var cdrel = await GetCdrel().ConfigureAwait(false);
+            return (cdrel?.Active ?? false) && (cdrel?.Enabled ?? false);
+        }
+
+        public async Task<Inventory?> GetInvInfo()
+        {
+            var cdrel = await GetCdrel().ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<Inventory>>($"api/Transactions/GetInv/{cdrel.rCode}/1SL", type: RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
+
         public async Task<(bool, string)> ChangeCompany(CDRelation cDRelation)
         {
             try
@@ -174,7 +205,18 @@ namespace XtremeWasmApp.Services
 
                 await SetCdrel(cDRelation).ConfigureAwait(false);
                 await SetCompany(Company).ConfigureAwait(false);
-
+                bool isFranchise = Company.Stype == 'F';
+                await setIsFranchise(isFranchise).ConfigureAwait(false);
+                await setFcode(Company.FCode).ConfigureAwait(false);
+                if (isFranchise)
+                {
+                    var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                    if (mkeys is null || mkeys.ResultObj is null)
+                    {
+                        return (false, "Error in franchise Invoice");
+                    }
+                    await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
+                }
                 var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var DashData = DashDataRes?.ResultObj;
                 if (DashData is null)
@@ -192,7 +234,7 @@ namespace XtremeWasmApp.Services
                     var ExtraBalance = 0;
                     if (!SelShedule)
                     {
-                        await SetSch(DashData!.sch[0]).ConfigureAwait(false);
+                        await SetSch(DashData?.sch?[0]).ConfigureAwait(false);
 
                         var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{DashData.sch[0].mkey}", RequestType.Get).ConfigureAwait(false);
 
@@ -229,6 +271,18 @@ namespace XtremeWasmApp.Services
             }
         }
 
+        public async Task SetFranMkeys(IList<int>? mkeys) => await _localStorage.SetItemAsync("FranMkeys", mkeys).ConfigureAwait(false);
+
+        public async Task<IList<int>?> GetFranMkeys() => await _localStorage.GetItemAsync<List<int>>("FranMkeys").ConfigureAwait(false);
+
+        public async Task setFcode(int fCode) => await _localStorage.SetItemAsync("FCode", fCode).ConfigureAwait(false);
+
+        public async Task setIsFranchise(bool v) => await _localStorage.SetItemAsync("Franchise", v).ConfigureAwait(false);
+
+        public async Task<int> GetFcode() => await _localStorage.GetItemAsync<int>("FCode").ConfigureAwait(false);
+
+        public async Task<bool> GetIsFranchise() => await _localStorage.GetItemAsync<bool>("Franchise").ConfigureAwait(false);
+
         public async Task<TopMarqueData> GetMarqData()
         {
             if (await IsCompanySelected().ConfigureAwait(false) && await IsDrawSelected().ConfigureAwait(false))
@@ -245,7 +299,6 @@ namespace XtremeWasmApp.Services
                 cdRel ??= new();
                 return new TopMarqueData
                 {
-                    Active = cdRel.Active,
                     Balance = ret,
                     BId = sch.BId,
                     DId = sch.DId,
@@ -254,10 +307,33 @@ namespace XtremeWasmApp.Services
                     Date = sch.Date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                     PCode = comp.Pcode,
                     PName = cdRel.UName,
-                    Uac = sch.Uac,
                 };
             }
             return null;
+        }
+
+        public async Task<bool> GetRepeatDataWeb()
+        {
+            try
+            {
+                var sel = await _localStorage.GetItemAsync<bool>("IsDrawSel").ConfigureAwait(false);
+                if (sel)
+                {
+                    var sch = await GetSch().ConfigureAwait(false);
+                    var result = await SendHttpRequest<ResultSet<RepeatDataReturnWA>>($"api/Data/CheckMixWebApp/{sch.mkey}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                    if (result?.ResultObj is null)
+                    {
+                        return false;
+                    }
+                    await SetRepeatData(result.ResultObj).ConfigureAwait(false);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<IEnumerable<TransSearch>?> GetTransSearch(string searchText, LimDem limDem)
@@ -272,7 +348,7 @@ namespace XtremeWasmApp.Services
             return null;
         }
 
-        public async Task<(bool, string)> ChangeSchedule(Schedule CurrSelectedSch)
+        public async Task<(bool, string)> ChangeSchedule(Schedule CurrSelectedSch, Timer timer)
         {
             try
             {
@@ -302,7 +378,9 @@ namespace XtremeWasmApp.Services
                 part.Balance += ExtraBalance?.ResultObj ?? 0;
                 await SetParty(part).ConfigureAwait(false);
                 await SetDrawSelected(value: true).ConfigureAwait(false);
+                timer.Change(0, 10000);
                 _navigationManager.NavigateTo("/");
+
                 return (true, "");
             }
             catch (Exception ex)
@@ -310,7 +388,6 @@ namespace XtremeWasmApp.Services
                 return (false, "Critical Error");
             }
         }
-
 
         private async Task<string> UpdateBalance(CDRelation cdrel, Party part)
         {
@@ -326,6 +403,32 @@ namespace XtremeWasmApp.Services
                 return $"Bal: {amt - amt2}";
             }
             return $"Sale: {amt2}";
+        }
+
+        public async Task UpdateAllBalance()
+        {
+            var part = await GetParty().ConfigureAwait(false);
+            var cdrel = await GetCdrel().ConfigureAwait(false);
+            var amt = (await SendHttpRequest<ResultSet<int>>($"api/DataSet/Login/GetPartyLimit/{cdrel.CompanyID}/{cdrel.rCode}", RequestType.Get, linkType: LinkType.Login).ConfigureAwait(false))?.ResultObj ?? 0;
+            var amt2 = (await SendHttpRequest<ResultSet<int>>($"api/Data/GetPartyBalance/{cdrel.rCode}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false))?.ResultObj ?? 0;
+
+            part.Balance = double.Parse(amt2.ToString(), CultureInfo.InvariantCulture);
+            await SetParty(part).ConfigureAwait(false);
+            cdrel.Limit = amt;
+            await SetCdrel(cdrel).ConfigureAwait(false);
+        }
+
+        public async Task<MixTransVouchersModel?> GetTransactionsListMix(int amt, int Vno)
+        {
+            var cdrel = await GetCdrel().ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<MixTransVouchersModel>>($"api/Transactions/GetVouchers/{cdrel.rCode}/{Vno}/1SL{(amt > 0 ? $"/{amt}" : "")}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
+
+        public async Task<Inventory?> MakeNewInv(InvData inv)
+        {
+            var res = await SendHttpRequest<ResultSet<Inventory>>("api/Transactions/MakeNewInv", RequestType.Post, inv, LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
         }
 
         public async Task<(string Name, string city, string Code, string Balance, string CompanyDetails, string pname)> GetDashboardData()
@@ -352,6 +455,8 @@ namespace XtremeWasmApp.Services
             }
         }
 
+        public async Task<bool> IsQtyUser() => (await GetCompany().ConfigureAwait(false)).Qtyuser;
+
         private async Task SetCompany(Company newCom)
         {
             await _localStorage.SetItemAsync("Company", newCom).ConfigureAwait(false);
@@ -360,12 +465,19 @@ namespace XtremeWasmApp.Services
 
         private async Task<Company> GetCompany() => await _localStorage.GetItemAsync<Company>("Company").ConfigureAwait(false);
 
+        public async Task SetRepeatData(RepeatDataReturnWA newObj)
+        {
+            await _localStorage.SetItemAsync("RepeatData", newObj).ConfigureAwait(false);
+        }
+
+        public async Task<RepeatDataReturnWA> GetRepeatData() => await _localStorage.GetItemAsync<RepeatDataReturnWA>("RepeatData").ConfigureAwait(false);
+
         private async Task SetCdrel(CDRelation newcd)
         {
             await _localStorage.SetItemAsync("cdRel", newcd).ConfigureAwait(false);
         }
 
-        private async Task<CDRelation> GetCdrel() => await _localStorage.GetItemAsync<CDRelation>("cdRel").ConfigureAwait(false);
+        public async Task<CDRelation> GetCdrel() => await _localStorage.GetItemAsync<CDRelation>("cdRel").ConfigureAwait(false);
 
         private async Task SetpartySchTrans(PartySch partySch)
         {
@@ -380,14 +492,14 @@ namespace XtremeWasmApp.Services
             await SetInvLink(newCom.WebApiI).ConfigureAwait(false);
         }
 
-        private async Task<Schedule> GetSch() => await _localStorage.GetItemAsync<Schedule>("sch").ConfigureAwait(false);
+        public async Task<Schedule> GetSch() => await _localStorage.GetItemAsync<Schedule>("sch").ConfigureAwait(false);
 
-        private async Task SetParty(Party newParty)
+        public async Task SetParty(Party newParty)
         {
             await _localStorage.SetItemAsync("party", newParty).ConfigureAwait(false);
         }
 
-        private async Task<Party> GetParty() => await _localStorage.GetItemAsync<Party>("party").ConfigureAwait(false);
+        public async Task<Party> GetParty() => await _localStorage.GetItemAsync<Party>("party").ConfigureAwait(false);
 
         private async Task SetAllSch(IList<Schedule> lst)
         {
@@ -401,7 +513,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<IList<Schedule>> GetAllSch() => await _localStorage.GetItemAsync<List<Schedule>>("allSch").ConfigureAwait(false);
 
-        private async Task SetCompanySelected(bool value) => await _localStorage.SetItemAsync("IsCompSel", value).ConfigureAwait(false);
+        public async Task SetCompanySelected(bool value) => await _localStorage.SetItemAsync("IsCompSel", value).ConfigureAwait(false);
 
         public async Task<bool> IsCompanySelected() => await _localStorage.GetItemAsync<bool>("IsCompSel").ConfigureAwait(false);
 
