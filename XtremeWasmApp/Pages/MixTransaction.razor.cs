@@ -146,9 +146,9 @@ namespace XtremeWasmApp.Pages
         protected override async Task OnInitializedAsync()
         {
             jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
-            await Js.InvokeVoidAsync("noScroll", "#MixDigitInput");
-            await Js.InvokeVoidAsync("noScroll", "#Prize1");
-            await Js.InvokeVoidAsync("noScroll", "#Prize2");
+            await Js.InvokeVoidAsync("noScroll", "MixDigitInput");
+            await Js.InvokeVoidAsync("noScroll", "Prize1");
+            await Js.InvokeVoidAsync("noScroll", "Prize2");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }

@@ -1,6 +1,6 @@
 ﻿function noScroll(id) {
-    $(id).on('focus', function (e) {
+    document.getElementById(id).onfocus = function (e) {
         e.preventDefault(); e.stopPropagation();
         window.scrollTo(0, 0);
-    });
+    }
 }
