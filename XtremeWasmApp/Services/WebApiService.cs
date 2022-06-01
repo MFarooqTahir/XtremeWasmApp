@@ -303,7 +303,7 @@ namespace XtremeWasmApp.Services
                     BId = sch.BId,
                     DId = sch.DId,
                     Category = sch.Cat,
-                    City = comp.City,
+                    City = sch.City,
                     Date = sch.Date.ToString("dd/MM/yyyy", CultureInfo.InvariantCulture),
                     PCode = comp.Pcode,
                     PName = cdRel.UName,

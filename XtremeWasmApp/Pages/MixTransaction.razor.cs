@@ -146,6 +146,9 @@ namespace XtremeWasmApp.Pages
         protected override async Task OnInitializedAsync()
         {
             jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
+            await Js.InvokeVoidAsync("noScroll", "#MixDigitInput");
+            await Js.InvokeVoidAsync("noScroll", "#Prize1");
+            await Js.InvokeVoidAsync("noScroll", "#Prize2");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }
@@ -300,6 +303,7 @@ namespace XtremeWasmApp.Pages
 
         private async Task OnPrz1Focus(FocusEventArgs args)
         {
+            // await jsModule.InvokeVoidAsync("scrollToTop");
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
