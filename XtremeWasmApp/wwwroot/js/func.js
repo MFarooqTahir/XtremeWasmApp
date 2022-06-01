@@ -9,6 +9,6 @@
         }
     }
     funct('MixDigitInput');
-    funct('Prize1');
     funct('Prize2');
+    funct('Prize1');
 }
