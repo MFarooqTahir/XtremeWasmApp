@@ -7,9 +7,9 @@
             document.body.scrollTop = 0;
             setTimeout(function () { window.scrollTo(0, 0); }, 0);
         }
-        document.getElementById(id). = function (e) {
+        document.getElementById(id).onblur = function (e) {
             e.preventDefault();
-            e.stopPropagation();onblur
+            e.stopPropagation();
             window.scrollTo(0, 0);
             document.body.scrollTop = 0;
             setTimeout(function () { window.scrollTo(0, 0); }, 0);
