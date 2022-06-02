@@ -20,7 +20,7 @@
 <AuthorizeView>
     <Authorized>
 
-        <div align-center style="max-width:650px;margin: auto;">
+        <div align-center style="max-width:650px;margin: auto;display:flex;">
             <div>
             <div style="display: flex;justify-content: space-between;" class="mx-1">
                 <MudText Style="align-self:center;" Align="Align.Center">Inv#: <span style="color:red;margin-right:10px;">@InvNo</span>A/c: <span style="color:darkcyan;margin-right:10px;">@Code</span>Ref: <span style="color:forestgreen">@Ref</span></MudText>
@@ -109,8 +109,8 @@
                 </div>
 
 
-                <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="1st Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
-                <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="2nd Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="I Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="II Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
 
             </MudStack>

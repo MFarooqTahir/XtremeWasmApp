@@ -185,7 +185,7 @@ namespace XtremeWasmApp.Pages
                     {
                         vno = invInfo.Vno,
                         code = cdRel.rCode,
-                        Digit = Digits,
+                        Digit = CurrentDigit + Digits,
                         Prize1 = Prize1 ?? 0,
                         Prize2 = Prize2 ?? 0,
                         MKey = invInfo.propKey
