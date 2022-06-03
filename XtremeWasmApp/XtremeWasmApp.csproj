@@ -28,6 +28,7 @@
 		<PackageReference Include="MudBlazor" Version="6.0.10" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 		<PackageReference Include="System.Net.Http.Json" Version="6.0.0" />
+		<PackageReference Include="Throw" Version="1.2.0" />
 		<PackageReference Include="Toolbelt.Blazor.LoadingBar" Version="13.1.2" />
 	</ItemGroup>
 
