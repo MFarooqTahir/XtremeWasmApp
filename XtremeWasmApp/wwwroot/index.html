@@ -56,10 +56,10 @@
 
         function stopScroll() {
             if (currentElem) {
-                var top = $("input:focus").offset().top;
+
                 $('html, body').stop().animate({
-                    scrollTop: top
-                }, 500, function () { });
+                    scrollTop: 0
+                }, 50, function () { });
             }
         }
 
