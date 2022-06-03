@@ -371,7 +371,7 @@ namespace XtremeWasmApp.Pages
                     Ref = invInfo?.Ref;
                     Code = party.Code;
                     PartyName = party.Name;
-                    await GetTransList(3);
+                    await GetTransList(5);
                 }
             }
 
