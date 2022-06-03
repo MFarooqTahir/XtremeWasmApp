@@ -63,7 +63,7 @@
             $("#footer").hide(); //hide footer so that the keyboard doesn't push it on top of textfield
             $("#containingDiv").css("bottom", "0px"); //remove bottom space for footer
             window.scrollTo(0, verticalNewSroll); // perform scroll!
-
+            setTimeout(function () { windows.scrollTo(0, verticalNewSroll); }, 0);
         }
 
         function isNativeApp() {
