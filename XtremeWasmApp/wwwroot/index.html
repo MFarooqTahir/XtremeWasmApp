@@ -37,31 +37,56 @@
     <meta name="msapplication-TileImage" content="Fav/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <script src="js/func.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
     <script type="text/javascript">
+
+        function setKeyboardPos(tarId) {
+
+            //programmatically: set scroll pos so keyboard aligns perfectly underneath textfield
+            var elVerticalDistance = $("#" + tarId).offset()["top"];
+            var keyboardHeight = 157;
+
+            if (isNativeApp()) { keyboardHeight = 261; } //I choose to change the keyboard height for the sake of simplicity. Obviously, this value does not correnspond to the actual height of the keyboard but it does the trick
+            var keyboardTextfieldPadding = 2;
+            var heightOfView = document.height;
+            var inputHeight = $("#" + tarId).outerHeight();
+
+            var viewPortSpace = heightOfView - keyboardHeight - keyboardTextfieldPadding; //180
+            var verticalNewSroll = (elVerticalDistance + inputHeight) - viewPortSpace;
+            if (verticalNewSroll < 0) { verticalNewSroll = 0; }
+            ////
+
+            //OK, all done lets go ahead with some actions
+            $("#footer").hide(); //hide footer so that the keyboard doesn't push it on top of textfield
+            $("#containingDiv").css("bottom", "0px"); //remove bottom space for footer
+            window.scrollTo(0, verticalNewSroll); // perform scroll!
+
+        }
+
+        function isNativeApp() {
+
+            var app = (document.URL.indexOf('http://') === -1) && (document.URL.indexOf('https://') === -1);
+            if (app) {
+                return true; // PhoneGap native application
+            } else {
+                return false; // Web app / safari
+            }
+
+        }
         function iphoneFocus() {
             var funct = (id) => {
-                let element = document.getElementById(id);
-                element.ontouchstart = function (e) {
-                    //e.preventDefault();
-                }
-                element.onfocus = function (e) {
-                    e.preventDefault();
-                    e.target.style.position = "fixed";
-                    window.scroll(0, 0);
-                    document.body.scroll(0);
-                }
-                element.onblur = function (e) {
-                    e.preventDefault();
-                    e.target.style.position = "absolute";
+                document.getElementById(id).onfocus = function (e) {
+
+                    setKeyboardPos(e.target.id);
                 }
             }
             funct('MixDigitInput');
             funct('Prize2');
             funct('Prize1');
-            console.log('iphoneFocus Done');
+
         }
     </script>
     <div id="app">
