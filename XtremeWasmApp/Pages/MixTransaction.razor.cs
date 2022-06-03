@@ -146,7 +146,7 @@ namespace XtremeWasmApp.Pages
         protected override async Task OnInitializedAsync()
         {
             jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
-            await Js.InvokeVoidAsync("noScroll");
+            await Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }
