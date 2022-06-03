@@ -43,10 +43,18 @@
     <script type="text/javascript">
         function iphoneFocus() {
             var funct = (id) => {
-                document.getElementById(id).onfocus = function (e) {
-                    e.target.style.position = "fixed";
+                let element = document.getElementById(id);
+                element.ontouchstart = function (e) {
+                    e.preventDefault();
                 }
-                document.getElementById(id).onblur = function (e) {
+                element.onfocus = function (e) {
+                    e.preventDefault();
+                    e.target.style.position = "fixed";
+                    window.scroll(0, 0);
+                    document.body.scroll(0);
+                }
+                element.onblur = function (e) {
+                    e.preventDefault();
                     e.target.style.position = "absolute";
                 }
             }
@@ -82,7 +90,7 @@
             .fsh-wasm-cont {
                 left: 50%;
                 padding: 10vmin;
-                position: fixed;
+                / position: fixed;
                 text-align: center;
                 top: 50%;
                 transform: translate(-50%, -50%)
