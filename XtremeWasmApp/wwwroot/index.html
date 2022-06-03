@@ -78,7 +78,11 @@
         }
         function iphoneFocus() {
             var funct = (id) => {
-                document.getElementById(id).onfocus = function (e) {
+                let element = document.getElementById(id);
+                element.ontouchmove = function (e) {
+                    e.preventDefault();
+                }
+                element.onfocus = function (e) {
 
                     setKeyboardPos(e.target.id);
                 }
