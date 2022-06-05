@@ -42,6 +42,18 @@
 
 <body>
     <script type="text/javascript">
+        function iOS() {
+            return [
+                'iPad Simulator',
+                'iPhone Simulator',
+                'iPod Simulator',
+                'iPad',
+                'iPhone',
+                'iPod'
+            ].includes(navigator.platform)
+                // iPad on iOS 13 detection
+                || (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+        }
         var currentElem;
 
         function stopScroll() {
@@ -82,20 +94,22 @@
             document.removeEventListener("touchend", stopScroll);
         }
         function iphoneFocus() {
-            var funct = (id) => {
-                let element = document.getElementById(id);
-                element.onfocus = function (e) {
+            if (iOS()) {
+                var funct = (id) => {
+                    let element = document.getElementById(id);
+                    element.onfocus = function (e) {
 
-                    disableScrolling(element);
+                        disableScrolling(element);
+                    }
+                    element.onfocusout = function (e) {
+                        enableScrolling()
+                    }
                 }
-                element.onfocusout = function (e) {
-                    enableScrolling()
-                }
+
+                funct('MixDigitInput');
+                funct('Prize2');
+                funct('Prize1');
             }
-            funct('MixDigitInput');
-            funct('Prize2');
-            funct('Prize1');
-
         }
     </script>
     <div id="app">
