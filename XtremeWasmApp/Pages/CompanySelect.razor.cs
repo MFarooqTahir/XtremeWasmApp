@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 using MudBlazor;
 
@@ -22,7 +23,13 @@ namespace XtremeWasmApp.Pages
         public IList<string> ErrorsList;
         private string acCode;
         private IList<CDRelation> CompanyList;
-
+        public int windowHeight, windowWidth;
+        private IJSObjectReference jsModule;
+        public class WindowDimensions
+        {
+            public int Width { get; set; }
+            public int Height { get; set; }
+        }
         protected override async Task OnInitializedAsync()
         {
             await GetCDRelations();
@@ -62,18 +69,39 @@ namespace XtremeWasmApp.Pages
                 }
             }
         }
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Dimentions.js");
 
+            }
+            if (jsModule is not null)
+            {
+                var (prevHeight, prevWidth) = (windowHeight, windowWidth);
+                var dimension = await jsModule.InvokeAsync<WindowDimensions>("getWindowSize");
+                windowHeight = dimension.Height;
+                windowWidth = dimension.Width;
+                if ((prevHeight, prevWidth) != (windowHeight, windowWidth))
+                {
+                    StateHasChanged();
+                }
+            }
+        }
         private async Task onRowSelection(int rowIndex)
         {
             await ApiService.SetDrawSelected(value: false);
             if (CompanyList?.Any() == true)
             {
                 var currSel = CompanyList[rowIndex];
-                var res = await ApiService.ChangeCompany(currSel);
-                if (!res.Item1)
+                if (currSel.Block || currSel.rBlocked)
                 {
-                    ErrorsList = new List<string>() { res.Item2 };
-                    StateHasChanged();
+                    var res = await ApiService.ChangeCompany(currSel);
+                    if (!res.Item1)
+                    {
+                        ErrorsList = new List<string>() { res.Item2 };
+                        StateHasChanged();
+                    }
                 }
             }
             //if (currSel.Block || currSel.rBlocked)
