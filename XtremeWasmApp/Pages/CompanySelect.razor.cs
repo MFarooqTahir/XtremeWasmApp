@@ -96,6 +96,10 @@ namespace XtremeWasmApp.Pages
                 var currSel = CompanyList[rowIndex];
                 if (currSel.Block || currSel.rBlocked)
                 {
+                    OnBlockClicked();
+                }
+                else
+                {
                     var res = await ApiService.ChangeCompany(currSel);
                     if (!res.Item1)
                     {
