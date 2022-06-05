@@ -260,7 +260,8 @@ namespace XtremeWasmApp.Pages
                             prz1Limit = (ret2.xamt1 - ret2.xuamt1) ?? 0;
                             prz2Limit = (ret2.xamt2 - ret2.xuamt2) ?? 0;
                         }
-                        await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                        Digits = null;
+                        await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                     }
                 }
                 else
