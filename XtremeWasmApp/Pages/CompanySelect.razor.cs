@@ -25,11 +25,13 @@ namespace XtremeWasmApp.Pages
         private IList<CDRelation> CompanyList;
         public int windowHeight, windowWidth;
         private IJSObjectReference jsModule;
+
         public class WindowDimensions
         {
             public int Width { get; set; }
             public int Height { get; set; }
         }
+
         protected override async Task OnInitializedAsync()
         {
             await GetCDRelations();
@@ -69,12 +71,12 @@ namespace XtremeWasmApp.Pages
                 }
             }
         }
+
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender)
             {
                 jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./js/Dimentions.js");
-
             }
             if (jsModule is not null)
             {
@@ -88,6 +90,7 @@ namespace XtremeWasmApp.Pages
                 }
             }
         }
+
         private async Task onRowSelection(int rowIndex)
         {
             await ApiService.SetDrawSelected(value: false);
@@ -108,19 +111,6 @@ namespace XtremeWasmApp.Pages
                     }
                 }
             }
-            //if (currSel.Block || currSel.rBlocked)
-            //{
-            //    OnBlockClicked();
-            //}
-            //else
-            //{
-            //    var res = await ApiService.ChangeCompany(currSel);
-            //    if (!res)
-            //    {
-            //        ErrorsList = new List<string>() { "Error changing company" };
-            //        StateHasChanged();
-            //    }
-            //}
         }
     }
 }
