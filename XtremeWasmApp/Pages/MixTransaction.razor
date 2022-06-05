@@ -62,17 +62,17 @@
                 </tbody>
             </MudSimpleTable>
             <MudStack Row="true" Class="my-3">
-                <MudText Class="mt-5 me-1" Style="font-size:15">T: @Total</MudText>
-                <div style="align-content:center;margin: auto;display:inline-flex;">
+                <MudText Class="mt-5 me-3" Style="font-size:15">T:@Total</MudText>
+                <div style="align-items: center;align-content:center;margin: auto;display:flex;width:100%;">
                     @if (repeatData?.RelationPrint == true)
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>
+                        <MudIconButton Style="margin-left:auto;" Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>
                     }
-                    <MudToggleIconButton @bind-Toggled="@AutoPrize"
+                    <MudToggleIconButton @bind-Toggled="@AutoPrize" Style="margin-right:auto;"
                                          Icon="@Icons.Material.Outlined.ContentCopy" Color="@Color.Default"
                                          ToggledIcon="@Icons.Material.TwoTone.ContentCopy" ToggledColor="@Color.Info" />
                 </div>
-                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl mt-2" Style="min-width:80px;width:80;max-width:200px;margin-right:0px;margin-left:auto;" FullWidth="false">
+                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl mt-2" Style="min-width:100px;width:100px;max-width:100px;margin-right:15px;margin-left:auto;" FullWidth="false">
                     <MudSelectItem Value=1>مکس</MudSelectItem>
                     <MudSelectItem Value=2>کلوز</MudSelectItem>
                     <MudSelectItem Value=3>سینٹر  </MudSelectItem>
