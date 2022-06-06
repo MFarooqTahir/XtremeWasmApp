@@ -274,7 +274,7 @@ namespace XtremeWasmApp.Pages
             catch (Exception ex)
             {
                 Digits = null;
-                await DialogService.ShowMessageBox("There was an error", "Ok");
+                await DialogService.ShowMessageBox("There was an error: " + ex.Message, "Ok");
                 await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
             }
             finally
