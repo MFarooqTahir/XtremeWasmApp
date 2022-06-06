@@ -15,6 +15,8 @@ namespace XtremeWasmApp.Pages
 {
     public partial class MixTransaction
     {
+        private Regex editMatch = new Regex(@"([a-zA-Z]+)(\d+)", RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
+
         private Regex filter = new Regex("[^0-9XSD]*", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
         private bool AddEntryDisabled = false;
 
@@ -30,13 +32,13 @@ namespace XtremeWasmApp.Pages
         private IList<Transaction>? Transactions { get; set; } = new List<Transaction>();
 
         private Transaction? Tempdata { get; set; }
-
+        private bool Editmode;
         private Inventory? invInfo { get; set; }
 
         private double Total;
         private int snoCountStart = 0;
         private bool DigitEnabled { get; set; }
-
+        private bool listEnabled;
         private bool Prz1Enabled { get; set; }
 
         private bool Prz2Enabled { get; set; }
@@ -50,10 +52,10 @@ namespace XtremeWasmApp.Pages
         public int? Prize1 {
             get { return _Prize1; }
             set {
-                if ((value ?? 0) > prz1Limit)
+                if (Prize1 is not null && (value ?? 0) > prz1Limit)
                 {
                     new Task(async () => {
-                        await DialogService.ShowMessageBox("Limit Exceeded", "Ok");
+                        await DialogService.ShowMessageBox("Limit Exceeded", "");
                         await jsModule.InvokeVoidAsync("focusInput", "Prize1");
                     }).Start();
                     //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
@@ -69,10 +71,10 @@ namespace XtremeWasmApp.Pages
         public int? Prize2 {
             get { return _Prize2; }
             set {
-                if ((value ?? 0) > prz2Limit)
+                if (Prize2 is not null && (value ?? 0) > prz2Limit)
                 {
                     new Task(async () => {
-                        await DialogService.ShowMessageBox("Limit Exceeded", "Ok");
+                        await DialogService.ShowMessageBox("Limit Exceeded", "");
                         await jsModule.InvokeVoidAsync("focusInput", "Prize2");
                     }).Start();
                     //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
@@ -170,6 +172,15 @@ namespace XtremeWasmApp.Pages
             }
         }
 
+        private async Task OnEditCancel(MouseEventArgs args)
+        {
+            Tempdata = new();
+            Digits = null;
+            Prize1 = null;
+            Prize2 = null;
+            Editmode = false;
+        }
+
         private async Task OnDoneClick(MouseEventArgs args)
         {
             if (!AddEntryDisabled)
@@ -178,26 +189,26 @@ namespace XtremeWasmApp.Pages
                 try
                 {
                     Digits.Throw().IfNullOrWhiteSpace(x => x);
-                    if (DropSel != 0 && Digits.Length != SearchLimit)
+                    if (DropSel != 1 && Digits.Length != SearchLimit)
                     {
-                        await DialogService.ShowMessageBox("Invalid Digit", "Ok");
+                        await DialogService.ShowMessageBox("Invalid Digit", "");
                     }
                     else
                     {
-                        mixpktchkModel? ret = await Api.PktCheck(CurrentDigit + Digits);
+                        var ret = await Api.PktCheck(CurrentDigit + Digits);
                         if (ret is not null && string.IsNullOrEmpty(ret.msg))
                         {
                             prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
                             prz2Limit = (ret.xamt2 - ret.xuamt2) ?? 0;
                             if (Prize1 > prz1Limit)
                             {
-                                var result = await DialogService.ShowMessageBox("Prize 1 exceeded limit", "Ok");
+                                await DialogService.ShowMessageBox("Prize 1 exceeded limit", "");
                                 Digits = "";
                                 await jsModule.InvokeVoidAsync("focusInput", "Prize1");
                             }
                             else if (Prize2 > prz2Limit)
                             {
-                                var result = await DialogService.ShowMessageBox("Prize 2 exceeded limit", "Ok");
+                                await DialogService.ShowMessageBox("Prize 2 exceeded limit", "");
                                 Digits = "";
                                 await jsModule.InvokeVoidAsync("focusInput", "Prize2");
                             }
@@ -211,13 +222,12 @@ namespace XtremeWasmApp.Pages
                                     Digit = CurrentDigit + Digits,
                                     Prize1 = Prize1 ?? 0,
                                     Prize2 = Prize2 ?? 0,
-                                    MKey = invInfo.propKey
+                                    MKey = invInfo.propKey,
                                 };
                                 var invD = new EntryData()
                                 {
                                     transaction = trans,
                                     dbf = "FAROOQ",
-                                    xmkey = 0,
                                     xid = cdRel.UName,
                                     xdtype = 'W',
                                     xmode = 0,
@@ -225,11 +235,18 @@ namespace XtremeWasmApp.Pages
                                     xpamt2 = 0,
                                     xpid = 'X',
                                 };
+                                if (Editmode)
+                                {
+                                    invD.lmkey = Tempdata?.lmkey ?? 0;
+                                    invD.xmkey = Tempdata?.MKey ?? 0;
+                                }
                                 Tempdata = await Api.MakeNewEntry(invD);
                                 if (string.Equals(Tempdata.code, cdRel.rCode, StringComparison.Ordinal))
                                 {
                                     if (Transactions!.Any() && !string.Equals(Tempdata.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
                                     {
+                                        listEnabled = Editmode;
+
                                         await refreshPage();
                                     }
                                     else
@@ -243,19 +260,22 @@ namespace XtremeWasmApp.Pages
                                 {
                                     if (string.Equals(Tempdata.code, "1", StringComparison.Ordinal))
                                     {
-                                        var result = await DialogService.ShowMessageBox("Draw Closed", "Ok");
+                                        await DialogService.ShowMessageBox("Draw Closed", "");
                                         nav.NavigateTo("/");
+                                        Editmode = false;
                                         return;
                                     }
                                     else if (string.Equals(Tempdata.code, "2", StringComparison.Ordinal))
                                     {
-                                        var result = await DialogService.ShowMessageBox("Limit has been reached", "Ok");
+                                        await DialogService.ShowMessageBox("Limit has been reached", "");
+                                        Editmode = false;
                                         return;
                                     }
                                     else if (string.Equals(Tempdata.code, "3", StringComparison.Ordinal))
                                     {
-                                        var result = await DialogService.ShowMessageBox("Invoice has been closed", "Ok");
+                                        await DialogService.ShowMessageBox("Invoice has been closed", "");
                                         await refreshPage();
+                                        Editmode = false;
                                         return;
                                     }
                                 }
@@ -274,7 +294,7 @@ namespace XtremeWasmApp.Pages
                         }
                         else
                         {
-                            var result2 = await DialogService.ShowMessageBox("Error " + ret.msg, "Ok");
+                            var result2 = await DialogService.ShowMessageBox("Error ", ret.msg);
                         }
                     }
                 }
@@ -285,6 +305,7 @@ namespace XtremeWasmApp.Pages
                 finally
                 {
                     AddEntryDisabled = false;
+                    Editmode = false;
 
                     Digits = null;
                     await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
@@ -313,19 +334,27 @@ namespace XtremeWasmApp.Pages
         {
             if (!string.IsNullOrEmpty(Digits))
             {
-                mixpktchkModel? ret = await Api.PktCheck(CurrentDigit + Digits);
-                if (ret is not null)
+                if (DropSel != 1 && Digits.Length != SearchLimit)
                 {
-                    if (string.IsNullOrEmpty(ret.msg))
+                    await DialogService.ShowMessageBox("Invalid Digit", "");
+                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                }
+                else
+                {
+                    var ret = await Api.PktCheck(CurrentDigit + Digits);
+                    if (ret is not null)
                     {
-                        prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
-                        prz2Limit = (ret.xamt2 - ret.xuamt2) ?? 0;
-                    }
-                    else
-                    {
-                        var result = await DialogService.ShowMessageBox(ret.msg, "Ok");
-                        Digits = "";
-                        await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                        if (string.IsNullOrEmpty(ret.msg))
+                        {
+                            prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
+                            prz2Limit = (ret.xamt2 - ret.xuamt2) ?? 0;
+                        }
+                        else
+                        {
+                            var result = await DialogService.ShowMessageBox(ret.msg, "");
+                            Digits = "";
+                            await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                        }
                     }
                 }
             }
@@ -334,6 +363,28 @@ namespace XtremeWasmApp.Pages
         private async Task OnDigitFocus(FocusEventArgs args)
         {
             prz1Limit = prz2Limit = 0;
+        }
+
+        private async Task OnListClick(MouseEventArgs args)
+        {
+            try
+            {
+                Prz1Enabled = false;
+                Prz2Enabled = false;
+                AddEntryDisabled = true;
+                listEnabled = true;
+                await GetTransList();
+            }
+            catch (Exception ex)
+            {
+                await DialogService.ShowMessageBox("There was an error", "");
+            }
+            finally
+            {
+                Prz1Enabled = true;
+                Prz2Enabled = true;
+                AddEntryDisabled = false;
+            }
         }
 
         private async Task OnPrz1Focus(FocusEventArgs args)
@@ -367,7 +418,7 @@ namespace XtremeWasmApp.Pages
                     var sch = await Api.GetSch();
                     var qty = await Api.IsQtyUser();
                     var invD = new InvData()
-                    { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = $"Online", xsc = 0, xvid = "1SL", xdtype = 'W', db = "", };
+                    { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = 'W', db = "", };
                     //Dmode = 0
                     var nParty = (await Api.GetParty()).ShallowCopy();
                     if (sch.Prz2 == 5)
@@ -398,7 +449,7 @@ namespace XtremeWasmApp.Pages
 
                 if (invInfo?.xres == 1)
                 {
-                    var result = await DialogService.ShowMessageBox("Draw Closed", "Ok");
+                    var result = await DialogService.ShowMessageBox("Draw Closed", "");
                     nav.NavigateTo("/");
                 }
                 else
@@ -408,7 +459,7 @@ namespace XtremeWasmApp.Pages
                     Ref = invInfo?.Ref;
                     Code = party.Code;
                     PartyName = party.Name;
-                    await GetTransList(5);
+                    await GetTransList(listEnabled ? 0 : 5);
                 }
             }
 
@@ -416,17 +467,98 @@ namespace XtremeWasmApp.Pages
             StateHasChanged();
         }
 
+        private async Task OnEntryClick(int Mkey)
+        {
+            try
+            {
+                var entry = Transactions.First(x => x.MKey == Mkey);
+                if (entry is not null)
+                {
+                    bool res = await Api.CheckEntryEdit(Mkey);
+                    if (res)
+                    {
+                        Tempdata = entry;
+                        Editmode = true;
+                        Prize2 = Prize1 = null;
+                        StateHasChanged();
+
+                        var alphaPart = entry.Digit.Where(x => char.IsLetter(x)).Aggregate("", (current, c) => current + c);
+                        var numberPart = entry.Digit.Where(x => !char.IsLetter(x)).Aggregate("", (current, c) => current + c);
+                        if (alphaPart?.Length == 0)
+                        {
+                            DropSel = 1;
+                        }
+                        else
+                        {
+                            switch (numberPart.Length)
+                            {
+                                case 1 when string.Equals(alphaPart, "X", StringComparison.Ordinal):
+                                    DropSel = 2;
+                                    break;
+
+                                case 1 when string.Equals(alphaPart, "XX", StringComparison.Ordinal):
+                                    DropSel = 3;
+                                    break;
+
+                                case 1 when string.Equals(alphaPart, "XXX", StringComparison.Ordinal):
+                                    DropSel = 4;
+                                    break;
+
+                                case 2 when string.Equals(alphaPart, "X", StringComparison.Ordinal):
+                                    DropSel = 5;
+                                    break;
+
+                                case 2 when string.Equals(alphaPart, "XX", StringComparison.Ordinal):
+                                    DropSel = 6;
+                                    break;
+
+                                case 3 when string.Equals(alphaPart, "X", StringComparison.Ordinal):
+                                    DropSel = 7;
+                                    break;
+
+                                case 1 when string.Equals(alphaPart, "D", StringComparison.Ordinal):
+                                    DropSel = 8;
+                                    break;
+
+                                case 1 when string.Equals(alphaPart, "S", StringComparison.Ordinal):
+                                    DropSel = 9;
+
+                                    break;
+
+                                default:
+                                    break;
+                            }
+                        }
+                        Digits = numberPart;
+                        await lostDigitFocus(null);
+                        Prize1 = int.Parse(entry.Prize1.ToString(), Curr);
+                        Prize2 = int.Parse(entry.Prize2.ToString(), Curr);
+                        StateHasChanged();
+                    }
+                    else
+                    {
+                        DialogService.ShowMessageBox("Edit Not Allowed", "");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Editmode = false;
+                await DialogService.ShowMessageBox(title: "There was an error", "");
+            }
+        }
+
         private async Task GetTransList(int amt = 0)
         {
             if (DigitEnabled)
             {
-                var TransactionsInfo = await Api.GetTransactionsListMix(amt, (invInfo?.Vno ?? 0));
+                var TransactionsInfo = await Api.GetTransactionsListMix(amt, invInfo?.Vno ?? 0);
                 if (TransactionsInfo is not null)
                 {
                     Transactions = TransactionsInfo.Transactions;
-                    if (amt < TransactionsInfo.TotalRows)
+                    if (amt != 0 && amt < TransactionsInfo.TotalRows)
                     {
-                        snoCountStart = TransactionsInfo.TotalRows - amt;
+                        snoCountStart = TransactionsInfo.TotalRows - amt + 1;
                     }
                     else
                     {

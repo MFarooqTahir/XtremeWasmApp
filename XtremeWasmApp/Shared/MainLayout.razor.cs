@@ -39,7 +39,7 @@ namespace XtremeWasmApp.Shared
 
         private bool Check(bool authen)
         {
-            bool page = string.Equals(Currpage, "Login", StringComparison.OrdinalIgnoreCase) || string.Equals(Currpage, "Register", StringComparison.OrdinalIgnoreCase);
+            var page = string.Equals(Currpage, "Login", StringComparison.OrdinalIgnoreCase) || string.Equals(Currpage, "Register", StringComparison.OrdinalIgnoreCase);
             if (!authen && !page)
             {
                 nav.NavigateTo("/Login");

@@ -23,15 +23,15 @@
         <div align-center style="max-width:750px;margin: auto;" class="mt--3 pt-0">
             <div style="display: flex;justify-content: space-between;height:25px;" class="mx-1">
                 <MudText Style="align-self:center;" Align="Align.Center">Inv#: <span style="color:red;margin-right:10px;">@InvNo</span>A/c: <span style="color:darkcyan;margin-right:10px;">@Code</span>Ref: <span style="color:forestgreen">@Ref</span></MudText>
-                <MudIconButton Style="align-self:right" Icon="@Icons.Material.Filled.List" Color="@(Color.Tertiary)"></MudIconButton>
+                <MudIconButton Style="align-self:right" Icon="@Icons.Material.Filled.List"  OnClick="@OnListClick" Color="@(Color.Tertiary)"></MudIconButton>
             </div>
             <MudSimpleTable Dense="true" Bordered="true" Striped="true" Hover="true" FixedHeader="true" Style="height:205px;">
                 <thead>
                     <tr>
-                        <th style="background-color: #ffe4b5;color:black">S #</th>
-                        <th style="background-color: #ffe4b5;color:black">Digit</th>
-                        <th style="text-align:right;background-color: #ffe4b5;color:black">1<sup>st</sup> Prize</th>
-                        <th style="text-align:right;background-color: #ffe4b5;color:black">2<sup>nd</sup> Prize</th>
+                        <th style="background-color: #ffe4b5;color:black;"><b>S #</b></th>
+                        <th style="background-color: #ffe4b5;color:black"><b>Digit</b></th>
+                        <th style="text-align:right;background-color: #ffe4b5;color:black"><b>1<sup>st</sup> Prize</b></th>
+                        <th style="text-align:right;background-color: #ffe4b5;color:black"><b>2<sup>nd</sup> Prize</b></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,13 +45,13 @@
                         var cNow = -1;
                         @foreach (var transaction in Transactions)
                         {
-                            transaction.sNo = snoCountStart.ToString("D6");
+                            transaction.sNo = snoCountStart.ToString("D5");
 
-                            <tr>
-                                <td>@transaction.sNo</td>
-                                <td>@transaction.Digit</td>
-                                <td style="text-align:right">@transaction.Prize1.ToString("C",numberFormat)</td>
-                                <td style="text-align:right">@transaction.Prize2.ToString("C",numberFormat)</td>
+                            <tr @onclick="@(()=>OnEntryClick(transaction.MKey))">
+                                <td><b>@transaction.sNo</b></td>
+                                <td><b>@transaction.Digit</b></td>
+                                <td style="text-align:right"><b>@transaction.Prize1.ToString("C",numberFormat)</b></td>
+                                <td style="text-align:right"><b>@transaction.Prize2.ToString("C",numberFormat)</b></td>
                             </tr>
                             cNow++;
                             snoCountStart++;
@@ -111,7 +111,11 @@
                 <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="I Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown"  @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="II Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudIconButton Disabled="@AddEntryDisabled" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
+                @if(@Editmode)
+                {                
+                    <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="@OnEditCancel" Style="margin-top:6px;height:55px;"></MudIconButton>
 
+                }
             </MudStack>
         </div>
     </Authorized>

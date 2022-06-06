@@ -16,14 +16,14 @@
         public override bool Equals(object? obj)
         {
             return obj is TopMarqueData data &&
-                   PCode == data.PCode &&
-                   PName == data.PName &&
-                   Balance == data.Balance &&
+string.Equals(PCode, data.PCode, StringComparison.Ordinal) &&
+string.Equals(PName, data.PName, StringComparison.Ordinal) &&
+string.Equals(Balance, data.Balance, StringComparison.Ordinal) &&
                    DId == data.DId &&
-                   BId == data.BId &&
-                   City == data.City &&
-                   Date == data.Date &&
-                   Category == data.Category;
+string.Equals(BId, data.BId, StringComparison.Ordinal) &&
+string.Equals(City, data.City, StringComparison.Ordinal) &&
+string.Equals(Date, data.Date, StringComparison.Ordinal) &&
+string.Equals(Category, data.Category, StringComparison.Ordinal);
         }
 
         public static bool operator ==(TopMarqueData? left, TopMarqueData? right)

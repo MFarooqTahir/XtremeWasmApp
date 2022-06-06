@@ -117,7 +117,7 @@ namespace XtremeWasmApp.Services
                             break;
                     }
                 }
-                HttpResponseMessage response = type switch
+                var response = type switch
                 {
                     RequestType.Get => await _httpClient.GetAsync(baseUri.AbsoluteUri + URL).ConfigureAwait(false),
                     RequestType.Post => await _httpClient.PostAsJsonAsync(baseUri.AbsoluteUri + URL, objPost).ConfigureAwait(false),
@@ -205,7 +205,7 @@ namespace XtremeWasmApp.Services
 
                 await SetCdrel(cDRelation).ConfigureAwait(false);
                 await SetCompany(Company).ConfigureAwait(false);
-                bool isFranchise = Company.Stype == 'F';
+                var isFranchise = Company.Stype == 'F';
                 await setIsFranchise(isFranchise).ConfigureAwait(false);
                 await setFcode(Company.FCode).ConfigureAwait(false);
                 if (isFranchise)
@@ -228,7 +228,7 @@ namespace XtremeWasmApp.Services
                     return (false, "There was an error in getting the data. Please try again later");
                 }
                 await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
-                bool SelShedule = DashData.sch?.Count > 1;
+                var SelShedule = DashData.sch?.Count > 1;
                 if (DashData.sch?.Count != 0)
                 {
                     var ExtraBalance = 0;
@@ -291,7 +291,7 @@ namespace XtremeWasmApp.Services
                 var party = await GetParty().ConfigureAwait(false);
                 var sch = await GetSch().ConfigureAwait(false) ?? new();
                 var cdRel = await GetCdrel().ConfigureAwait(false);
-                string ret = string.Empty;
+                var ret = string.Empty;
                 if (party is not null && cdRel is not null)
                 {
                     ret = await UpdateBalance(cdRel, party).ConfigureAwait(false);
@@ -403,6 +403,12 @@ namespace XtremeWasmApp.Services
                 return $"Bal: {amt - amt2}";
             }
             return $"Sale: {amt2}";
+        }
+
+        internal async Task<bool> CheckEntryEdit(int mkey)
+        {
+            var res = await SendHttpRequest<ResultSet<bool>>($"api/Transactions/CheckEntryEdit/{mkey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            return res.ResultObj;
         }
 
         public async Task UpdateAllBalance()

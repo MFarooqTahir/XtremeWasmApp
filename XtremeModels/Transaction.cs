@@ -12,5 +12,6 @@
         public int vno { get; set; }
         public int MKey { get; set; }
         public double sc_rate { get; set; }
+        public int lmkey { get; set; }
     }
 }
