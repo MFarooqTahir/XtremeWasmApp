@@ -172,114 +172,117 @@ namespace XtremeWasmApp.Pages
 
         private async Task OnDoneClick(MouseEventArgs args)
         {
-            AddEntryDisabled = true;
-            try
+            if (!AddEntryDisabled)
             {
-                Digits.Throw().IfNullOrWhiteSpace(x => x);
-                mixpktchkModel? ret = await Api.PktCheck(CurrentDigit + Digits);
-                if (ret is not null && string.IsNullOrEmpty(ret.msg))
+                AddEntryDisabled = true;
+                try
                 {
-                    prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
-                    prz2Limit = (ret.xamt2 - ret.xuamt2) ?? 0;
-                    if (Prize1 > prz1Limit)
+                    Digits.Throw().IfNullOrWhiteSpace(x => x);
+                    mixpktchkModel? ret = await Api.PktCheck(CurrentDigit + Digits);
+                    if (ret is not null && string.IsNullOrEmpty(ret.msg))
                     {
-                        var result = await DialogService.ShowMessageBox("Prize 1 exceeded limit", "Ok");
-                        Digits = "";
-                        await jsModule.InvokeVoidAsync("focusInput", "Prize1");
-                    }
-                    else if (Prize2 > prz2Limit)
-                    {
-                        var result = await DialogService.ShowMessageBox("Prize 2 exceeded limit", "Ok");
-                        Digits = "";
-                        await jsModule.InvokeVoidAsync("focusInput", "Prize2");
-                    }
-                    else
-                    {
-                        var cdRel = await Api.GetCdrel();
-                        var trans = new Transaction()
+                        prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
+                        prz2Limit = (ret.xamt2 - ret.xuamt2) ?? 0;
+                        if (Prize1 > prz1Limit)
                         {
-                            vno = invInfo.Vno,
-                            code = cdRel.rCode,
-                            Digit = CurrentDigit + Digits,
-                            Prize1 = Prize1 ?? 0,
-                            Prize2 = Prize2 ?? 0,
-                            MKey = invInfo.propKey
-                        };
-                        var invD = new EntryData()
+                            var result = await DialogService.ShowMessageBox("Prize 1 exceeded limit", "Ok");
+                            Digits = "";
+                            await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                        }
+                        else if (Prize2 > prz2Limit)
                         {
-                            transaction = trans,
-                            dbf = "FAROOQ",
-                            xmkey = 0,
-                            xid = cdRel.UName,
-                            xdtype = 'W',
-                            xmode = 0,
-                            xpamt1 = 0,
-                            xpamt2 = 0,
-                            xpid = 'X',
-                        };
-                        Tempdata = await Api.MakeNewEntry(invD);
-                        if (string.Equals(Tempdata.code, cdRel.rCode, StringComparison.Ordinal))
-                        {
-                            if (Transactions!.Any() && !string.Equals(Tempdata.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
-                            {
-                                await refreshPage();
-                            }
-                            else
-                            {
-                                Transactions.Add(Tempdata);
-                                Total += Tempdata.Prize1 + Tempdata.Prize2;
-                                await Api.UpdateAllBalance();
-                            }
+                            var result = await DialogService.ShowMessageBox("Prize 2 exceeded limit", "Ok");
+                            Digits = "";
+                            await jsModule.InvokeVoidAsync("focusInput", "Prize2");
                         }
                         else
                         {
-                            if (string.Equals(Tempdata.code, "1", StringComparison.Ordinal))
+                            var cdRel = await Api.GetCdrel();
+                            var trans = new Transaction()
                             {
-                                var result = await DialogService.ShowMessageBox("Draw Closed", "Ok");
-                                nav.NavigateTo("/");
-                                return;
-                            }
-                            else if (string.Equals(Tempdata.code, "2", StringComparison.Ordinal))
+                                vno = invInfo.Vno,
+                                code = cdRel.rCode,
+                                Digit = CurrentDigit + Digits,
+                                Prize1 = Prize1 ?? 0,
+                                Prize2 = Prize2 ?? 0,
+                                MKey = invInfo.propKey
+                            };
+                            var invD = new EntryData()
                             {
-                                var result = await DialogService.ShowMessageBox("Limit has been reached", "Ok");
-                                return;
-                            }
-                            else if (string.Equals(Tempdata.code, "3", StringComparison.Ordinal))
+                                transaction = trans,
+                                dbf = "FAROOQ",
+                                xmkey = 0,
+                                xid = cdRel.UName,
+                                xdtype = 'W',
+                                xmode = 0,
+                                xpamt1 = 0,
+                                xpamt2 = 0,
+                                xpid = 'X',
+                            };
+                            Tempdata = await Api.MakeNewEntry(invD);
+                            if (string.Equals(Tempdata.code, cdRel.rCode, StringComparison.Ordinal))
                             {
-                                var result = await DialogService.ShowMessageBox("Invoice has been closed", "Ok");
-                                await refreshPage();
-                                return;
+                                if (Transactions!.Any() && !string.Equals(Tempdata.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    await refreshPage();
+                                }
+                                else
+                                {
+                                    Transactions.Add(Tempdata);
+                                    Total += Tempdata.Prize1 + Tempdata.Prize2;
+                                    await Api.UpdateAllBalance();
+                                }
                             }
+                            else
+                            {
+                                if (string.Equals(Tempdata.code, "1", StringComparison.Ordinal))
+                                {
+                                    var result = await DialogService.ShowMessageBox("Draw Closed", "Ok");
+                                    nav.NavigateTo("/");
+                                    return;
+                                }
+                                else if (string.Equals(Tempdata.code, "2", StringComparison.Ordinal))
+                                {
+                                    var result = await DialogService.ShowMessageBox("Limit has been reached", "Ok");
+                                    return;
+                                }
+                                else if (string.Equals(Tempdata.code, "3", StringComparison.Ordinal))
+                                {
+                                    var result = await DialogService.ShowMessageBox("Invoice has been closed", "Ok");
+                                    await refreshPage();
+                                    return;
+                                }
+                            }
+                            if (!AutoPrize)
+                            {
+                                Prize1 = null;
+                                Prize2 = null;
+                            }
+                            var ret2 = await Api.PktCheck(CurrentDigit + Digits);
+                            if (ret2 is not null && string.IsNullOrEmpty(ret2.msg))
+                            {
+                                prz1Limit = (ret2.xamt1 - ret2.xuamt1) ?? 0;
+                                prz2Limit = (ret2.xamt2 - ret2.xuamt2) ?? 0;
+                            }
+                            Digits = null;
+                            await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                         }
-                        if (!AutoPrize)
-                        {
-                            Prize1 = null;
-                            Prize2 = null;
-                        }
-                        var ret2 = await Api.PktCheck(CurrentDigit + Digits);
-                        if (ret2 is not null && string.IsNullOrEmpty(ret2.msg))
-                        {
-                            prz1Limit = (ret2.xamt1 - ret2.xuamt1) ?? 0;
-                            prz2Limit = (ret2.xamt2 - ret2.xuamt2) ?? 0;
-                        }
-                        Digits = null;
-                        await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    }
+                    else
+                    {
+                        var result2 = await DialogService.ShowMessageBox("Error " + ret.msg, "Ok");
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    var result2 = await DialogService.ShowMessageBox("Error " + ret.msg, "Ok");
+                    Digits = null;
+                    await DialogService.ShowMessageBox("There was an error", "Ok");
+                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
-            }
-            catch (Exception ex)
-            {
-                Digits = null;
-                await DialogService.ShowMessageBox("There was an error: " + ex.Message, "Ok");
-                await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
-            }
-            finally
-            {
-                AddEntryDisabled = false;
+                finally
+                {
+                    AddEntryDisabled = false;
+                }
             }
         }
 
