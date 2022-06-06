@@ -16,6 +16,7 @@ namespace XtremeWasmApp.Pages
     public partial class MixTransaction
     {
         private Regex filter = new Regex("[^0-9XSD]*", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
+        private bool AddEntryDisabled = false;
 
         [Inject]
         private IJSRuntime Js { get; set; }
@@ -171,6 +172,7 @@ namespace XtremeWasmApp.Pages
 
         private async Task OnDoneClick(MouseEventArgs args)
         {
+            AddEntryDisabled = true;
             try
             {
                 Digits.Throw().IfNullOrWhiteSpace(x => x);
@@ -274,6 +276,10 @@ namespace XtremeWasmApp.Pages
                 Digits = null;
                 await DialogService.ShowMessageBox("There was an error", "Ok");
                 await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+            }
+            finally
+            {
+                AddEntryDisabled = false;
             }
         }
 

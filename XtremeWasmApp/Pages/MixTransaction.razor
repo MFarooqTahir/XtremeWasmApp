@@ -110,7 +110,7 @@
 
                 <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="I Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown"  @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="II Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
-                <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
+                <MudIconButton Disabled="@AddEntryDisabled" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
 
             </MudStack>
         </div>
