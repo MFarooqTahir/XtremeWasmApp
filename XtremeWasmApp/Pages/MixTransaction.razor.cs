@@ -266,6 +266,7 @@ namespace XtremeWasmApp.Pages
                             }
                             Digits = null;
                             await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                            await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                         }
                     }
                     else
@@ -277,6 +278,7 @@ namespace XtremeWasmApp.Pages
                 {
                     Digits = null;
                     await DialogService.ShowMessageBox("There was an error", "Ok");
+                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                     await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
                 finally
