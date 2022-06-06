@@ -70,13 +70,13 @@
     
     string trStyle(bool Enabled, bool Block, bool Active, bool rBlocked)
     {
-        if (Enabled)
-        {
-            return "background:transparent;";
-        }
-        else if (Block || rBlocked)
+        if (Block || rBlocked)
         {
             return "background:rgba(255,0,0,0.4);";
+        }
+        else if (Enabled)
+        {
+            return "background:transparent;";
         }
         else if (Active)
         {
