@@ -34,7 +34,7 @@ namespace XtremeWasmApp.Shared
 
         private bool compSel;
         private bool drawSel;
-        private bool MarqSet;
+        private bool MarqSet => MarqData is not null;
         private TopMarqueData MarqData;
 
         private bool Check(bool authen)
@@ -83,7 +83,6 @@ namespace XtremeWasmApp.Shared
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             var currMarq = MarqSet;
-            MarqSet = false;
             if (firstRender)
             {
                 //await Auth.Logout();
@@ -131,7 +130,6 @@ namespace XtremeWasmApp.Shared
                 }
                 var currMarqData = MarqData;
                 MarqData = await Auth.GetMarqData();
-                MarqSet = MarqData is not null;
                 rerender = rerender || MarqSet != currMarq || currMarqData != MarqData;
                 if (rerender)
                 {

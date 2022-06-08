@@ -67,7 +67,7 @@
                     {
                         <MudIconButton Style="margin-left:auto;" Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>
                     }
-                    <MudToggleIconButton @bind-Toggled="@AutoPrize" Style="margin-right:auto;"
+                    <MudToggleIconButton @bind-Toggled="@AutoPrize" Style=@($"margin-right:auto;{(repeatData?.RelationPrint == false?"margin-left:auto":"")}")
                                          Icon="@Icons.Material.Outlined.ContentCopy" Color="@Color.Default"
                                          ToggledIcon="@Icons.Material.TwoTone.ContentCopy" ToggledColor="@Color.Info" />
                 </div>

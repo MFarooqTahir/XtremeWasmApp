@@ -195,7 +195,7 @@ namespace XtremeWasmApp.Pages
                     }
                     else
                     {
-                        var ret = await Api.PktCheck(CurrentDigit + Digits);
+                        var ret = await Api.PktCheck((CurrentDigit + Digits).ToUpper());
                         if (ret is not null && string.IsNullOrEmpty(ret.msg))
                         {
                             prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
@@ -284,7 +284,7 @@ namespace XtremeWasmApp.Pages
                                     Prize1 = null;
                                     Prize2 = null;
                                 }
-                                var ret2 = await Api.PktCheck(CurrentDigit + Digits);
+                                var ret2 = await Api.PktCheck((CurrentDigit + Digits).ToUpper());
                                 if (ret2 is not null && string.IsNullOrEmpty(ret2.msg))
                                 {
                                     prz1Limit = (ret2.xamt1 - ret2.xuamt1) ?? 0;
@@ -341,7 +341,7 @@ namespace XtremeWasmApp.Pages
                 }
                 else
                 {
-                    var ret = await Api.PktCheck(CurrentDigit + Digits);
+                    var ret = await Api.PktCheck((CurrentDigit + Digits).ToUpper());
                     if (ret is not null)
                     {
                         if (string.IsNullOrEmpty(ret.msg))
@@ -444,7 +444,8 @@ namespace XtremeWasmApp.Pages
                     }
 
                     invD.party = nParty;
-                    invInfo = await Api.MakeNewInv(invD);
+                    await Api.MakeNewInv(invD);
+                    invInfo = await Api.GetInvInfo();
                 }
 
                 if (invInfo?.xres == 1)
