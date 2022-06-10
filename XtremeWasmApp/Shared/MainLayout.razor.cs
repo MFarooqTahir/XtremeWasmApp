@@ -16,6 +16,9 @@ namespace XtremeWasmApp.Shared
         [Inject]
         private WebApiService Auth { get; set; } = null!;
 
+        [Inject]
+        private IRefreshService service { get; set; }
+
         public Timer _timer;
 
         private RepeatDataReturnWA repeatData;
@@ -48,8 +51,15 @@ namespace XtremeWasmApp.Shared
             return true;
         }
 
+        private void RefreshMe()
+        {
+            StateHasChanged();
+        }
+
         protected override void OnInitialized()
         {
+            service.RefreshRequested += RefreshMe;
+
             _timer = new(async _ => {
                 if (RunTimer && await Auth.GetRepeatDataWeb())
                 {
@@ -69,8 +79,8 @@ namespace XtremeWasmApp.Shared
                             await Auth.SetDrawSelected(value: false);
                             nav.NavigateTo("/DrawSelection");
                         }
-                        await InvokeAsync(StateHasChanged);
                     }
+                    await InvokeAsync(StateHasChanged);
                 }
             }, state: null, 0, 10000);
         }

@@ -208,15 +208,7 @@ namespace XtremeWasmApp.Services
                 var isFranchise = Company.Stype == 'F';
                 await setIsFranchise(isFranchise).ConfigureAwait(false);
                 await setFcode(Company.FCode).ConfigureAwait(false);
-                if (isFranchise)
-                {
-                    var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
-                    if (mkeys is null || mkeys.ResultObj is null)
-                    {
-                        return (false, "Error in franchise Invoice");
-                    }
-                    await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
-                }
+
                 var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var DashData = DashDataRes?.ResultObj;
                 if (DashData is null)
@@ -235,10 +227,18 @@ namespace XtremeWasmApp.Services
                     if (!SelShedule)
                     {
                         await SetSch(DashData?.sch?[0]).ConfigureAwait(false);
-
                         var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{DashData.sch[0].mkey}", RequestType.Get).ConfigureAwait(false);
 
                         await ChangeToken(newTokenInv).ConfigureAwait(false);
+                        if (isFranchise)
+                        {
+                            var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                            if (mkeys is null || mkeys.ResultObj is null)
+                            {
+                                return (false, "Error in franchise Invoice");
+                            }
+                            await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
+                        }
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                         if (!resl.ResultObj)
                         {
@@ -365,6 +365,16 @@ namespace XtremeWasmApp.Services
                 await SetSch(CurrSelectedSch).ConfigureAwait(false);
                 var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{CurrSelectedSch.mkey}", RequestType.Get).ConfigureAwait(false);
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
+                if (await GetIsFranchise().ConfigureAwait(false))
+                {
+                    var Company = await GetCompany().ConfigureAwait(false);
+                    var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                    if (mkeys is null || mkeys.ResultObj is null)
+                    {
+                        return (false, "Error in franchise Invoice");
+                    }
+                    await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
+                }
 
                 var cDRelation = await GetCdrel().ConfigureAwait(false);
                 var res = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
