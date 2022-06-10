@@ -563,7 +563,7 @@ namespace XtremeWasmApp.Pages
             catch (Exception ex)
             {
                 Editmode = false;
-                await showDialog(title: "There was an error", "");
+                await showDialog("There was an error", "");
             }
         }
 
