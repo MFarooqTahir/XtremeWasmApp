@@ -7,14 +7,14 @@
 
 <style>
 
-        #numericinpdiv input:focus, #numericinpdiv input.form-control:focus {
-            outline: none !important;
-            outline-width: 0 !important;
-            box-shadow: none;
-            -moz-box-shadow: none;
-            -webkit-box-shadow: none;
-        }
-        
+    #numericinpdiv input:focus, #numericinpdiv input.form-control:focus {
+        outline: none !important;
+        outline-width: 0 !important;
+        box-shadow: none;
+        -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+    }
+
 </style>
 
 <AuthorizeView>
@@ -23,7 +23,7 @@
         <div align-center style="max-width:750px;margin: auto;" class="mt--3 pt-0">
             <div style="display: flex;justify-content: space-between;height:25px;" class="mx-1">
                 <MudText Style="align-self:center;" Align="Align.Center"><MudIcon Icon="@Icons.Material.Filled.StackedLineChart" Color="Color.Tertiary" Size="Size.Small"></MudIcon> Inv#: <span style="color:red;margin-right:10px;">@InvNo</span>A/c: <span style="color:darkcyan;margin-right:10px;">@Code</span>Ref: <span style="color:forestgreen">@Ref</span></MudText>
-                <MudIconButton Style="align-self:right" Icon="@Icons.Material.Filled.List"  OnClick="@OnListClick" Color="@(Color.Tertiary)"></MudIconButton>
+                <MudIconButton Style="align-self:right" Icon="@Icons.Material.Filled.List" OnClick="@OnListClick" Color="@(Color.Tertiary)"></MudIconButton>
             </div>
             <MudSimpleTable Dense="true" Bordered="true" Striped="true" Hover="true" FixedHeader="true" Style="height:205px;">
                 <thead>
@@ -72,40 +72,38 @@
                     <MudToggleIconButton @bind-Toggled="@AutoPrize" Style=@($"margin-right:auto;{(repeatData?.RelationPrint == false?"margin-left:auto":"")}")
                                          Icon="@Icons.Material.Outlined.ContentCopy" Color="@Color.Default"
                                          ToggledIcon="@Icons.Material.TwoTone.ContentCopy" ToggledColor="@Color.Info" />
+                    <MudStack Class="me-0">
+                        <span>
+                            <b>Win I: <span style="color:red">@(win[0].ToString("F0"))</span></b> &nbsp;&nbsp; <b>Win II: <span style="color:orange">@(win[1].ToString("F0"))</span></b>
+                        </span>
+                    </MudStack>
                 </div>
-                <MudSelect @bind-Value="@DropSel" Label="Type" Class="mud-rtl mt--3" Style="align-self:flex-start;height:30px;min-width:120px;width:120px;max-width:120px;margin-left:auto;margin-right:30px;" FullWidth="false">
-                    <MudSelectItem Value=1>مکس</MudSelectItem>
-                    <MudSelectItem Value=2>کلوز</MudSelectItem>
-                    <MudSelectItem Value=3>سینٹر  </MudSelectItem>
-                    <MudSelectItem Value=4>بیک اوپن  </MudSelectItem>
-                    <MudSelectItem Value=5>سینٹر آکڑا  </MudSelectItem>
-                    <MudSelectItem Value=6>بیک آکڑا  </MudSelectItem>
-                    <MudSelectItem Value=7>بیک ٹنڈیلا  </MudSelectItem>
-                    <MudSelectItem Value=8>فائف ڈاٹ  </MudSelectItem>
-                    <MudSelectItem Value=9>سکس ڈاٹ  </MudSelectItem>
-                </MudSelect>
+
             </MudStack>
 
 
             <MudStack Row="true">
                 <div id="numericinpdiv" class="input-group shadow-none" style="max-width:65px;height:55px;margin-top:5px;">
-                    @if (DropSel != 1)
-                    {
-                        <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);border-right:0px;margin-right:0px;padding-right:0px;">@CurrentDigit</span>
-                    }
-                    <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);@(DropSel!=1?"border-left:0px;margin-left:0px;padding-left:0px":"")"
-                           placeholder="@(new string('#', @SearchLimit))" inputmode="numeric" class="form-control" pattern="[0-9]*" id="MixDigitInput"
+                    <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);"
+                           placeholder="@(new string('#',4))" inputmode="numeric" class="form-control" pattern="[0-9]*" id="MixDigitInput" maxlength=4 minlength=3
                            disabled="@(DigitEnabled==false)" @onkeypress="@digitKeyDown" @onblur="@lostDigitFocus" @onfocus="@OnDigitFocus"
-                           @bind-value="@Digits" maxlength="@SearchLimit" />
+                           @bind-value="@Digits" />
                 </div>
 
 
-                <MudNumericField id="Rate" OnBlur="@RateUnFocus" OnKeyDown="@RateKeyDown" @bind-Value="Rate" Immediate="true" Label="Rate" Culture="@Curr" HideSpinButtons="true" Disabled="@(RateEnabled==false)" Variant="Variant.Outlined" Min="0" />
-                <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="I Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Rate" OnKeyDown="@RateKeyDown" @bind-Value="Rate" Immediate="true" Label="Rate" Culture="@Curr" HelperText=@($"Limit:{prz1Limit:F0} x {prz2Limit:F0}") HideSpinButtons="true" Disabled="@(RateEnabled==false)" Variant="Variant.Outlined" Min="0" />
+                @*<MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="I Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown"  @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="II Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                *@
+
+                <MudStack Style="min-width:120px;display:flex">
+                    <span>1<sup>st</sup> : @((Prize1??0).ToString("F2"))</span>
+                    <span>2<sup>nd</sup> : @((Prize2??0).ToString("F2"))</span>
+                </MudStack>
+
                 <MudIconButton Disabled="@AddEntryDisabled" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
-                @if(@Editmode)
-                {                
+                @if (@Editmode)
+                {
                     <MudIconButton Variant="Variant.Filled" Icon="@Icons.Material.Filled.Cancel" Color="Color.Error" Size="Size.Small" OnClick="@OnEditCancel" Style="margin-top:6px;height:55px;"></MudIconButton>
 
                 }
@@ -114,4 +112,3 @@
     </Authorized>
 </AuthorizeView>
 
-  

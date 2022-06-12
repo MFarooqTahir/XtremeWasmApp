@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 using MudBlazor.Services;
 
+using System.Globalization;
 using System.Net.Http.Headers;
 
 using Toolbelt.Blazor.Extensions.DependencyInjection;
@@ -23,7 +24,11 @@ var HttpDataVar = new HttpData() { BaseAddress = new("https://pbtsweb.azurewebsi
 #endif
 var cli = new HttpClient();
 cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
+CultureInfo Curr = new CultureInfo("hi-IN");
+Curr.NumberFormat.CurrencySymbol = "Rs.";
+CultureInfo.DefaultThreadCurrentCulture = Curr;
+CultureInfo.CurrentCulture = Curr;
+CultureInfo.CurrentUICulture = Curr;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");

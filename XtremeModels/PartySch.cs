@@ -10,6 +10,10 @@
         public double Sfc2 { get; set; }
         public double Sfc3 { get; set; }
         public double Sfc4 { get; set; }
+        public double Win_Rate1 { get; set; }
+        public double Win_Rate2 { get; set; }
+        public double Win_Rate3 { get; set; }
+        public double Win_Rate4 { get; set; }
         public double Sfc_com { get; set; }
         public double Sfc_own { get; set; }
         public double Std1 { get; set; }
