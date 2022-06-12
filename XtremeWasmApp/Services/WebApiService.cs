@@ -167,16 +167,28 @@ namespace XtremeWasmApp.Services
             return res?.ResultObj;
         }
 
+        public async Task<Transaction?> MakeNewEntrySch(EntryDataSch invD)
+        {
+            var isFranchise = await GetIsFranchise().ConfigureAwait(false);
+            var mkey = 0;
+            if (isFranchise)
+            {
+                mkey = (await GetFranMkeys())[1];
+            }
+            var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntrySch/{isFranchise}/{mkey}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
+
         public async Task<bool> GetDigitEnabled()
         {
             var cdrel = await GetCdrel().ConfigureAwait(false);
             return (cdrel?.Active ?? false) && (cdrel?.Enabled ?? false);
         }
 
-        public async Task<Inventory?> GetInvInfo()
+        public async Task<Inventory?> GetInvInfo(string type = "1SL")
         {
             var cdrel = await GetCdrel().ConfigureAwait(false);
-            var res = await SendHttpRequest<ResultSet<Inventory>>($"api/Transactions/GetInv/{cdrel.rCode}/1SL", type: RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<Inventory>>($"api/Transactions/GetInv/{cdrel.rCode}/{type}", type: RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
 
@@ -208,8 +220,18 @@ namespace XtremeWasmApp.Services
                 var isFranchise = Company.Stype == 'F';
                 await setIsFranchise(isFranchise).ConfigureAwait(false);
                 await setFcode(Company.FCode).ConfigureAwait(false);
-
-                var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                //List<int> mke = new() { 0, 0, 0 };
+                //if (isFranchise)
+                //{
+                //    var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                //    if (mkeys is null || mkeys.ResultObj is null)
+                //    {
+                //        return (false, "Error in franchise Invoice");
+                //    }
+                //    mke = mkeys.ResultObj;
+                //    await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
+                //}
+                var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}/0", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var DashData = DashDataRes?.ResultObj;
                 if (DashData is null)
                 {
@@ -219,7 +241,7 @@ namespace XtremeWasmApp.Services
                 {
                     return (false, "There was an error in getting the data. Please try again later");
                 }
-                await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
+                //await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
                 var SelShedule = DashData.sch?.Count > 1;
                 if (DashData.sch?.Count != 0)
                 {
@@ -230,6 +252,7 @@ namespace XtremeWasmApp.Services
                         var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{DashData.sch[0].mkey}", RequestType.Get).ConfigureAwait(false);
 
                         await ChangeToken(newTokenInv).ConfigureAwait(false);
+                        List<int> mke = new() { 0, 0, 0 };
                         if (isFranchise)
                         {
                             var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -237,8 +260,20 @@ namespace XtremeWasmApp.Services
                             {
                                 return (false, "Error in franchise Invoice");
                             }
+                            mke = mkeys.ResultObj;
                             await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
                         }
+                        DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                        DashData = DashDataRes?.ResultObj;
+                        if (DashData is null)
+                        {
+                            return (false, "Error. There might be no active draws for this company");
+                        }
+                        if (DashData.party is null || DashData.sch is null)
+                        {
+                            return (false, "There was an error in getting the data. Please try again later");
+                        }
+                        await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                         if (!resl.ResultObj)
                         {
@@ -365,6 +400,7 @@ namespace XtremeWasmApp.Services
                 await SetSch(CurrSelectedSch).ConfigureAwait(false);
                 var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{CurrSelectedSch.mkey}", RequestType.Get).ConfigureAwait(false);
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
+                List<int> mke = new() { 0, 0, 0 };
                 if (await GetIsFranchise().ConfigureAwait(false))
                 {
                     var Company = await GetCompany().ConfigureAwait(false);
@@ -373,10 +409,21 @@ namespace XtremeWasmApp.Services
                     {
                         return (false, "Error in franchise Invoice");
                     }
+                    mke = mkeys.ResultObj;
                     await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
                 }
-
                 var cDRelation = await GetCdrel().ConfigureAwait(false);
+                var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                var DashData = DashDataRes?.ResultObj;
+                if (DashData is null)
+                {
+                    return (false, "Error. There might be no active draws for this company");
+                }
+                if (DashData.party is null || DashData.sch is null)
+                {
+                    return (false, "There was an error in getting the data. Please try again later");
+                }
+                await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
                 var res = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
 
                 if (!res.ResultObj)
@@ -408,9 +455,12 @@ namespace XtremeWasmApp.Services
             await SetParty(part).ConfigureAwait(false);
             cdrel.Limit = amt;
             await SetCdrel(cdrel).ConfigureAwait(false);
+            var bal = amt - amt2;
+
+            await SetCurrentBalance(bal).ConfigureAwait(false);
             if (amt > 0)
             {
-                return $"Bal: {amt - amt2}";
+                return $"Bal: {bal}";
             }
             return $"Sale: {amt2}";
         }
@@ -434,16 +484,22 @@ namespace XtremeWasmApp.Services
             await SetCdrel(cdrel).ConfigureAwait(false);
         }
 
-        public async Task<MixTransVouchersModel?> GetTransactionsListMix(int amt, int Vno)
+        public async Task<MixTransVouchersModel?> GetTransactionsListMix(int amt, int Vno, string type = "1SL")
         {
             var cdrel = await GetCdrel().ConfigureAwait(false);
-            var res = await SendHttpRequest<ResultSet<MixTransVouchersModel>>($"api/Transactions/GetVouchers/{cdrel.rCode}/{Vno}/1SL{(amt > 0 ? $"/{amt}" : "")}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<MixTransVouchersModel>>($"api/Transactions/GetVouchers/{cdrel.rCode}/{Vno}/{type}{(amt > 0 ? $"/{amt}" : "")}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
 
         public async Task<Inventory?> MakeNewInv(InvData inv)
         {
             var res = await SendHttpRequest<ResultSet<Inventory>>("api/Transactions/MakeNewInv", RequestType.Post, inv, LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
+
+        public async Task<Inventory?> MakeNewInvSch(InvDataSch inv)
+        {
+            var res = await SendHttpRequest<ResultSet<Inventory>>("api/Transactions/MakeNewInvSch", RequestType.Post, inv, LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
 
@@ -479,7 +535,7 @@ namespace XtremeWasmApp.Services
             await SetDataLink(newCom.WebApiD).ConfigureAwait(false);
         }
 
-        private async Task<Company> GetCompany() => await _localStorage.GetItemAsync<Company>("Company").ConfigureAwait(false);
+        public async Task<Company> GetCompany() => await _localStorage.GetItemAsync<Company>("Company").ConfigureAwait(false);
 
         public async Task SetRepeatData(RepeatDataReturnWA newObj)
         {
@@ -495,12 +551,19 @@ namespace XtremeWasmApp.Services
 
         public async Task<CDRelation> GetCdrel() => await _localStorage.GetItemAsync<CDRelation>("cdRel").ConfigureAwait(false);
 
+        private async Task SetCurrentBalance(int amt)
+        {
+            await _localStorage.SetItemAsync("CurrBalanceAmount", amt).ConfigureAwait(false);
+        }
+
+        public async Task<int> GetCurrentBalance() => await _localStorage.GetItemAsync<int>("CurrBalanceAmount").ConfigureAwait(false);
+
         private async Task SetpartySchTrans(PartySch partySch)
         {
             await _localStorage.SetItemAsync("partySchTrans", partySch).ConfigureAwait(false);
         }
 
-        private async Task<PartySch> GetpartySchTrans() => await _localStorage.GetItemAsync<PartySch>("partySchTrans").ConfigureAwait(false);
+        public async Task<PartySch> GetpartySchTrans() => await _localStorage.GetItemAsync<PartySch>("partySchTrans").ConfigureAwait(false);
 
         private async Task SetSch(Schedule newCom)
         {

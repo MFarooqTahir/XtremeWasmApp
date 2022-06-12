@@ -14,10 +14,9 @@ using XtremeWasmApp.Services;
 
 namespace XtremeWasmApp.Pages
 {
-    public partial class MixTransaction
+    public partial class SchemeTransaction
     {
         private Regex editMatch = new Regex(@"([a-zA-Z]+)(\d+)", RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
-
         private Regex filter = new Regex("[^0-9XSD]*", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
         private bool AddEntryDisabled = false;
 
@@ -34,27 +33,34 @@ namespace XtremeWasmApp.Pages
         private NumberFormatInfo numberFormat { get; set; }
 
         private IList<Transaction>? Transactions { get; set; } = new List<Transaction>();
-
         private Transaction? Tempdata { get; set; }
+
         private bool Editmode;
         private Inventory? invInfo { get; set; }
 
         private double Total;
         private int snoCountStart = 0;
         private bool DigitEnabled { get; set; }
+
         private bool listEnabled;
         private bool Prz1Enabled { get; set; }
+        private bool RateEnabled { get; set; }
 
         private bool Prz2Enabled { get; set; }
+        private double[] win = { 0, 0, 0 };
+
         private int prz1Limit, prz2Limit;
         private string CurrentDigit;
         private bool loading = true;
         private bool AutoPrize = false;
+        private double? _Prize1;
+        private double? Rate;
 
-        private int? _Prize1;
+        public double? Prize1 {
+            get {
+                return _Prize1;
+            }
 
-        public int? Prize1 {
-            get { return _Prize1; }
             set {
                 if (Prize1 is not null && (value ?? 0) > prz1Limit)
                 {
@@ -62,18 +68,19 @@ namespace XtremeWasmApp.Pages
                         await showDialog("Limit Exceeded", "");
                         await jsModule.InvokeVoidAsync("focusInput", "Prize1");
                     }).Start();
-                    //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
-                    //Js.InvokeAsync<object>("alert", "Limit Exceeded");
-                    //jsModule.InvokeVoidAsync("focusInput", "Prize1");
                 }
+
                 _Prize1 = value;
             }
         }
 
-        private int? _Prize2;
+        private double? _Prize2;
 
-        public int? Prize2 {
-            get { return _Prize2; }
+        public double? Prize2 {
+            get {
+                return _Prize2;
+            }
+
             set {
                 if (Prize2 is not null && (value ?? 0) > prz2Limit)
                 {
@@ -81,10 +88,8 @@ namespace XtremeWasmApp.Pages
                         await showDialog("Limit Exceeded", "");
                         await jsModule.InvokeVoidAsync("focusInput", "Prize2");
                     }).Start();
-                    //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
-                    //Js.InvokeAsync<object>("alert", "Limit Exceeded");
-                    //jsModule.InvokeVoidAsync("focusInput", "Prize2");
                 }
+
                 _Prize2 = value;
             }
         }
@@ -92,7 +97,10 @@ namespace XtremeWasmApp.Pages
         private string? _digit;
 
         public string? Digits {
-            get { return _digit; }
+            get {
+                return _digit;
+            }
+
             set => _digit = filter.Replace(value ?? "", string.Empty);
         }
 
@@ -172,16 +180,17 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
-                await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                await jsModule.InvokeVoidAsync("focusInput", "Rate");
             }
         }
 
         private async Task<bool?> showDialog(string Title, string message)
         {
-            Prz1Enabled = Prz2Enabled = false;
+            Prz1Enabled = Prz2Enabled = RateEnabled = false;
             await Js.InvokeVoidAsync("document.activeElement.blur");
-            var res = await DialogService.ShowMessageBox(Title, message, options: new MudBlazor.DialogOptions() { CloseOnEscapeKey = true });
-            Prz1Enabled = Prz2Enabled = true;
+            var res = await DialogService.ShowMessageBox(Title, message, options: new MudBlazor.DialogOptions()
+            { CloseOnEscapeKey = true });
+            Prz1Enabled = Prz2Enabled = RateEnabled = true;
             return res;
         }
 
@@ -214,7 +223,8 @@ namespace XtremeWasmApp.Pages
                         }
                         else
                         {
-                            var ret = await Api.PktCheck((CurrentDigit + Digits).ToUpper());
+                            var txtDigit = (CurrentDigit + Digits).ToUpperInvariant();
+                            var ret = await Api.PktCheck(txtDigit);
                             if (ret is not null && string.IsNullOrEmpty(ret.msg))
                             {
                                 prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
@@ -235,38 +245,42 @@ namespace XtremeWasmApp.Pages
                                 else
                                 {
                                     var cdRel = await Api.GetCdrel();
+                                    var partySchT = await Api.GetpartySchTrans();
                                     var trans = new Transaction()
+                                    { vno = invInfo.Vno, code = cdRel.rCode, Digit = (CurrentDigit + Digits).ToUpperInvariant(), Prize1 = Prize1 ?? 0, Prize2 = Prize2 ?? 0, MKey = invInfo.propKey, };
+                                    var invD = new EntryDataSch()
                                     {
-                                        vno = invInfo.Vno,
-                                        code = cdRel.rCode,
-                                        Digit = (CurrentDigit + Digits).ToUpperInvariant(),
-                                        Prize1 = Prize1 ?? 0,
-                                        Prize2 = Prize2 ?? 0,
-                                        MKey = invInfo.propKey,
-                                    };
-                                    var invD = new EntryData()
-                                    {
-                                        transaction = trans,
                                         dbf = "FAROOQ",
+                                        xmkey = 0,
                                         xid = cdRel.UName,
-                                        xdtype = 'W',
                                         xmode = 0,
                                         xpamt1 = 0,
                                         xpamt2 = 0,
-                                        xpid = 'X',
+                                        xxmkey = invInfo.propKey,
+                                        xpid = txtDigit.Length.ToString(),
+                                        xpkt = txtDigit,
+                                        xdtype = "W",
+                                        xscode = txtDigit.Length == 3 ? "Ring" : "Packet",
+                                        xwin1 = Convert.ToInt32(win[0]),
+                                        xwin2 = Convert.ToInt32(win[1]),
+                                        xwin3 = Convert.ToInt32(win[2]),
+                                        xsamt1 = Prize1 ?? 0,
+                                        xsamt2 = Prize2 ?? 0,
+                                        xsrate = Rate ?? 0,
+                                        xscom = txtDigit.Length == 3 ? partySchT.Std_com : partySchT.Sfc_com,
+                                        xsown = txtDigit.Length == 3 ? partySchT.Std_own : partySchT.Sfc_own,
                                     };
                                     if (Editmode)
                                     {
-                                        invD.lmkey = Tempdata?.lmkey ?? 0;
                                         invD.xmkey = Tempdata?.MKey ?? 0;
                                     }
-                                    Tempdata = await Api.MakeNewEntry(invD);
+
+                                    Tempdata = await Api.MakeNewEntrySch(invD);
                                     if (string.Equals(Tempdata.code, cdRel.rCode, StringComparison.Ordinal))
                                     {
                                         if (Transactions!.Any() && !string.Equals(Tempdata.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
                                         {
                                             listEnabled = Editmode;
-
                                             await refreshPage();
                                         }
                                         else
@@ -299,11 +313,13 @@ namespace XtremeWasmApp.Pages
                                             return;
                                         }
                                     }
+
                                     if (!AutoPrize)
                                     {
                                         Prize1 = null;
                                         Prize2 = null;
                                     }
+
                                     var ret2 = await Api.PktCheck((CurrentDigit + Digits).ToUpperInvariant());
                                     if (ret2 is not null && string.IsNullOrEmpty(ret2.msg))
                                     {
@@ -327,13 +343,19 @@ namespace XtremeWasmApp.Pages
                 {
                     AddEntryDisabled = false;
                     Editmode = false;
-
                     Digits = null;
                     service.CallRequestRefresh();
-
                     await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                     await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
+            }
+        }
+
+        private async Task RateKeyDown(KeyboardEventArgs x)
+        {
+            if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
+            {
+                await jsModule.InvokeVoidAsync("focusInput", "Prize1");
             }
         }
 
@@ -383,6 +405,80 @@ namespace XtremeWasmApp.Pages
             }
         }
 
+        private async Task RateUnFocus(FocusEventArgs args)
+        {
+            if (Rate is not null)
+            {
+                calPrzChange();
+            }
+        }
+
+        private async void calPrzChange()
+        {
+            if (Rate >= 100000.00)
+            {
+                Rate = null;
+            }
+            else
+            {
+                var Company = await Api.GetCompany();
+                var sch = await Api.GetSch();
+                var partytransSch = await Api.GetpartySchTrans();
+                var txtDigit = (CurrentDigit + Digits).ToUpperInvariant();
+                if (txtDigit.Length == 3)
+                {
+                    win[0] = (partytransSch.Std1 / 100 * Rate) ?? 0;
+                    if (sch.Prz2 == 5)
+                    {
+                        win[1] = (partytransSch.Std3 / 100 * Rate) ?? 0;
+                    }
+                    else
+                    {
+                        win[1] = (partytransSch.Std2 / 100 * Rate) ?? 0;
+                    }
+                    win[2] = 0;
+                }
+                else if (txtDigit.Length == 4)
+                {
+                    win[0] = (partytransSch.Sfc1 / 100 * Rate) ?? 0;
+                    if (sch.Prz2 == 5)
+                    {
+                        win[1] = (partytransSch.Sfc3 / 100 * Rate) ?? 0;
+                    }
+                    else
+                    {
+                        win[1] = (partytransSch.Sfc2 / 100 * Rate) ?? 0;
+                    }
+                    win[2] = (partytransSch.Sfc4 / 100 * Rate) ?? 0;
+                    if (win[2] > 0)
+                    {
+                        win[2] = win[2] * 3 / 5;
+                    }
+                }
+                for (int i = 0; i < win.Length; i++)
+                {
+                    win[i] = Math.Round(win[i], 0);
+                    if (win[i].ToString().Last() == '7')
+                    {
+                        win[i]--;
+                    }
+                }
+                if (txtDigit.Length == 3)
+                {
+                    Prize1 = (win[0] + (win[0] / 100 * partytransSch.Std_own)) / Company.Std1;
+                    Prize2 = (win[1] + (win[1] / 100 * partytransSch.Std_own)) / Company.Std2;
+                }
+                else if (txtDigit.Length == 4)
+                {
+                    Prize1 = (win[0] + (win[0] / 100 * partytransSch.Sfc_own)) / Company.Std1;
+                    Prize2 = (win[1] + (win[1] / 100 * partytransSch.Sfc_own)) / Company.Std2;
+                }
+                //txtWin1.Text = win[0].ToString("N2", Curr);
+                //txtWin2.Text = win[1].ToString("N2", Curr);
+                //txtWin3.Text = win[2].ToString("N2", Curr);
+            }
+        }
+
         private async Task OnDigitFocus(FocusEventArgs args)
         {
             prz1Limit = prz2Limit = 0;
@@ -394,6 +490,7 @@ namespace XtremeWasmApp.Pages
             {
                 Prz1Enabled = false;
                 Prz2Enabled = false;
+                RateEnabled = false;
                 AddEntryDisabled = true;
                 listEnabled = true;
                 await GetTransList();
@@ -406,6 +503,7 @@ namespace XtremeWasmApp.Pages
             {
                 Prz1Enabled = true;
                 Prz2Enabled = true;
+                RateEnabled = true;
                 AddEntryDisabled = false;
             }
         }
@@ -422,7 +520,7 @@ namespace XtremeWasmApp.Pages
                 nav.NavigateTo("/");
             }
 
-            DigitEnabled = Prz1Enabled = Prz2Enabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
+            DigitEnabled = Prz1Enabled = Prz2Enabled = RateEnabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
             if (firstRender)
             {
                 await refreshPage();
@@ -434,41 +532,34 @@ namespace XtremeWasmApp.Pages
             loading = true;
             if (DigitEnabled)
             {
-                invInfo = await Api.GetInvInfo();
+                invInfo = await Api.GetInvInfo("1SM");
                 if (invInfo is null || invInfo?.Vno == -1)
                 {
                     var cdrel = await Api.GetCdrel();
-                    var sch = await Api.GetSch();
-                    var qty = await Api.IsQtyUser();
-                    var invD = new InvData()
-                    { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = 'W', db = "", };
-                    //Dmode = 0
-                    var nParty = (await Api.GetParty()).ShallowCopy();
-                    if (sch.Prz2 == 5)
+                    var partySch = await Api.GetpartySchTrans();
+                    var invD = new InvDataSch()
                     {
-                        if (qty)
-                        {
-                            nParty.Ak_win2 = nParty.Ak_win2 != 0 ? Math.Ceiling(nParty.Ak_win2 * 3 / 5) : 0;
-                            nParty.Fc_win2 = nParty.Fc_win2 != 0 ? Math.Ceiling(nParty.Fc_win2 * 3 / 5) : 0;
-                            nParty.Op_win2 = nParty.Op_win2 != 0 ? Math.Ceiling(nParty.Op_win2 * 3 / 5) : 0;
-                            nParty.Td_win2 = nParty.Td_win2 != 0 ? Math.Ceiling(nParty.Td_win2 * 3 / 5) : 0;
-                            nParty.Xak_win2 = nParty.Xak_win2 != 0 ? Math.Ceiling(nParty.Xak_win2 * 3 / 5) : 0;
-                            nParty.Xtd_win2 = nParty.Xtd_win2 != 0 ? Math.Ceiling(nParty.Xtd_win2 * 3 / 5) : 0;
-                        }
-                        else
-                        {
-                            nParty.Ak_win2 = nParty.Ak_win1 != 0 ? nParty.Ak_win1 / 5 : 0;
-                            nParty.Fc_win2 = nParty.Fc_win1 != 0 ? nParty.Fc_win1 / 5 : 0;
-                            nParty.Op_win2 = nParty.Op_win1 != 0 ? nParty.Op_win1 / 5 : 0;
-                            nParty.Td_win2 = nParty.Td_win1 != 0 ? nParty.Td_win1 / 5 : 0;
-                            nParty.Xak_win2 = nParty.Xak_win1 != 0 ? nParty.Xak_win1 / 5 : 0;
-                            nParty.Xtd_win2 = nParty.Xtd_win1 != 0 ? nParty.Xtd_win1 / 5 : 0;
-                        }
-                    }
+                        dbf = "FAROOQ",
+                        xdemand = false,
+                        xmkey = 0,
+                        xid = cdrel.UName,
+                        xref = "Online",
+                        xsc = 0,
+                        xvid = "1SM",
+                        xdtype = "W",
+                        xcode = cdrel.rCode,
+                        sfcom = partySch.Sfc_com,
+                        sfown = partySch.Sfc_own,
+                        stcom = partySch.Std_com,
+                        stown = partySch.Std_own,
+                        wrate1 = partySch.Sfc1,
+                        wrate2 = partySch.Sfc2,
+                        wrate3 = partySch.Sfc3,
+                        wrate4 = partySch.Sfc4
+                    };
 
-                    invD.party = nParty;
-                    var res = await Api.MakeNewInv(invD);
-                    invInfo = await Api.GetInvInfo();
+                    var res = await Api.MakeNewInvSch(invD);
+                    invInfo = await Api.GetInvInfo("1SM");
                 }
 
                 if (invInfo is null || invInfo?.xres == 1)
@@ -505,7 +596,6 @@ namespace XtremeWasmApp.Pages
                         Editmode = true;
                         Prize2 = Prize1 = null;
                         StateHasChanged();
-
                         var alphaPart = entry.Digit.Where(x => char.IsLetter(x)).Aggregate("", (current, c) => current + c);
                         var numberPart = entry.Digit.Where(x => !char.IsLetter(x)).Aggregate("", (current, c) => current + c);
                         if (alphaPart?.Length == 0)
@@ -546,13 +636,13 @@ namespace XtremeWasmApp.Pages
 
                                 case 1 when string.Equals(alphaPart, "S", StringComparison.Ordinal):
                                     DropSel = 9;
-
                                     break;
 
                                 default:
                                     break;
                             }
                         }
+
                         Digits = numberPart;
                         await lostDigitFocus(null);
                         Prize1 = int.Parse(entry.Prize1.ToString(), Curr);
@@ -576,7 +666,7 @@ namespace XtremeWasmApp.Pages
         {
             if (DigitEnabled)
             {
-                var TransactionsInfo = await Api.GetTransactionsListMix(amt, invInfo?.Vno ?? 0);
+                var TransactionsInfo = await Api.GetTransactionsListMix(amt, invInfo?.Vno ?? 0, "1SM");
                 if (TransactionsInfo is not null)
                 {
                     Transactions = TransactionsInfo.Transactions;
@@ -588,6 +678,7 @@ namespace XtremeWasmApp.Pages
                     {
                         snoCountStart = 1;
                     }
+
                     Total = TransactionsInfo.InvoiceTotal;
                 }
             }
