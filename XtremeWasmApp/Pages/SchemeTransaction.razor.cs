@@ -39,7 +39,7 @@ namespace XtremeWasmApp.Pages
         private bool Editmode;
         private Inventory? invInfo { get; set; }
 
-        private double Total;
+        private double Total { get; set; }
         private int snoCountStart = 0;
         private bool DigitEnabled { get; set; }
 
@@ -136,12 +136,9 @@ namespace XtremeWasmApp.Pages
 
         private async Task<bool?> showDialog(string Title, string message)
         {
-            //Prz1Enabled = Prz2Enabled =
-            //RateEnabled = false;
             await Js.InvokeVoidAsync("document.activeElement.blur");
             var res = await DialogService.ShowMessageBox(Title, message, options: new MudBlazor.DialogOptions()
             { CloseOnEscapeKey = true });
-            //RateEnabled = true;
             return res;
         }
 
@@ -174,6 +171,7 @@ namespace XtremeWasmApp.Pages
                         }
                         else
                         {
+                            await calPrzChange();
                             var txtDigit = Digits;
                             var ret = await Api.PktCheck(txtDigit);
                             if (ret is not null && string.IsNullOrEmpty(ret.msg))
@@ -237,7 +235,7 @@ namespace XtremeWasmApp.Pages
                                         else
                                         {
                                             Transactions.Add(Tempdata);
-                                            Total += Tempdata.Prize1 + Tempdata.Prize2;
+                                            Total += Tempdata.Prize1 + Tempdata.Prize2 + Rate ?? 0;
                                         }
                                     }
                                     else
@@ -303,22 +301,6 @@ namespace XtremeWasmApp.Pages
         }
 
         private async Task RateKeyDown(KeyboardEventArgs x)
-        {
-            if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
-            {
-                await jsModule.InvokeVoidAsync("focusInput", "Prize1");
-            }
-        }
-
-        private async Task Prz1KeyDown(KeyboardEventArgs x)
-        {
-            if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
-            {
-                await jsModule.InvokeVoidAsync("focusInput", "Prize2");
-            }
-        }
-
-        private async Task Prz2KeyDown(KeyboardEventArgs x)
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
