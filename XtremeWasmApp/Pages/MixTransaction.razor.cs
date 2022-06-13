@@ -214,7 +214,7 @@ namespace XtremeWasmApp.Pages
                         }
                         else
                         {
-                            var ret = await Api.PktCheck((CurrentDigit + Digits).ToUpper());
+                            var ret = await Api.PktCheck((CurrentDigit + Digits).ToUpperInvariant());
                             if (ret is not null && string.IsNullOrEmpty(ret.msg))
                             {
                                 prz1Limit = (ret.xamt1 - ret.xuamt1) ?? 0;
