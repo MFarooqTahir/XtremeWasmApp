@@ -115,12 +115,12 @@ namespace XtremeWasmApp.Pages
             set => _digit = filter.Replace(value ?? "", string.Empty);
         }
 
-        private IJSObjectReference jsModule;
+        //private IJSObjectReference jsModule;
         private string InvNo, Ref, Code, PartyName;
 
         protected override async Task OnInitializedAsync()
         {
-            jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
+            //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
             await Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
@@ -130,7 +130,7 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
-                await jsModule.InvokeVoidAsync("focusInput", "Rate");
+                await Js.InvokeVoidAsync("focusInput", "Rate");
             }
         }
 
@@ -182,14 +182,14 @@ namespace XtremeWasmApp.Pages
                                 {
                                     await showDialog("Prize 1 exceeded limit", "");
                                     Digits = "";
-                                    await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                                    await Js.InvokeVoidAsync("focusInput", "Prize1");
                                 }
                                 else if (Prize2 > prz2Limit)
                                 {
                                     await showDialog("Prize 2 exceeded limit", "");
                                     //await DialogService.ShowMessageBox("Prize 2 exceeded limit", "");
                                     Digits = "";
-                                    await jsModule.InvokeVoidAsync("focusInput", "Prize2");
+                                    await Js.InvokeVoidAsync("focusInput", "Prize2");
                                 }
                                 else
                                 {
@@ -262,11 +262,7 @@ namespace XtremeWasmApp.Pages
                                         }
                                     }
 
-                                    if (AutoPrize)
-                                    {
-                                        Digits = null;
-                                    }
-                                    else
+                                    if (!AutoPrize)
                                     {
                                         Rate = null;
                                         var ret2 = await Api.PktCheck(Digits.ToUpperInvariant());
@@ -293,9 +289,10 @@ namespace XtremeWasmApp.Pages
                 {
                     AddEntryDisabled = false;
                     Editmode = false;
+                    Digits = null;
                     service.CallRequestRefresh();
-                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
-                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    //await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
             }
         }
@@ -315,7 +312,7 @@ namespace XtremeWasmApp.Pages
                 if (Digits.Length != 3 && Digits.Length != 4)
                 {
                     await showDialog("Invalid Digit", "");
-                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
                 else
                 {
@@ -335,7 +332,7 @@ namespace XtremeWasmApp.Pages
                         {
                             var result = await showDialog(ret.msg, "");
                             Digits = "";
-                            await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                            await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
                         }
                     }
                 }
