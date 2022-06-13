@@ -121,7 +121,7 @@ namespace XtremeWasmApp.Pages
         protected override async Task OnInitializedAsync()
         {
             //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
-            //await Js.InvokeVoidAsync("iphoneFocus");
+            await Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }
@@ -158,7 +158,7 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    if ((await Api.GetCurrentBalance() - Prize1 + Prize2) < 0)
+                    if (Rate is not null && (await Api.GetCurrentBalance() - Prize1 + Prize2) < 0)
                     {
                         await showDialog("Limit Exceeded", "");
                     }
