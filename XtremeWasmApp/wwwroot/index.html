@@ -38,17 +38,8 @@
     <meta name="theme-color" content="#ffffff">
     <script src="js/func.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-
-<body>
-    <style>
-        html,
-        body {
-            overscroll-behavior-y: contain;
-        }
-    </style>
     <script type="text/javascript">
-        export function focusInput(id) {
+        function focusInput(id) {
             document.getElementById(id).focus();
         }
         //export function noScroll(id) {
@@ -57,7 +48,7 @@
         //        window.scrollTo(0, 0);
         //    });
         //}
-        export function scrollToTop() {
+        function scrollToTop() {
             window.scrollTo(0, 0);
         }
         function iOS() {
@@ -77,23 +68,6 @@
 
         function stopScroll() {
             if (currentElem) {
-                //function requestFullScreen(element) {
-                //    // Supports most browsers and their versions.
-                //    var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
-
-                //    if (requestMethod) { // Native full screen.
-                //        requestMethod.call(element);
-                //    } else if (typeof window.ActiveXObject !== "undefined") { // Older IE.
-                //        var wscript = new ActiveXObject("WScript.Shell");
-
-                //    }
-                //}
-                //let prop = getComputedStyle(document.documentElement)
-                //    .getPropertyValue('--mud-palette-background'); // #999999
-                //var elem = document.body; // Make the body go full screen.
-                //requestFullScreen(elem);
-                //document.documentElement.style
-                //    .setProperty('--mud-palette-background', prop);
 
                 $('html, body').stop().animate({
                     scrollTop: 0
@@ -114,14 +88,17 @@
         }
         function iphoneFocus() {
             //if (iOS()) {
+            console.log("focus setting");
             var funct = (id) => {
                 let element = document.getElementById(id);
-                element.onfocus = function (e) {
+                if (element != null) {
+                    element.onfocus = function (e) {
 
-                    disableScrolling(element);
-                }
-                element.onfocusout = function (e) {
-                    enableScrolling()
+                        disableScrolling(element);
+                    }
+                    element.onfocusout = function (e) {
+                        enableScrolling()
+                    }
                 }
             }
 
@@ -132,6 +109,16 @@
             //}
         }
     </script>
+</head>
+
+<body>
+    <style>
+        html,
+        body {
+            overscroll-behavior-y: contain;
+        }
+    </style>
+  
     <div id="app">
         <style>
             @keyframes slide {
