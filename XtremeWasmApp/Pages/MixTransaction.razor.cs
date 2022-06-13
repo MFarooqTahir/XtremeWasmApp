@@ -60,7 +60,7 @@ namespace XtremeWasmApp.Pages
                 {
                     new Task(async () => {
                         await showDialog("Limit Exceeded", "");
-                        await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                        await Js.InvokeVoidAsync("focusInput", "Prize1");
                     }).Start();
                     //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
                     //Js.InvokeAsync<object>("alert", "Limit Exceeded");
@@ -79,7 +79,7 @@ namespace XtremeWasmApp.Pages
                 {
                     new Task(async () => {
                         await showDialog("Limit Exceeded", "");
-                        await jsModule.InvokeVoidAsync("focusInput", "Prize2");
+                        await Js.InvokeVoidAsync("focusInput", "Prize2");
                     }).Start();
                     //var result = DialogService.ShowMessageBox("Limit Exceeded", "Ok").Result;
                     //Js.InvokeAsync<object>("alert", "Limit Exceeded");
@@ -96,8 +96,9 @@ namespace XtremeWasmApp.Pages
             set => _digit = filter.Replace(value ?? "", string.Empty);
         }
 
-        private IJSObjectReference jsModule;
+        //private IJSObjectReference jsModule;
         private int SearchLimit = 4;
+
         private string InvNo, Ref, Code, PartyName;
         private int _dropSel = 1;
 
@@ -162,8 +163,8 @@ namespace XtremeWasmApp.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
-            await Js.InvokeVoidAsync("iphoneFocus");
+            //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
+            //await Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }
@@ -172,7 +173,7 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
-                await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                await Js.InvokeVoidAsync("focusInput", "Prize1");
             }
         }
 
@@ -223,14 +224,14 @@ namespace XtremeWasmApp.Pages
                                 {
                                     await showDialog("Prize 1 exceeded limit", "");
                                     Digits = "";
-                                    await jsModule.InvokeVoidAsync("focusInput", "Prize1");
+                                    await Js.InvokeVoidAsync("focusInput", "Prize1");
                                 }
                                 else if (Prize2 > prz2Limit)
                                 {
                                     await showDialog("Prize 2 exceeded limit", "");
                                     //await DialogService.ShowMessageBox("Prize 2 exceeded limit", "");
                                     Digits = "";
-                                    await jsModule.InvokeVoidAsync("focusInput", "Prize2");
+                                    await Js.InvokeVoidAsync("focusInput", "Prize2");
                                 }
                                 else
                                 {
@@ -331,8 +332,8 @@ namespace XtremeWasmApp.Pages
                     Digits = null;
                     service.CallRequestRefresh();
 
-                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
-                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    //await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
             }
         }
@@ -341,7 +342,7 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
-                await jsModule.InvokeVoidAsync("focusInput", "Prize2");
+                await Js.InvokeVoidAsync("focusInput", "Prize2");
             }
         }
 
@@ -360,7 +361,7 @@ namespace XtremeWasmApp.Pages
                 if (DropSel != 1 && Digits.Length != SearchLimit)
                 {
                     await showDialog("Invalid Digit", "");
-                    await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                    await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
                 }
                 else
                 {
@@ -376,7 +377,7 @@ namespace XtremeWasmApp.Pages
                         {
                             var result = await showDialog(ret.msg, "");
                             Digits = "";
-                            await jsModule.InvokeVoidAsync("focusInput", "MixDigitInput");
+                            await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
                         }
                     }
                 }
