@@ -87,26 +87,26 @@
             document.removeEventListener("touchend", stopScroll);
         }
         function iphoneFocus() {
-            //if (iOS()) {
-            console.log("focus setting");
-            var funct = (id) => {
-                let element = document.getElementById(id);
-                if (element != null) {
-                    element.onfocus = function (e) {
+            if (iOS()) {
+                console.log("focus setting");
+                var funct = (id) => {
+                    let element = document.getElementById(id);
+                    if (element != null) {
+                        element.onfocus = function (e) {
 
-                        disableScrolling(element);
-                    }
-                    element.onfocusout = function (e) {
-                        enableScrolling()
+                            disableScrolling(element);
+                        }
+                        element.onfocusout = function (e) {
+                            enableScrolling()
+                        }
                     }
                 }
-            }
 
-            funct('MixDigitInput');
-            funct('Prize2');
-            funct('Prize1');
-            funct('Rate');
-            //}
+                funct('MixDigitInput');
+                funct('Prize2');
+                funct('Prize1');
+                funct('Rate');
+            }
         }
     </script>
 </head>
@@ -118,7 +118,7 @@
             overscroll-behavior-y: contain;
         }
     </style>
-  
+
     <div id="app">
         <style>
             @keyframes slide {
