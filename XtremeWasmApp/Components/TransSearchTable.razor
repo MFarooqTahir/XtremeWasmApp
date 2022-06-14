@@ -1,60 +1,60 @@
 ﻿@using System.Globalization
 @using XtremeModels
 <style>
-    tfoot tr{
-            background-color: var(--mud-palette-surface);
-        
-    }
-        tfoot tr td
-        {
-            border-top: 1px solid var(--mud-palette-table-lines);
-            background-color: var(--mud-palette-surface);
-            position: sticky;
-            bottom: 0;
-        }
+	tfoot tr{
+			background-color: var(--mud-palette-surface);
+		
+	}
+		tfoot tr td
+		{
+			border-top: 1px solid var(--mud-palette-table-lines);
+			background-color: var(--mud-palette-surface);
+			position: sticky;
+			bottom: 0;
+		}
 </style>
 @if (SourceList?.Any() == true)
 {
-    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">@Title</MudText>
-    <MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="height:250px;margin-top:5px;" Class="rounded-0">
-        <thead>
-            <tr>
-                <th style="width:40px; max-width:40px;">L/D</th>
-                <th style="text-align:center" class="ml-n5">Inv#</th>
-                <th style="text-align:right">1<sup>st</sup> Prize</th>
-                <th style="text-align:right">2<sup>nd</sup> Prize</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var TransSearchItem in SourceList)
-            {
-                <tr>
-                    <td>@TransSearchItem.lb</td>
-                    <td style="text-align:center" class="ml-n1">@TransSearchItem.Vno</td>
-                    <td style="text-align:right">@TransSearchItem.prize1.ToString("C",numberFormat)</td>
-                    <td style="text-align:right">@TransSearchItem.prize2.ToString("C",numberFormat)</td>
-                </tr>
-            }
-            
-        </tbody>
-        <tfoot>
-            <tr>
-                <td></td>
-                <td></td>
-                <td style="text-align:right">@SourceList.Sum(x=>x.prize1).ToString("C",numberFormat)</td>
-                <td style="text-align:right">@SourceList.Sum(x=>x.prize2).ToString("C",numberFormat)</td>
-            </tr>
-        </tfoot>
-    </MudSimpleTable>
+	<MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">@Title</MudText>
+	<MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="height:250px;margin-top:5px;" Class="rounded-0">
+		<thead>
+			<tr>
+				<th style="width:40px; max-width:40px;">L/D</th>
+				<th style="text-align:center" class="ml-n5">Inv#</th>
+				<th style="text-align:right">1<sup>st</sup> Prize</th>
+				<th style="text-align:right">2<sup>nd</sup> Prize</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var TransSearchItem in SourceList)
+			{
+				<tr>
+					<td>@TransSearchItem.lb</td>
+					<td style="text-align:center" class="ml-n1">@TransSearchItem.Vno</td>
+					<td style="text-align:right">@TransSearchItem.prize1.ToString("C2",numberFormat)</td>
+					<td style="text-align:right">@TransSearchItem.prize2.ToString("C2",numberFormat)</td>
+				</tr>
+			}
+			
+		</tbody>
+		<tfoot>
+			<tr>
+				<td></td>
+				<td></td>
+				<td style="text-align:right">@SourceList.Sum(x=>x.prize1).ToString("C2",numberFormat)</td>
+				<td style="text-align:right">@SourceList.Sum(x=>x.prize2).ToString("C2",numberFormat)</td>
+			</tr>
+		</tfoot>
+	</MudSimpleTable>
 }
 @code {
-    [Parameter]
-    public IEnumerable<TransSearch>? SourceList { get; set; }
-    [Parameter]
-    public string Title { get; set; }
-    private CultureInfo Curr = new CultureInfo("hi-IN");
-    private NumberFormatInfo numberFormat { get; set; }
-    protected override void OnInitialized()
+	[Parameter]
+	public IEnumerable<TransSearch>? SourceList { get; set; }
+	[Parameter]
+	public string Title { get; set; }
+	private CultureInfo Curr = new CultureInfo("hi-IN");
+	private NumberFormatInfo numberFormat { get; set; }
+	protected override void OnInitialized()
 		{
 			numberFormat = Curr.NumberFormat;
 

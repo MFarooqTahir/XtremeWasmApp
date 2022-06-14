@@ -40,7 +40,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script type="text/javascript">
         function focusInput(id) {
-            document.getElementById(id).focus();
+            console.log("Focussing input " + id);
+            let d = document.getElementById(id);
+            console.log("d is " + d);
+            if (d != null) { 
+                d.focus();
+            }
         }
         //export function noScroll(id) {
         //    $(id).on('focus', function (e) {

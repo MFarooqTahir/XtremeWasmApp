@@ -263,18 +263,21 @@ namespace XtremeWasmApp.Services
                             mke = mkeys.ResultObj;
                             await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
                         }
-                        var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                        var values = resx.ResultObj;
-                        if (values is null)
-                        {
-                            return (false, "Error. There might be no active draws for this company");
-                        }
                         var partySchCurr = await GetpartySchTrans().ConfigureAwait(false);
-                        partySchCurr.Win_Rate1 = values[0];
-                        partySchCurr.Win_Rate2 = values[1];
-                        partySchCurr.Win_Rate3 = values[2];
-                        partySchCurr.Win_Rate4 = values[3];
-                        await SetpartySchTrans(partySchCurr).ConfigureAwait(false);
+                        if (partySchCurr is not null)
+                        {
+                            var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                            var values = resx.ResultObj;
+                            if (values is null)
+                            {
+                                return (false, "Error. There might be no active draws for this company");
+                            }
+                            partySchCurr.Win_Rate1 = values[0];
+                            partySchCurr.Win_Rate2 = values[1];
+                            partySchCurr.Win_Rate3 = values[2];
+                            partySchCurr.Win_Rate4 = values[3];
+                            await SetpartySchTrans(partySchCurr).ConfigureAwait(false);
+                        }
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                         if (!resl.ResultObj)
                         {
@@ -510,7 +513,7 @@ namespace XtremeWasmApp.Services
             var comp = await GetCompany().ConfigureAwait(false) ?? new();
             var cdRel = await GetCdrel().ConfigureAwait(false) ?? new();
 
-            return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F2", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
+            return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F0", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
         }
 
         public async Task<IList<Schedule>> GetScheduleList(bool notall)
@@ -632,7 +635,7 @@ namespace XtremeWasmApp.Services
             try
             {
                 var ID = await GetUserID().ConfigureAwait(false);
-                var listret = await SendHttpRequest<ResultSet<IEnumerable<CDRelation>>>($"api/Company/GetCompanyList/{ID}/false", RequestType.Get).ConfigureAwait(false);
+                var listret = await SendHttpRequest<ResultSet<IEnumerable<CDRelation>>>($"api/Company/GetCompanyList/{ID}/true", RequestType.Get).ConfigureAwait(false);
                 return listret?.ResultObj;
             }
             catch (Exception ex)

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace XtremeModels
+﻿namespace XtremeModels
 {
     public class Schedule
     {
@@ -16,5 +14,7 @@ namespace XtremeModels
         public int Prz2 { get; set; }
         public string WebApiI { get; set; }
         public bool Uac { get; set; }
+        public bool blocked { get; set; }
+        public bool completed { get; set; }
     }
 }

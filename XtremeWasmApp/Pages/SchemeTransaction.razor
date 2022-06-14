@@ -30,7 +30,7 @@
                     <tr>
                         <th style="background-color: #ffe4b5;color:black;"><b>S #</b></th>
                         <th style="background-color: #ffe4b5;color:black"><b>Digit</b></th>
-                        <th style="background-color: #ffe4b5;color:black"><b>Rate</b></th>
+                        <th style="background-color: #ffe4b5;color:black;text-align:right;"><b>Rate</b></th>
                         <th style="text-align:right;background-color: #ffe4b5;color:black"><b>1<sup>st</sup> Prize</b></th>
                         <th style="text-align:right;background-color: #ffe4b5;color:black"><b>2<sup>nd</sup> Prize</b></th>
                     </tr>
@@ -51,9 +51,9 @@
                             <tr @onclick="@(()=>OnEntryClick(transaction.MKey))">
                                 <td><b>@transaction.sNo</b></td>
                                 <td><b>@transaction.Digit</b></td>
-                                <td><b>@transaction.sc_rate</b></td>
-                                <td style="text-align:right"><b>@transaction.Prize1.ToString("C",numberFormat)</b></td>
-                                <td style="text-align:right"><b>@transaction.Prize2.ToString("C",numberFormat)</b></td>
+                                <td style="text-align:right"><b>@((Math.Abs(transaction.sc_rate % 1) <= (Double.Epsilon * 100))?transaction.sc_rate:transaction.sc_rate.ToString("C2",numberFormat))</b></td>
+                                <td style="text-align:right"><b>@transaction.Prize1.ToString("C2",numberFormat)</b></td>
+                                <td style="text-align:right"><b>@transaction.Prize2.ToString("C2",numberFormat)</b></td>
                             </tr>
                             cNow++;
                             snoCountStart++;

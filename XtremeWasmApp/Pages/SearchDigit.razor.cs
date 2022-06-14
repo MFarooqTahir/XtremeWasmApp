@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 using System.Globalization;
 
@@ -12,6 +14,9 @@ namespace XtremeWasmApp.Pages
     {
         [Inject]
         private WebApiService _api { get; set; }
+
+        [Inject]
+        private IJSRuntime Js { get; set; }
 
         private IEnumerable<TransSearch>? TransListSale { get; set; }
         private IEnumerable<TransSearch>? TransListPurchase { get; set; }
@@ -90,12 +95,20 @@ namespace XtremeWasmApp.Pages
             }
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             numberFormat = Curr.NumberFormat;
 
             numberFormat.CurrencySymbol = "";
-            base.OnInitialized();
+            //await Js.InvokeVoidAsync("focusInput", "srchInput");
+        }
+
+        private async Task OnKeyDownSearch(KeyboardEventArgs args)
+        {
+            if (args.Key == "Enter")
+            {
+                await OnSearchClick();
+            }
         }
 
         private async Task OnSearchClick()
@@ -141,6 +154,14 @@ namespace XtremeWasmApp.Pages
             else
             {
                 ResultNotFound = true;
+            }
+        }
+
+        private void OnValueChange(ChangeEventArgs args)
+        {
+            if (args.Value is string str)
+            {
+                SearchText = str;
             }
         }
 

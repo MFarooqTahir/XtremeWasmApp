@@ -530,8 +530,9 @@ namespace XtremeWasmApp.Pages
                         StateHasChanged();
                         Digits = entry.Digit;
                         await lostDigitFocus(null);
-                        Prize1 = int.Parse(entry.Prize1.ToString(), Curr);
-                        Prize2 = int.Parse(entry.Prize2.ToString(), Curr);
+                        Rate = entry.sc_rate;
+                        Prize1 = double.Parse(entry.Prize1.ToString(), Curr);
+                        Prize2 = double.Parse(entry.Prize2.ToString(), Curr);
                         StateHasChanged();
                     }
                     else

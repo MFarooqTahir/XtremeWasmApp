@@ -50,8 +50,8 @@
                             <tr @onclick="@(()=>OnEntryClick(transaction.MKey))">
                                 <td><b>@transaction.sNo</b></td>
                                 <td><b>@transaction.Digit</b></td>
-                                <td style="text-align:right"><b>@transaction.Prize1.ToString("C",numberFormat)</b></td>
-                                <td style="text-align:right"><b>@transaction.Prize2.ToString("C",numberFormat)</b></td>
+                                <td style="text-align:right"><b>@transaction.Prize1.ToString("C2",numberFormat)</b></td>
+                                <td style="text-align:right"><b>@transaction.Prize2.ToString("C2",numberFormat)</b></td>
                             </tr>
                             cNow++;
                             snoCountStart++;

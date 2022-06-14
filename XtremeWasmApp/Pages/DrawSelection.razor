@@ -142,7 +142,12 @@
     private async Task onRowSelection(int rowIndex)
     {
         var currSel = schedules[rowIndex];
-        
+        if (currSel.blocked)
+        {
+            ErrorsList = new List<string>() { "This draw is blocked" };
+            StateHasChanged();
+            return;
+        }
         var res = await ApiService.ChangeSchedule(currSel,_timer);
         if (!res.Item1)
         {
