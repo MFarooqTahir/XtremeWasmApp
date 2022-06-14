@@ -161,7 +161,7 @@ namespace XtremeWasmApp.Services
             var mkey = 0;
             if (isFranchise)
             {
-                mkey = (await GetFranMkeys())[0];
+                mkey = (await GetFranMkeys().ConfigureAwait(false))[0];
             }
             var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntry/{isFranchise}/{mkey}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
@@ -173,7 +173,7 @@ namespace XtremeWasmApp.Services
             var mkey = 0;
             if (isFranchise)
             {
-                mkey = (await GetFranMkeys())[1];
+                mkey = (await GetFranMkeys().ConfigureAwait(false))[1];
             }
             var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntrySch/{isFranchise}/{mkey}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
@@ -263,17 +263,18 @@ namespace XtremeWasmApp.Services
                             mke = mkeys.ResultObj;
                             await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
                         }
-                        DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                        DashData = DashDataRes?.ResultObj;
-                        if (DashData is null)
+                        var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                        var values = resx.ResultObj;
+                        if (values is null)
                         {
                             return (false, "Error. There might be no active draws for this company");
                         }
-                        if (DashData.party is null || DashData.sch is null)
-                        {
-                            return (false, "There was an error in getting the data. Please try again later");
-                        }
-                        await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
+                        var partySchCurr = await GetpartySchTrans().ConfigureAwait(false);
+                        partySchCurr.Win_Rate1 = values[0];
+                        partySchCurr.Win_Rate2 = values[1];
+                        partySchCurr.Win_Rate3 = values[2];
+                        partySchCurr.Win_Rate4 = values[3];
+                        await SetpartySchTrans(partySchCurr).ConfigureAwait(false);
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                         if (!resl.ResultObj)
                         {

@@ -62,7 +62,7 @@ namespace XtremeWasmApp.Pages
                 acCode = await ApiService.GetMbm().ConfigureAwait(false);
                 if (comp?.Any() == false)
                 {
-                    await OnNoParties();
+                    await OnNoParties().ConfigureAwait(false);
                 }
                 else
                 {

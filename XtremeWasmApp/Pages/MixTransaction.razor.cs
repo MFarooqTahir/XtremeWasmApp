@@ -202,7 +202,7 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    if (Prize1 is not null && Prize2 is not null && (await Api.GetCurrentBalance() - Prize1 + Prize2) < 0)
+                    if (Prize1 is not null && Prize2 is not null && (Editmode || (Prize1 > 0 && Prize2 > 0)) && (await Api.GetCurrentBalance() - Prize1 + Prize2) < 0)
                     {
                         await showDialog("Limit Exceeded", "");
                     }
@@ -424,7 +424,7 @@ namespace XtremeWasmApp.Pages
             }
 
             DigitEnabled = Prz1Enabled = Prz2Enabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
-            if (firstRender)
+            if (invInfo is null || invInfo?.propKey == 0)
             {
                 await refreshPage();
             }
