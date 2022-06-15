@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.JSInterop;
 
 using MudBlazor;
 
@@ -12,6 +13,9 @@ namespace XtremeWasmApp.Shared
     {
         [CascadingParameter]
         private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+
+        [Inject]
+        private IJSRuntime Js { get; set; }
 
         [Inject]
         private WebApiService Auth { get; set; } = null!;
@@ -56,10 +60,11 @@ namespace XtremeWasmApp.Shared
             StateHasChanged();
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             service.RefreshRequested += RefreshMe;
-
+            var dtype = await Js.InvokeAsync<string>("getOS");
+            await Auth.SetDtype(dtype);
             _timer = new(async _ => {
                 if (RunTimer && await Auth.GetRepeatDataWeb())
                 {

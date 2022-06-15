@@ -30,7 +30,8 @@ namespace XtremeWasmApp.Services
             _navigationManager = navigationManager;
             _httpData = httpData;
         }
-
+        public async Task SetDtype(string dtype) => await _localStorage.SetItemAsync("dtype", dtype);
+        public async Task<string> GetDtype() => await _localStorage.GetItemAsStringAsync("dtype").ConfigureAwait(false);
         public async Task<Models.RegisterResult?> Register(Models.RegisterModel registerModel)
         {
             return await SendHttpRequest<Models.RegisterResult?>("api/Login/RegisterWebApp", RequestType.Post, registerModel).ConfigureAwait(false);

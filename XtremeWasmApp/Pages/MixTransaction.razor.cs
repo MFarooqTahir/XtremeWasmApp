@@ -32,7 +32,7 @@ namespace XtremeWasmApp.Pages
 
         private CultureInfo Curr = new CultureInfo("hi-IN");
         private NumberFormatInfo numberFormat { get; set; }
-
+        private string Dtype;
         private IList<Transaction>? Transactions { get; set; } = new List<Transaction>();
 
         private Transaction? Tempdata { get; set; }
@@ -165,6 +165,8 @@ namespace XtremeWasmApp.Pages
         {
             //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
             await Js.InvokeVoidAsync("iphoneFocus");
+            Dtype = await Api.GetDtype();
+
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }
@@ -250,7 +252,7 @@ namespace XtremeWasmApp.Pages
                                         transaction = trans,
                                         dbf = "FAROOQ",
                                         xid = cdRel.UName,
-                                        xdtype = 'W',
+                                        xdtype = Dtype[0],
                                         xmode = 0,
                                         xpamt1 = 0,
                                         xpamt2 = 0,
@@ -442,7 +444,7 @@ namespace XtremeWasmApp.Pages
                     var sch = await Api.GetSch();
                     var qty = await Api.IsQtyUser();
                     var invD = new InvData()
-                    { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = 'W', db = "", };
+                    { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = Dtype[0], db = "", };
                     //Dmode = 0
                     var nParty = (await Api.GetParty()).ShallowCopy();
                     if (sch.Prz2 == 5)

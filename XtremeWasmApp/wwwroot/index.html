@@ -43,10 +43,25 @@
             console.log("Focussing input " + id);
             let d = document.getElementById(id);
             console.log("d is " + d);
-            if (d != null) { 
+            if (d != null) {
                 d.focus();
             }
         }
+        function getOS() {
+            platform = window.navigator.platform,
+                windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'],
+                iosPlatforms = ['iPhone', 'iPad', 'iPod'],
+                os = "A";
+
+            if (iosPlatforms.indexOf(platform) !== -1) {
+                os = "I";
+            } else if (windowsPlatforms.indexOf(platform) !== -1) {
+                os = "W";
+            }
+            console.log(os);
+            return os;
+        }
+
         //export function noScroll(id) {
         //    $(id).on('focus', function (e) {
         //        e.preventDefault(); e.stopPropagation();
