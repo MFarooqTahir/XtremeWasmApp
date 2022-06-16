@@ -38,7 +38,6 @@ namespace XtremeWasmApp.Pages
 
         private bool Editmode;
         private Inventory? invInfo { get; set; }
-        private string Dtype;
         private double Total { get; set; }
         private int snoCountStart = 0;
         private bool DigitEnabled { get; set; }
@@ -121,8 +120,7 @@ namespace XtremeWasmApp.Pages
         protected override void OnInitialized()
         {
             //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
-            Js.InvokeVoidAsync("iphoneFocus").GetAwaiter().GetResult();
-            Dtype = Api.GetDtype().Result;
+            Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
         }
@@ -209,7 +207,7 @@ namespace XtremeWasmApp.Pages
                                         xxmkey = invInfo.propKey,
                                         xpid = txtDigit.Length.ToString(),
                                         xpkt = txtDigit,
-                                        xdtype = Dtype,
+                                        xdtype = await Api.GetDtype(),
                                         xscode = txtDigit.Length == 3 ? "Ring" : "Packet",
                                         xwin1 = Convert.ToInt32(win[0]),
                                         xwin2 = Convert.ToInt32(win[1]),
@@ -479,7 +477,7 @@ namespace XtremeWasmApp.Pages
                         xref = "Online",
                         xsc = 0,
                         xvid = "1SM",
-                        xdtype = Dtype,
+                        xdtype = await Api.GetDtype(),
                         xcode = cdrel.rCode,
                         sfcom = partySch.Sfc_com,
                         sfown = partySch.Sfc_own,
