@@ -245,12 +245,13 @@ namespace XtremeWasmApp.Pages
                                         Prize2 = Prize2 ?? 0,
                                         MKey = invInfo.propKey,
                                     };
+                                    var d = (await Api.GetDtype());
                                     var invD = new EntryData()
                                     {
                                         transaction = trans,
                                         dbf = "FAROOQ",
                                         xid = cdRel.UName,
-                                        xdtype = (await Api.GetDtype())[0],
+                                        xdtype = d[0],
                                         xmode = 0,
                                         xpamt1 = 0,
                                         xpamt2 = 0,
