@@ -31,9 +31,9 @@ namespace XtremeWasmApp.Services
             _httpData = httpData;
         }
 
-        public async Task SetDtype(string dtype) => await _localStorage.SetItemAsync("dtype", dtype ?? "W");
+        public async Task SetDtype(string dtype) => await _localStorage.SetItemAsync("dtype", dtype ?? "A");
 
-        public async Task<string> GetDtype() => (await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false)) ?? "W";
+        public async Task<string> GetDtype() => (await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false)) ?? "A";
 
         public async Task<Models.RegisterResult?> Register(Models.RegisterModel registerModel)
         {

@@ -63,7 +63,7 @@ namespace XtremeWasmApp.Shared
         protected override async Task OnInitializedAsync()
         {
             service.RefreshRequested += RefreshMe;
-            var dtype = "W";// Js.InvokeAsync<string>("getOS").Result;
+            var dtype = (await Js.InvokeAsync<string>("getOS")) ?? "A";
             await Auth.SetDtype(dtype);
             _timer = new(async _ => {
                 if (RunTimer && await Auth.GetRepeatDataWeb())
