@@ -161,11 +161,11 @@ namespace XtremeWasmApp.Pages
             }
         }
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
             //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
-            await Js.InvokeVoidAsync("iphoneFocus");
-            Dtype = await Api.GetDtype();
+            Js.InvokeVoidAsync("iphoneFocus").GetAwaiter().GetResult();
+            Dtype = Api.GetDtype().Result;
 
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
