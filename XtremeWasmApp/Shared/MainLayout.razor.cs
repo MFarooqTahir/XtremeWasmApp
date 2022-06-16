@@ -60,11 +60,11 @@ namespace XtremeWasmApp.Shared
             StateHasChanged();
         }
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             service.RefreshRequested += RefreshMe;
             var dtype = "W";// Js.InvokeAsync<string>("getOS").Result;
-            Auth.SetDtype(dtype);
+            await Auth.SetDtype(dtype);
             _timer = new(async _ => {
                 if (RunTimer && await Auth.GetRepeatDataWeb())
                 {
