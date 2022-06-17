@@ -35,7 +35,7 @@ namespace XtremeWasmApp.Pages
         private IList<Transaction>? Transactions { get; set; } = new List<Transaction>();
 
         private Transaction? Tempdata { get; set; }
-        private bool Editmode, NotRefreshing;
+        private bool Editmode, NotRefreshing = true;
         private Inventory? invInfo { get; set; }
 
         private double Total;
