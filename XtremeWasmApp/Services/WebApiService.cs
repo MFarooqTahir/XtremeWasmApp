@@ -185,7 +185,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<bool> GetDigitEnabled()
         {
-            var cdrel = await GetCdrel().ConfigureAwait(false);
+            var cdrel = await GetCdrel();
             return (cdrel?.Active ?? false) && (cdrel?.Enabled ?? false);
         }
 

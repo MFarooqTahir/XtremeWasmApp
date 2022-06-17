@@ -269,7 +269,7 @@ namespace XtremeWasmApp.Pages
                                         {
                                             listEnabled = Editmode;
 
-                                            await refreshPage();
+                                            refreshPage();
                                         }
                                         else
                                         {
@@ -297,7 +297,7 @@ namespace XtremeWasmApp.Pages
                                         else if (string.Equals(Tempdata.code, "3", StringComparison.Ordinal))
                                         {
                                             await showDialog("Invoice has been closed", "");
-                                            await refreshPage();
+                                            refreshPage();
                                             Editmode = false;
                                             return;
                                         }
@@ -428,11 +428,11 @@ namespace XtremeWasmApp.Pages
             DigitEnabled = Prz1Enabled = Prz2Enabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
             if (invInfo is null || invInfo?.propKey == 0)
             {
-                await refreshPage();
+                refreshPage();
             }
         }
 
-        private async Task refreshPage()
+        private async void refreshPage()
         {
             if (NotRefreshing)
             {
