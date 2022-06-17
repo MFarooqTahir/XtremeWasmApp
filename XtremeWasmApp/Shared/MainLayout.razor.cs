@@ -60,36 +60,6 @@ namespace XtremeWasmApp.Shared
             StateHasChanged();
         }
 
-        protected override async Task OnInitializedAsync()
-        {
-            service.RefreshRequested += RefreshMe;
-            var dtype = (await Js.InvokeAsync<string>("getOS")) ?? "A";
-            await Auth.SetDtype(dtype);
-            _timer = new(async _ => {
-                if (RunTimer && await Auth.GetRepeatDataWeb())
-                {
-                    var newRepeat = await Auth.GetRepeatData();
-                    if (newRepeat is not null && newRepeat != repeatData)
-                    {
-                        repeatData = newRepeat;
-                        if (newRepeat.RelationBlocked)
-                        {
-                            RunTimer = false;
-                            await Auth.SetCompanySelected(value: false);
-                            nav.NavigateTo("/CompanySelection");
-                        }
-                        else if (newRepeat.DrawBlocked)
-                        {
-                            RunTimer = false;
-                            await Auth.SetDrawSelected(value: false);
-                            nav.NavigateTo("/DrawSelection");
-                        }
-                    }
-                    await InvokeAsync(StateHasChanged);
-                }
-            }, state: null, 0, 10000);
-        }
-
         private void ontopclick()
         {
             nav.NavigateTo("/DrawSelection?onlyactive=true");
@@ -100,6 +70,32 @@ namespace XtremeWasmApp.Shared
             var currMarq = MarqSet;
             if (firstRender)
             {
+                service.RefreshRequested += RefreshMe;
+                var dtype = await Js.InvokeAsync<string>("getOS") ?? "A";
+                await Auth.SetDtype(dtype);
+                _timer = new(async _ => {
+                    if (RunTimer && await Auth.GetRepeatDataWeb())
+                    {
+                        var newRepeat = await Auth.GetRepeatData();
+                        if (newRepeat is not null && newRepeat != repeatData)
+                        {
+                            repeatData = newRepeat;
+                            if (newRepeat.RelationBlocked)
+                            {
+                                RunTimer = false;
+                                await Auth.SetCompanySelected(value: false);
+                                nav.NavigateTo("/CompanySelection");
+                            }
+                            else if (newRepeat.DrawBlocked)
+                            {
+                                RunTimer = false;
+                                await Auth.SetDrawSelected(value: false);
+                                nav.NavigateTo("/DrawSelection");
+                            }
+                        }
+                        await InvokeAsync(StateHasChanged);
+                    }
+                }, state: null, 0, 10000);
                 //await Auth.Logout();
                 var pal = _mudThemeProvider.Theme.Palette;
                 var palD = _mudThemeProvider.Theme.PaletteDark;
