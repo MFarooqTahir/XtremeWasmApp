@@ -123,6 +123,10 @@ namespace XtremeWasmApp.Pages
             Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
+            if (invInfo is null || invInfo?.propKey == 0)
+            {
+                refreshPage();
+            }
         }
 
         private async Task digitKeyDown(KeyboardEventArgs x)
@@ -229,7 +233,7 @@ namespace XtremeWasmApp.Pages
                                         if (Transactions!.Any() && !string.Equals(Tempdata.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
                                         {
                                             listEnabled = Editmode;
-                                            await refreshPage();
+                                            refreshPage();
                                         }
                                         else
                                         {
@@ -255,7 +259,7 @@ namespace XtremeWasmApp.Pages
                                         else if (string.Equals(Tempdata.code, "3", StringComparison.Ordinal))
                                         {
                                             await showDialog("Invoice has been closed", "");
-                                            await refreshPage();
+                                            refreshPage();
                                             Editmode = false;
                                             return;
                                         }
@@ -452,13 +456,9 @@ namespace XtremeWasmApp.Pages
             }
             //Prz1Enabled = Prz2Enabled =
             DigitEnabled = RateEnabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
-            if (invInfo is null || invInfo?.propKey == 0)
-            {
-                await refreshPage();
-            }
         }
 
-        private async Task refreshPage()
+        private async void refreshPage()
         {
             if (NotRefreshing)
             {

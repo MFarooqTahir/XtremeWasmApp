@@ -167,6 +167,10 @@ namespace XtremeWasmApp.Pages
 
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
+            if (invInfo is null || invInfo?.propKey == 0)
+            {
+                refreshPage();
+            }
         }
 
         private async Task digitKeyDown(KeyboardEventArgs x)
@@ -426,10 +430,6 @@ namespace XtremeWasmApp.Pages
             }
 
             DigitEnabled = Prz1Enabled = Prz2Enabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
-            if (invInfo is null || invInfo?.propKey == 0)
-            {
-                refreshPage();
-            }
         }
 
         private async void refreshPage()
