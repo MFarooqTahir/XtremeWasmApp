@@ -123,10 +123,7 @@ namespace XtremeWasmApp.Pages
             Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
-            if (invInfo is null || invInfo?.propKey == 0)
-            {
-                refreshPage();
-            }
+
         }
 
         private async Task digitKeyDown(KeyboardEventArgs x)
@@ -456,6 +453,10 @@ namespace XtremeWasmApp.Pages
             }
             //Prz1Enabled = Prz2Enabled =
             DigitEnabled = RateEnabled = repeatData?.Uac == true && await Api.GetDigitEnabled();
+            if (invInfo is null || invInfo?.propKey == 0)
+            {
+                refreshPage();
+            }
         }
 
         private async void refreshPage()
