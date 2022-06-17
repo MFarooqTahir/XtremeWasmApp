@@ -36,7 +36,7 @@ namespace XtremeWasmApp.Pages
         private IList<Transaction>? Transactions { get; set; } = new List<Transaction>();
         private Transaction? Tempdata { get; set; }
 
-        private bool Editmode;
+        private bool Editmode, NotRefreshing;
         private Inventory? invInfo { get; set; }
         private double Total { get; set; }
         private int snoCountStart = 0;
@@ -460,57 +460,62 @@ namespace XtremeWasmApp.Pages
 
         private async Task refreshPage()
         {
-            loading = true;
-            if (DigitEnabled)
+            if (NotRefreshing)
             {
-                invInfo = await Api.GetInvInfo("1SM");
-                if (invInfo is null || invInfo?.Vno == -1)
+                NotRefreshing = false;
+                loading = true;
+                if (DigitEnabled)
                 {
-                    var cdrel = await Api.GetCdrel();
-                    var partySch = await Api.GetpartySchTrans();
-                    var invD = new InvDataSch()
-                    {
-                        dbf = "FAROOQ",
-                        xdemand = false,
-                        xmkey = 0,
-                        xid = cdrel.UName,
-                        xref = "Online",
-                        xsc = 0,
-                        xvid = "1SM",
-                        xdtype = await Api.GetDtype(),
-                        xcode = cdrel.rCode,
-                        sfcom = partySch.Sfc_com,
-                        sfown = partySch.Sfc_own,
-                        stcom = partySch.Std_com,
-                        stown = partySch.Std_own,
-                        wrate1 = partySch.Win_Rate1,
-                        wrate2 = partySch.Win_Rate2,
-                        wrate3 = partySch.Win_Rate3,
-                        wrate4 = partySch.Win_Rate4
-                    };
-
-                    var res = await Api.MakeNewInvSch(invD);
                     invInfo = await Api.GetInvInfo("1SM");
+                    if (invInfo is null || invInfo?.Vno == -1)
+                    {
+                        var cdrel = await Api.GetCdrel();
+                        var partySch = await Api.GetpartySchTrans();
+                        var invD = new InvDataSch()
+                        {
+                            dbf = "FAROOQ",
+                            xdemand = false,
+                            xmkey = 0,
+                            xid = cdrel.UName,
+                            xref = "Online",
+                            xsc = 0,
+                            xvid = "1SM",
+                            xdtype = await Api.GetDtype(),
+                            xcode = cdrel.rCode,
+                            sfcom = partySch.Sfc_com,
+                            sfown = partySch.Sfc_own,
+                            stcom = partySch.Std_com,
+                            stown = partySch.Std_own,
+                            wrate1 = partySch.Win_Rate1,
+                            wrate2 = partySch.Win_Rate2,
+                            wrate3 = partySch.Win_Rate3,
+                            wrate4 = partySch.Win_Rate4
+                        };
+
+                        var res = await Api.MakeNewInvSch(invD);
+                        invInfo = await Api.GetInvInfo("1SM");
+                    }
+
+                    if (invInfo is null || invInfo?.xres == 1)
+                    {
+                        var result = await showDialog("Draw Closed", "");
+                        nav.NavigateTo("/");
+                    }
+                    else
+                    {
+                        var party = await Api.GetParty();
+                        InvNo = invInfo?.Vno.ToString("D4");
+                        Ref = invInfo?.Ref;
+                        Code = party.Code;
+                        PartyName = party.Name;
+                        await GetTransList(listEnabled ? 0 : 5);
+                        StateHasChanged();
+                    }
                 }
 
-                if (invInfo is null || invInfo?.xres == 1)
-                {
-                    var result = await showDialog("Draw Closed", "");
-                    nav.NavigateTo("/");
-                }
-                else
-                {
-                    var party = await Api.GetParty();
-                    InvNo = invInfo?.Vno.ToString("D4");
-                    Ref = invInfo?.Ref;
-                    Code = party.Code;
-                    PartyName = party.Name;
-                    await GetTransList(listEnabled ? 0 : 5);
-                    StateHasChanged();
-                }
+                loading = false;
+                NotRefreshing = true;
             }
-
-            loading = false;
         }
 
         private async Task OnEntryClick(int Mkey)

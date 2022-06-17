@@ -35,7 +35,7 @@ namespace XtremeWasmApp.Pages
         private IList<Transaction>? Transactions { get; set; } = new List<Transaction>();
 
         private Transaction? Tempdata { get; set; }
-        private bool Editmode;
+        private bool Editmode, NotRefreshing;
         private Inventory? invInfo { get; set; }
 
         private double Total;
@@ -434,64 +434,69 @@ namespace XtremeWasmApp.Pages
 
         private async Task refreshPage()
         {
-            loading = true;
-            if (DigitEnabled)
+            if (NotRefreshing)
             {
-                invInfo = await Api.GetInvInfo();
-                if (invInfo is null || invInfo?.Vno == -1)
+                NotRefreshing = false;
+                loading = true;
+                if (DigitEnabled)
                 {
-                    var cdrel = await Api.GetCdrel();
-                    var sch = await Api.GetSch();
-                    var qty = await Api.IsQtyUser();
-                    var invD = new InvData()
-                    { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = (await Api.GetDtype())[0], db = "", };
-                    //Dmode = 0
-                    var nParty = (await Api.GetParty()).ShallowCopy();
-                    if (sch.Prz2 == 5)
+                    invInfo = await Api.GetInvInfo();
+                    if (invInfo is null || invInfo?.Vno == -1)
                     {
-                        if (qty)
+                        var cdrel = await Api.GetCdrel();
+                        var sch = await Api.GetSch();
+                        var qty = await Api.IsQtyUser();
+                        var invD = new InvData()
+                        { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = (await Api.GetDtype())[0], db = "", };
+                        //Dmode = 0
+                        var nParty = (await Api.GetParty()).ShallowCopy();
+                        if (sch.Prz2 == 5)
                         {
-                            nParty.Ak_win2 = nParty.Ak_win2 != 0 ? Math.Ceiling(nParty.Ak_win2 * 3 / 5) : 0;
-                            nParty.Fc_win2 = nParty.Fc_win2 != 0 ? Math.Ceiling(nParty.Fc_win2 * 3 / 5) : 0;
-                            nParty.Op_win2 = nParty.Op_win2 != 0 ? Math.Ceiling(nParty.Op_win2 * 3 / 5) : 0;
-                            nParty.Td_win2 = nParty.Td_win2 != 0 ? Math.Ceiling(nParty.Td_win2 * 3 / 5) : 0;
-                            nParty.Xak_win2 = nParty.Xak_win2 != 0 ? Math.Ceiling(nParty.Xak_win2 * 3 / 5) : 0;
-                            nParty.Xtd_win2 = nParty.Xtd_win2 != 0 ? Math.Ceiling(nParty.Xtd_win2 * 3 / 5) : 0;
+                            if (qty)
+                            {
+                                nParty.Ak_win2 = nParty.Ak_win2 != 0 ? Math.Ceiling(nParty.Ak_win2 * 3 / 5) : 0;
+                                nParty.Fc_win2 = nParty.Fc_win2 != 0 ? Math.Ceiling(nParty.Fc_win2 * 3 / 5) : 0;
+                                nParty.Op_win2 = nParty.Op_win2 != 0 ? Math.Ceiling(nParty.Op_win2 * 3 / 5) : 0;
+                                nParty.Td_win2 = nParty.Td_win2 != 0 ? Math.Ceiling(nParty.Td_win2 * 3 / 5) : 0;
+                                nParty.Xak_win2 = nParty.Xak_win2 != 0 ? Math.Ceiling(nParty.Xak_win2 * 3 / 5) : 0;
+                                nParty.Xtd_win2 = nParty.Xtd_win2 != 0 ? Math.Ceiling(nParty.Xtd_win2 * 3 / 5) : 0;
+                            }
+                            else
+                            {
+                                nParty.Ak_win2 = nParty.Ak_win1 != 0 ? nParty.Ak_win1 / 5 : 0;
+                                nParty.Fc_win2 = nParty.Fc_win1 != 0 ? nParty.Fc_win1 / 5 : 0;
+                                nParty.Op_win2 = nParty.Op_win1 != 0 ? nParty.Op_win1 / 5 : 0;
+                                nParty.Td_win2 = nParty.Td_win1 != 0 ? nParty.Td_win1 / 5 : 0;
+                                nParty.Xak_win2 = nParty.Xak_win1 != 0 ? nParty.Xak_win1 / 5 : 0;
+                                nParty.Xtd_win2 = nParty.Xtd_win1 != 0 ? nParty.Xtd_win1 / 5 : 0;
+                            }
                         }
-                        else
-                        {
-                            nParty.Ak_win2 = nParty.Ak_win1 != 0 ? nParty.Ak_win1 / 5 : 0;
-                            nParty.Fc_win2 = nParty.Fc_win1 != 0 ? nParty.Fc_win1 / 5 : 0;
-                            nParty.Op_win2 = nParty.Op_win1 != 0 ? nParty.Op_win1 / 5 : 0;
-                            nParty.Td_win2 = nParty.Td_win1 != 0 ? nParty.Td_win1 / 5 : 0;
-                            nParty.Xak_win2 = nParty.Xak_win1 != 0 ? nParty.Xak_win1 / 5 : 0;
-                            nParty.Xtd_win2 = nParty.Xtd_win1 != 0 ? nParty.Xtd_win1 / 5 : 0;
-                        }
+
+                        invD.party = nParty;
+                        var res = await Api.MakeNewInv(invD);
+                        invInfo = await Api.GetInvInfo();
                     }
 
-                    invD.party = nParty;
-                    var res = await Api.MakeNewInv(invD);
-                    invInfo = await Api.GetInvInfo();
+                    if (invInfo is null || invInfo?.xres == 1)
+                    {
+                        var result = await showDialog("Draw Closed", "");
+                        nav.NavigateTo("/");
+                    }
+                    else
+                    {
+                        var party = await Api.GetParty();
+                        InvNo = invInfo?.Vno.ToString("D4");
+                        Ref = invInfo?.Ref;
+                        Code = party.Code;
+                        PartyName = party.Name;
+                        await GetTransList(listEnabled ? 0 : 5);
+                        StateHasChanged();
+                    }
                 }
 
-                if (invInfo is null || invInfo?.xres == 1)
-                {
-                    var result = await showDialog("Draw Closed", "");
-                    nav.NavigateTo("/");
-                }
-                else
-                {
-                    var party = await Api.GetParty();
-                    InvNo = invInfo?.Vno.ToString("D4");
-                    Ref = invInfo?.Ref;
-                    Code = party.Code;
-                    PartyName = party.Name;
-                    await GetTransList(listEnabled ? 0 : 5);
-                    StateHasChanged();
-                }
+                loading = false;
+                NotRefreshing = true;
             }
-
-            loading = false;
         }
 
         private async Task OnEntryClick(int Mkey)
