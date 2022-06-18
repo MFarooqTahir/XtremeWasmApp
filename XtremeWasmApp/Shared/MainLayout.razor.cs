@@ -27,7 +27,7 @@ namespace XtremeWasmApp.Shared
 
         private RepeatDataReturnWA repeatData;
 
-        private bool RunTimer;
+        private bool RunTimer, ac;
 
         private bool _isDarkMode;
         private MudThemeProvider _mudThemeProvider = null!;
@@ -38,7 +38,7 @@ namespace XtremeWasmApp.Shared
             get { return _selectedCompDraw; }
             set { var old = selectedCompDraw; _selectedCompDraw = value; if (old != value) { StateHasChanged(); } }
         }
-
+        string MBM = "Loading...";
         private bool compSel;
         private bool drawSel;
         private bool MarqSet => MarqData is not null;
@@ -93,8 +93,7 @@ namespace XtremeWasmApp.Shared
                             }
                         }
                         RunTimer = true;
-
-                        await InvokeAsync(StateHasChanged);
+                        StateHasChanged();
                     }
                 }, state: null, 0, 10000);
                 await Auth.Logout();
@@ -106,6 +105,9 @@ namespace XtremeWasmApp.Shared
                 _isDarkMode = await _mudThemeProvider.GetSystemPreference();
                 StateHasChanged();
             }
+            ac = repeatData?.RelationActive == false || repeatData?.Uac == false || repeatData?.DrawCompleted == true;
+            MBM = await AuthService.GetMbm();
+
             Currpage = nav.Uri.Replace(nav.BaseUri, "", StringComparison.OrdinalIgnoreCase);
             var ind = Currpage.IndexOf('/', StringComparison.OrdinalIgnoreCase);
             if (!string.IsNullOrWhiteSpace(Currpage) && ind > 0)

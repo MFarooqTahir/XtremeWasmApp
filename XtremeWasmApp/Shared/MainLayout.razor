@@ -6,7 +6,7 @@
 @inject NavigationManager nav
 @inject WebApiService AuthService
 @implements IDisposable
-                    <PageTitle>PBTS.Net Web App</PageTitle>
+<PageTitle>PBTS.Net Web App</PageTitle>
 
 <MudRTLProvider>
     <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
@@ -48,42 +48,66 @@
             <LoginDisplay />
         </MudAppBar>
         <CascadingValue TValue="Timer" Value="_timer">
-        <CascadingValue TValue="RepeatDataReturnWA" Value="repeatData">
-            @if (selectedCompDraw)
-            {
-                <AuthorizeView>
-                    <Authorized>
-
-                        <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-                            <NavMenu />
-                        </MudDrawer>
-                    </Authorized>
-                </AuthorizeView>
-            }
-            <MudMainContent>
-                @if (MarqSet)
+            <CascadingValue TValue="RepeatDataReturnWA" Value="repeatData">
+                @if (selectedCompDraw)
                 {
                     <AuthorizeView>
                         <Authorized>
-                            <MudPaper @onclick="@ontopclick" Elevation="3" Class="py-3" Outlined="true">
 
-                                <MudStack @onclick="@ontopclick" Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Center">
-                                    <MudIcon @onclick="@ontopclick" Icon="@(repeatData?.Uac==true && repeatData?.DrawCompleted==false?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Size="Size.Small" Color="@(repeatData?.Uac==true && repeatData?.DrawCompleted==false?Color.Success:Color.Error)" Title="Pencil" />
-                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.DId - @MarqData.BId</b></MudText>
-                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Category</b></MudText>
-                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.City</b></MudText>
-                                    <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Date</b></MudText>
-                                </MudStack>
-                            </MudPaper>
-                            
+                            <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+                                <MudText Align="Align.Center" Class="my-2"><b>REG ID: @MBM</b></MudText>
+                                <MudNavMenu>
+
+                                    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+                                    <MudNavLink Href="/Mix" Match="NavLinkMatch.Prefix"
+                                            Icon="@Icons.Material.Filled.StackedBarChart"
+                                            Disabled=@ac>
+                                        Mix Trans
+                                    </MudNavLink>
+
+                                    <MudNavLink Href="/Scheme" Match="NavLinkMatch.Prefix"
+                                            Icon="@Icons.Material.Filled.StackedLineChart"
+                                            Disabled=@ac>
+                                        Scheme Trans
+                                    </MudNavLink>
+                                    @*<MudNavLink Href="/Scheme" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Percent">Scheme % Trans</MudNavLink>*@
+                                    <MudNavLink Href="/Search" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Search Digit</MudNavLink>
+                                    <MudNavLink Href="/Win" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.PriceCheck" Disabled="@(repeatData?.RelationPrize==false)">Win Prize</MudNavLink>
+                                    <MudNavLink Href="/View" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CreditCard">View Invoice</MudNavLink>
+                                    <MudNavLink Href="/Bill" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceChange" Disabled="@(repeatData?.RelationBill==false)">Party Bill</MudNavLink>
+                                    <MudNavLink Href="/Ledger" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.FileFormats.FileDocument" Disabled="@(repeatData?.RelationLedger==false)">A/C Ledger</MudNavLink>
+                                    <MudNavLink Href="/Print" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Print" Disabled="@(repeatData?.RelationPrint==false)">Print</MudNavLink>
+                                    @*<MudNavLink Href="/CompanySelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Warehouse">Company Selection</MudNavLink>
+                                <MudNavLink Href="/DrawSelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CardMembership">Draw Selection</MudNavLink>*@
+                                </MudNavMenu>
+                            </MudDrawer>
                         </Authorized>
                     </AuthorizeView>
                 }
-                <MudContainer Class="mt-2 px-2" MaxWidth="MaxWidth.False">
-                    @Body
-                </MudContainer>
-            </MudMainContent>
-        </CascadingValue>
+                <MudMainContent>
+                    @if (MarqSet)
+                    {
+                        <AuthorizeView>
+                            <Authorized>
+                                <MudPaper @onclick="@ontopclick" Elevation="3" Class="py-3" Outlined="true">
+
+                                    <MudStack @onclick="@ontopclick" Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Center">
+                                        <MudIcon @onclick="@ontopclick" Icon="@(repeatData?.Uac==true && repeatData?.DrawCompleted==false?Icons.Material.Filled.Edit:Icons.Material.Filled.EditOff)" Size="Size.Small" Color="@(repeatData?.Uac==true && repeatData?.DrawCompleted==false?Color.Success:Color.Error)" Title="Pencil" />
+                                        <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.DId - @MarqData.BId</b></MudText>
+                                        <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Category</b></MudText>
+                                        <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.City</b></MudText>
+                                        <MudText @onclick="@ontopclick" Typo="Typo.body2"><b>@MarqData.Date</b></MudText>
+                                    </MudStack>
+                                </MudPaper>
+
+                            </Authorized>
+                        </AuthorizeView>
+                    }
+                    <MudContainer Class="mt-2 px-2" MaxWidth="MaxWidth.False">
+                        @Body
+                    </MudContainer>
+                </MudMainContent>
+            </CascadingValue>
         </CascadingValue>
     </MudLayout>
 
