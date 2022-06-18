@@ -71,7 +71,7 @@ namespace XtremeWasmApp.Shared
             if (firstRender)
             {
                 service.RefreshRequested += RefreshMe;
-                var dtype = "A";// await Js.InvokeAsync<string>("getOS") ?? "A";
+                var dtype = await Js.InvokeAsync<string>("getOS") ?? "A";
                 await Auth.SetDtype(dtype);
                 _timer = new(async _ => {
                     if (RunTimer && await Auth.GetRepeatDataWeb())
