@@ -76,26 +76,27 @@ namespace XtremeWasmApp.Shared
                 _timer = new(async _ => {
                     if (RunTimer && await Auth.GetRepeatDataWeb())
                     {
+                        RunTimer = false;
                         var newRepeat = await Auth.GetRepeatData();
                         if (newRepeat is not null && newRepeat != repeatData)
                         {
                             repeatData = newRepeat;
                             if (newRepeat.RelationBlocked)
                             {
-                                RunTimer = false;
                                 await Auth.SetCompanySelected(value: false);
                                 nav.NavigateTo("/CompanySelection");
                             }
                             else if (newRepeat.DrawBlocked)
                             {
-                                RunTimer = false;
                                 await Auth.SetDrawSelected(value: false);
                                 nav.NavigateTo("/DrawSelection");
                             }
-                            await InvokeAsync(StateHasChanged);
                         }
+                        RunTimer = true;
+
+                        await InvokeAsync(StateHasChanged);
                     }
-                }, state: null, 0, 15000);
+                }, state: null, 0, 10000);
                 await Auth.Logout();
                 var pal = _mudThemeProvider.Theme.Palette;
                 var palD = _mudThemeProvider.Theme.PaletteDark;
