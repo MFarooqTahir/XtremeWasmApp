@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 
 using XtremeModels;
 
@@ -17,6 +18,7 @@ namespace XtremeWasmApp.Services
     {
         private readonly HttpData _httpData;
         private readonly HttpClient _httpClient;
+
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
         private readonly NavigationManager _navigationManager;
@@ -34,6 +36,14 @@ namespace XtremeWasmApp.Services
         public async Task SetDtype(string dtype) => await _localStorage.SetItemAsync("dtype", dtype ?? "A");
 
         public async Task<string> GetDtype() => (await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false)) ?? "A";
+
+        public async Task<bool> GetCode(string Email)
+        {
+            byte[] bytes = Encoding.Default.GetBytes(Email);
+            Email = Encoding.UTF8.GetString(bytes);
+            var res = await SendHttpRequest<bool>($"/api/Login/RegisterCode?Email={Email}", RequestType.Get).ConfigureAwait(false);
+            return res;
+        }
 
         public async Task<Models.RegisterResult?> Register(Models.RegisterModel registerModel)
         {

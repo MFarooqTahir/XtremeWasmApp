@@ -1,0 +1,22 @@
+﻿
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Code" @bind-Value="@Code"></MudTextField>
+       
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Register</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+    
+    public string Code { get; set; }
+
+    void Submit() =>MudDialog.Close(DialogResult.Ok(Code));
+    void Cancel() => MudDialog.Cancel();
+}
+
