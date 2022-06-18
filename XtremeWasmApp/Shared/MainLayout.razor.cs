@@ -92,8 +92,8 @@ namespace XtremeWasmApp.Shared
                                 await Auth.SetDrawSelected(value: false);
                                 nav.NavigateTo("/DrawSelection");
                             }
+                            await InvokeAsync(StateHasChanged);
                         }
-                        await InvokeAsync(StateHasChanged);
                     }
                 }, state: null, 0, 15000);
                 //await Auth.Logout();
