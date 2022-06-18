@@ -6,7 +6,7 @@
 @inject NavigationManager nav
 @inject WebApiService AuthService
 @implements IDisposable
-                    <PageTitle>PBTS.Net  Web App 1.19062022</PageTitle>
+                    <PageTitle>PBTS.Net Web App</PageTitle>
 
 <MudRTLProvider>
     <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode" />
@@ -35,11 +35,11 @@
                     }
                     else
                     {
-                        <div Class="ml-3">PBTS.Net  Web App 1.19062022</div>
+                        <div Class="ml-3">PBTS.Net Web App</div>
                     }
                 </Authorized>
                 <NotAuthorized>
-                    <div Class="ml-3">PBTS.Net  Web App 1.19062022</div>
+                    <div Class="ml-3">PBTS.Net Web App</div>
 
                 </NotAuthorized>
             </AuthorizeView>
