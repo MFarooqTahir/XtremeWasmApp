@@ -71,7 +71,7 @@ namespace XtremeWasmApp.Shared
             if (firstRender)
             {
                 service.RefreshRequested += RefreshMe;
-                var dtype = await Js.InvokeAsync<string>("getOS") ?? "A";
+                var dtype = "A";// await Js.InvokeAsync<string>("getOS") ?? "A";
                 await Auth.SetDtype(dtype);
                 //_timer = new(async _ => {
                 //    if (RunTimer && await Auth.GetRepeatDataWeb())
@@ -105,15 +105,13 @@ namespace XtremeWasmApp.Shared
                 _isDarkMode = await _mudThemeProvider.GetSystemPreference();
                 StateHasChanged();
             }
-            else
+            Currpage = nav.Uri.Replace(nav.BaseUri, "", StringComparison.OrdinalIgnoreCase);
+            var ind = Currpage.IndexOf('/', StringComparison.OrdinalIgnoreCase);
+            if (!string.IsNullOrWhiteSpace(Currpage) && ind > 0)
             {
-                Currpage = nav.Uri.Replace(nav.BaseUri, "", StringComparison.OrdinalIgnoreCase);
-                var ind = Currpage.IndexOf('/', StringComparison.OrdinalIgnoreCase);
-                if (!string.IsNullOrWhiteSpace(Currpage) && ind > 0)
-                {
-                    Currpage = Currpage.Remove(ind);
-                }
+                Currpage = Currpage.Remove(ind);
             }
+
             var authState = await AuthenticationStateTask;
             var user = authState.User;
             var authen = user?
