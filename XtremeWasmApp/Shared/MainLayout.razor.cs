@@ -73,30 +73,30 @@ namespace XtremeWasmApp.Shared
                 service.RefreshRequested += RefreshMe;
                 var dtype = "A";// await Js.InvokeAsync<string>("getOS") ?? "A";
                 await Auth.SetDtype(dtype);
-                //_timer = new(async _ => {
-                //    if (RunTimer && await Auth.GetRepeatDataWeb())
-                //    {
-                //        var newRepeat = await Auth.GetRepeatData();
-                //        if (newRepeat is not null && newRepeat != repeatData)
-                //        {
-                //            repeatData = newRepeat;
-                //            if (newRepeat.RelationBlocked)
-                //            {
-                //                RunTimer = false;
-                //                await Auth.SetCompanySelected(value: false);
-                //                nav.NavigateTo("/CompanySelection");
-                //            }
-                //            else if (newRepeat.DrawBlocked)
-                //            {
-                //                RunTimer = false;
-                //                await Auth.SetDrawSelected(value: false);
-                //                nav.NavigateTo("/DrawSelection");
-                //            }
-                //            await InvokeAsync(StateHasChanged);
-                //        }
-                //    }
-                //}, state: null, 0, 15000);
-                //await Auth.Logout();
+                _timer = new(async _ => {
+                    if (RunTimer && await Auth.GetRepeatDataWeb())
+                    {
+                        var newRepeat = await Auth.GetRepeatData();
+                        if (newRepeat is not null && newRepeat != repeatData)
+                        {
+                            repeatData = newRepeat;
+                            if (newRepeat.RelationBlocked)
+                            {
+                                RunTimer = false;
+                                await Auth.SetCompanySelected(value: false);
+                                nav.NavigateTo("/CompanySelection");
+                            }
+                            else if (newRepeat.DrawBlocked)
+                            {
+                                RunTimer = false;
+                                await Auth.SetDrawSelected(value: false);
+                                nav.NavigateTo("/DrawSelection");
+                            }
+                            await InvokeAsync(StateHasChanged);
+                        }
+                    }
+                }, state: null, 0, 15000);
+                await Auth.Logout();
                 var pal = _mudThemeProvider.Theme.Palette;
                 var palD = _mudThemeProvider.Theme.PaletteDark;
                 palD.Primary = pal.Primary = "#D2B48C";
@@ -137,13 +137,13 @@ namespace XtremeWasmApp.Shared
                         nav.NavigateTo("/DrawSelection");
                     }
                 }
-                //var currMarqData = MarqData;
-                //MarqData = await Auth.GetMarqData();
-                //rerender = rerender || MarqSet != currMarq || currMarqData != MarqData;
-                //if (rerender)
-                //{
-                //    StateHasChanged();
-                //}
+                var currMarqData = MarqData;
+                MarqData = await Auth.GetMarqData();
+                rerender = rerender || MarqSet != currMarq || currMarqData != MarqData;
+                if (rerender)
+                {
+                    StateHasChanged();
+                }
             }
         }
 
