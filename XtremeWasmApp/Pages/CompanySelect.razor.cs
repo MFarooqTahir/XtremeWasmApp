@@ -58,18 +58,15 @@ namespace XtremeWasmApp.Pages
         {
             acCode = await ApiService.GetMbm().ConfigureAwait(false);
             var comp = await ApiService.GetCdRelations().ConfigureAwait(false);
-            comp ??= new List<CDRelation>();
+
             if (comp?.Any() == true)
             {
-                if (comp?.Any() == false)
-                {
-                    await OnNoParties().ConfigureAwait(false);
-                }
-                else
-                {
-                    CompanyList = comp.ToList();
-                    StateHasChanged();
-                }
+                CompanyList = comp.ToList();
+                StateHasChanged();
+            }
+            else
+            {
+                await OnNoParties().ConfigureAwait(false);
             }
         }
 
