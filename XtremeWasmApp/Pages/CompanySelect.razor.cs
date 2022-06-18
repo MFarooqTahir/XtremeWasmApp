@@ -56,10 +56,11 @@ namespace XtremeWasmApp.Pages
 
         private async Task GetCDRelations()
         {
-            var comp = (await ApiService.GetCdRelations().ConfigureAwait(false));
+            acCode = await ApiService.GetMbm().ConfigureAwait(false);
+            var comp = await ApiService.GetCdRelations().ConfigureAwait(false);
+            comp ??= new List<CDRelation>();
             if (comp?.Any() == true)
             {
-                acCode = await ApiService.GetMbm().ConfigureAwait(false);
                 if (comp?.Any() == false)
                 {
                     await OnNoParties().ConfigureAwait(false);
