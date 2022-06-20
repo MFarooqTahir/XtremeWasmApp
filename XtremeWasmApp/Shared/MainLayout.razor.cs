@@ -4,6 +4,8 @@ using Microsoft.JSInterop;
 
 using MudBlazor;
 
+using XtremeModels;
+
 using XtremeWasmApp.Models;
 using XtremeWasmApp.Services;
 
@@ -23,6 +25,7 @@ namespace XtremeWasmApp.Shared
         [Inject]
         private IRefreshService service { get; set; }
 
+        private Company? Company { get; set; }
         public Timer _timer;
 
         private RepeatDataReturnWA repeatData;
@@ -38,7 +41,8 @@ namespace XtremeWasmApp.Shared
             get { return _selectedCompDraw; }
             set { var old = selectedCompDraw; _selectedCompDraw = value; if (old != value) { StateHasChanged(); } }
         }
-        string MBM = "Loading...";
+
+        private string MBM = "Loading...";
         private bool compSel;
         private bool drawSel;
         private bool MarqSet => MarqData is not null;
@@ -67,6 +71,7 @@ namespace XtremeWasmApp.Shared
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            Company = await Auth.GetCompany();
             var currMarq = MarqSet;
             if (firstRender)
             {
@@ -162,9 +167,10 @@ namespace XtremeWasmApp.Shared
             _drawerOpen = !_drawerOpen;
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
-            _timer.Dispose();
+            await _timer.DisposeAsync();
+            await Auth.Logout();
         }
     }
 }

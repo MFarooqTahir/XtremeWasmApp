@@ -5,7 +5,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager nav
 @inject WebApiService AuthService
-@implements IDisposable
+@implements IAsyncDisposable
 <PageTitle>PBTS.Net Web App</PageTitle>
 
 <MudRTLProvider>
@@ -77,9 +77,15 @@
                                     <MudNavLink Href="/Bill" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceChange" Disabled="@(repeatData?.RelationBill==false)">Party Bill</MudNavLink>
                                     <MudNavLink Href="/Ledger" Match="NavLinkMatch.Prefix" Icon="@Icons.Custom.FileFormats.FileDocument" Disabled="@(repeatData?.RelationLedger==false)">A/C Ledger</MudNavLink>
                                     <MudNavLink Href="/Print" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Print" Disabled="@(repeatData?.RelationPrint==false)">Print</MudNavLink>
-                                    @*<MudNavLink Href="/CompanySelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Warehouse">Company Selection</MudNavLink>
-                                <MudNavLink Href="/DrawSelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CardMembership">Draw Selection</MudNavLink>*@
-                                </MudNavMenu>
+                                    @*<MudNavLink Href="/CompanySelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Warehouse">Company Selection</MudNavLink>*@
+                                <MudNavLink Href="/DrawSelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CardMembership">Draw Selection</MudNavLink>
+                                @if(Company is not null)
+                                {
+                                    <div class="mt-3 mx-auto" style="max-width:90px;" align-center>
+                                                                  <MudImage align-center Src=@($"data:image/gif;base64,{Convert.ToBase64String(Company?.Pic)}") Width="90" Height="90" Alt="Icon" Elevation="25" Class="rounded-lg" />
+                                                                  </div>
+                                }
+                            </MudNavMenu>
                             </MudDrawer>
                         </Authorized>
                     </AuthorizeView>

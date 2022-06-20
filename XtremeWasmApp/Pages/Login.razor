@@ -22,9 +22,12 @@
 					  @bind-Value="loginModel.Email" For="@(() => loginModel.Email)" />
         <MudTextField Label="Password" HelperText="" InputType="InputType.Password"
 					  @bind-Value="loginModel.Password" For="@(() => loginModel.Password)" />
-		<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-2 ml-auto">Login</MudButton>
-
+                      <div style="display:flex;" class="mx-auto mt-2 align-content-center">
+		<MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="me-1">Login</MudButton>
+		@*<MudButton OnClick="@((e)=>NavigationManager.NavigateTo("/register"))" Variant="Variant.Filled" Color="Color.Primary" Class="ms-1">Register</MudButton>*@
+		</div>
 		
 	</EditForm>
 </MudPaper>
 
+        

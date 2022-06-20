@@ -18,19 +18,20 @@ namespace XtremeWasmApp.Services
     {
         private readonly HttpData _httpData;
         private readonly HttpClient _httpClient;
-
+        private readonly IRefreshService _refresh;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
         private readonly NavigationManager _navigationManager;
 
         public WebApiService(AuthenticationStateProvider authenticationStateProvider,
-                           ILocalStorageService localStorage, HttpClient httpClient, NavigationManager navigationManager, HttpData httpData)
+                           ILocalStorageService localStorage, HttpClient httpClient, NavigationManager navigationManager, HttpData httpData, IRefreshService refresh)
         {
             _authenticationStateProvider = authenticationStateProvider;
             _localStorage = localStorage;
             _httpClient = httpClient;
             _navigationManager = navigationManager;
             _httpData = httpData;
+            _refresh = refresh;
         }
 
         public async Task SetDtype(string dtype) => await _localStorage.SetItemAsync("dtype", dtype ?? "A");
@@ -280,16 +281,26 @@ namespace XtremeWasmApp.Services
                         var partySchCurr = await GetpartySchTrans().ConfigureAwait(false);
                         if (partySchCurr is not null)
                         {
-                            var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                            var values = resx.ResultObj;
-                            if (values is null)
+                            if (isFranchise)
                             {
-                                return (false, "Error. There might be no active draws for this company");
+                                var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                                var values = resx.ResultObj;
+                                if (values is null)
+                                {
+                                    return (false, "Error. There might be no active draws for this company");
+                                }
+                                partySchCurr.Win_Rate1 = values[0];
+                                partySchCurr.Win_Rate2 = values[1];
+                                partySchCurr.Win_Rate3 = values[2];
+                                partySchCurr.Win_Rate4 = values[3];
                             }
-                            partySchCurr.Win_Rate1 = values[0];
-                            partySchCurr.Win_Rate2 = values[1];
-                            partySchCurr.Win_Rate3 = values[2];
-                            partySchCurr.Win_Rate4 = values[3];
+                            else
+                            {
+                                partySchCurr.Win_Rate1 = Company.Sfc1;
+                                partySchCurr.Win_Rate2 = Company.Sfc2;
+                                partySchCurr.Win_Rate3 = Company.Std1;
+                                partySchCurr.Win_Rate4 = Company.Std2;
+                            }
                             await SetpartySchTrans(partySchCurr).ConfigureAwait(false);
                         }
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -419,9 +430,10 @@ namespace XtremeWasmApp.Services
                 var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{CurrSelectedSch.mkey}", RequestType.Get).ConfigureAwait(false);
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
                 List<int> mke = new() { 0, 0, 0 };
-                if (await GetIsFranchise().ConfigureAwait(false))
+                var isFranchise = await GetIsFranchise().ConfigureAwait(false);
+                var Company = await GetCompany().ConfigureAwait(false);
+                if (isFranchise)
                 {
-                    var Company = await GetCompany().ConfigureAwait(false);
                     var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                     if (mkeys is null || mkeys.ResultObj is null)
                     {
@@ -440,6 +452,13 @@ namespace XtremeWasmApp.Services
                 if (DashData.party is null || DashData.sch is null)
                 {
                     return (false, "There was an error in getting the data. Please try again later");
+                }
+                if (!isFranchise)
+                {
+                    DashData.partySch.Win_Rate1 = Company.Sfc1;
+                    DashData.partySch.Win_Rate2 = Company.Sfc2;
+                    DashData.partySch.Win_Rate3 = Company.Std1;
+                    DashData.partySch.Win_Rate4 = Company.Std2;
                 }
                 await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
                 var res = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -530,11 +549,11 @@ namespace XtremeWasmApp.Services
             return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F0", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
         }
 
-        public async Task<IList<Schedule>> GetScheduleList(bool notall)
+        public async Task<IList<Schedule>> GetScheduleList(bool notall, bool isSelected = false)
         {
             try
             {
-                var getting = await SendHttpRequest<ResultSet<List<Schedule>>>($"api/Data/GetScheduleList/{notall}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                var getting = await SendHttpRequest<ResultSet<List<Schedule>>>($"api/Data/GetScheduleList/{notall}/{isSelected}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var resObj = getting.ResultObj;
                 await SetAllSch(resObj).ConfigureAwait(false);
                 return resObj;
@@ -553,7 +572,7 @@ namespace XtremeWasmApp.Services
             await SetDataLink(newCom.WebApiD).ConfigureAwait(false);
         }
 
-        public async Task<Company> GetCompany() => await _localStorage.GetItemAsync<Company>("Company").ConfigureAwait(false);
+        public async Task<Company?> GetCompany() => await _localStorage.GetItemAsync<Company?>("Company").ConfigureAwait(false);
 
         public async Task SetRepeatData(RepeatDataReturnWA newObj)
         {
@@ -660,10 +679,11 @@ namespace XtremeWasmApp.Services
 
         public async Task Logout()
         {
-            ((ApiAuthenticationStateProvider)_authenticationStateProvider)
-                .MarkUserAsLoggedOut();
             _httpClient.DefaultRequestHeaders.Authorization = null;
             await _localStorage.ClearAsync().ConfigureAwait(false);
+            ((ApiAuthenticationStateProvider)_authenticationStateProvider)
+                .MarkUserAsLoggedOut();
+            _refresh.CallRequestRefresh();
         }
 
         public async Task<string?> GetTest()
