@@ -453,7 +453,7 @@ namespace XtremeWasmApp.Services
                 {
                     return (false, "There was an error in getting the data. Please try again later");
                 }
-                if (!isFranchise)
+                if (!isFranchise && DashData.partySch is not null)
                 {
                     DashData.partySch.Win_Rate1 = Company.Sfc1;
                     DashData.partySch.Win_Rate2 = Company.Sfc2;
