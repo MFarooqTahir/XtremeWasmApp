@@ -1,5 +1,6 @@
 
-<CascadingAuthenticationState>
+<div @onclick="HandleClick" @oncontextmenu="HandleRightClick" @oncontextmenu:preventDefault="true" >
+	<CascadingAuthenticationState>
 	<Router AppAssembly="@typeof(App).Assembly">
 		<Found Context="routeData">
 			<AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
@@ -23,3 +24,17 @@
 		</NotFound>
 	</Router>
 </CascadingAuthenticationState>
+</div>
+@code {
+
+    void HandleClick(MouseEventArgs args)
+    {
+        //Console.WriteLine("This is a left click");
+    }
+
+    void HandleRightClick(MouseEventArgs args)
+    {
+        //if (args.Button == 2)
+        //    Console.WriteLine("This is a right click");
+    }
+}
