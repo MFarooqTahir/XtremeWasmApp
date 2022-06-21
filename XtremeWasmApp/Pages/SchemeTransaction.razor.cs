@@ -48,7 +48,7 @@ namespace XtremeWasmApp.Pages
 
         private bool Prz2Enabled { get; set; }
         private double[] win = { 0, 0, 0 };
-
+        private double Xwin2, Xwin4;
         private int prz1Limit, prz2Limit;
         private bool loading = true;
         private bool AutoPrize = false;
@@ -117,12 +117,33 @@ namespace XtremeWasmApp.Pages
         //private IJSObjectReference jsModule;
         private string InvNo, Ref, Code, PartyName;
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
             //jsModule = await Js.InvokeAsync<IJSObjectReference>("import", "./js/functions.js");
             Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
+            var Company = await Api.GetCompany();
+            var sch = await Api.GetSch();
+            if (sch.Prz2 == 5)
+            {
+                if (Company.Qtyuser)
+                {
+                    Xwin2 = ((Math.Ceiling(Company.Sfc2) * 3) / (sch.Prz2));
+                    Xwin4 = ((Math.Ceiling(Company.Std2) * 3) / (sch.Prz2));
+                }
+                else
+                {
+                    Xwin2 = ((Company.Sfc1) / (sch.Prz2));
+                    Xwin4 = ((Company.Std1) / (sch.Prz2));
+                }
+            }
+            else
+            {
+                Xwin2 = Company.Sfc2;
+                Xwin4 = Company.Std2;
+
+            }
         }
 
         private async Task digitKeyDown(KeyboardEventArgs x)
@@ -347,7 +368,7 @@ namespace XtremeWasmApp.Pages
             else
             {
                 var party = await Api.GetParty();
-
+                var Company = await Api.GetCompany();
                 var sch = await Api.GetSch();
                 var partytransSch = await Api.GetpartySchTrans();
                 var txtDigit = Digits.ToUpperInvariant();
@@ -381,7 +402,7 @@ namespace XtremeWasmApp.Pages
                         win[2] = win[2] * 3 / 5;
                     }
                 }
-                for (int i = 0; i < win.Length; i++)
+                for (var i = 0; i < win.Length; i++)
                 {
                     win[i] = Math.Round(win[i], 0);
                     if (win[i].ToString(CultureInfo.DefaultThreadCurrentCulture)[^1] == '7')
@@ -389,19 +410,18 @@ namespace XtremeWasmApp.Pages
                         win[i]--;
                     }
                 }
+
                 if (txtDigit.Length == 3)
                 {
                     Prize1 = (win[0] + (win[0] / 100 * partytransSch.Std_own)) / partytransSch.Win_Rate3;
-                    Prize2 = (win[1] + (win[1] / 100 * partytransSch.Std_own)) / partytransSch.Win_Rate4;
+                    Prize2 = (win[1] + (win[1] / 100 * partytransSch.Std_own)) / Xwin4;
                 }
                 else if (txtDigit.Length == 4)
                 {
                     Prize1 = (win[0] + (win[0] / 100 * partytransSch.Sfc_own)) / partytransSch.Win_Rate1;
-                    Prize2 = (win[1] + (win[1] / 100 * partytransSch.Sfc_own)) / partytransSch.Win_Rate2;
+                    Prize2 = (win[1] + (win[1] / 100 * partytransSch.Sfc_own)) / Xwin2;
                 }
-                //txtWin1.Text = win[0].ToString("N2", Curr);
-                //txtWin2.Text = win[1].ToString("N2", Curr);
-                //txtWin3.Text = win[2].ToString("N2", Curr);
+
                 StateHasChanged();
                 if (Prize1 > prz1Limit || Prize2 > prz2Limit)
                 {
@@ -487,9 +507,9 @@ namespace XtremeWasmApp.Pages
                             stcom = partySch.Std_com,
                             stown = partySch.Std_own,
                             wrate1 = partySch.Win_Rate1,
-                            wrate2 = partySch.Win_Rate2,
+                            wrate2 = Xwin2,
                             wrate3 = partySch.Win_Rate3,
-                            wrate4 = partySch.Win_Rate4
+                            wrate4 = Xwin4,
                         };
 
                         var res = await Api.MakeNewInvSch(invD);
@@ -498,7 +518,7 @@ namespace XtremeWasmApp.Pages
 
                     if (invInfo is null || invInfo?.xres == 1)
                     {
-                        var result = await showDialog("Draw Closed", "");
+                        await showDialog("Draw Closed", "");
                         nav.NavigateTo("/");
                     }
                     else

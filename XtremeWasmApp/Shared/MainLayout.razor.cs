@@ -100,7 +100,7 @@ namespace XtremeWasmApp.Shared
                         RunTimer = true;
                         StateHasChanged();
                     }
-                }, state: null, 0, 8000);
+                }, state: null, 0, 12000);
                 await Auth.Logout();
                 var pal = _mudThemeProvider.Theme.Palette;
                 var palD = _mudThemeProvider.Theme.PaletteDark;

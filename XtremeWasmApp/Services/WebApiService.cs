@@ -283,26 +283,26 @@ namespace XtremeWasmApp.Services
                         var partySchCurr = await GetpartySchTrans().ConfigureAwait(false);
                         if (partySchCurr is not null)
                         {
-                            if (isFranchise)
-                            {
-                                var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                                var values = resx.ResultObj;
-                                if (values is null)
-                                {
-                                    return (false, "Error. There might be no active draws for this company");
-                                }
-                                partySchCurr.Win_Rate1 = values[0];
-                                partySchCurr.Win_Rate2 = values[1];
-                                partySchCurr.Win_Rate3 = values[2];
-                                partySchCurr.Win_Rate4 = values[3];
-                            }
-                            else
-                            {
-                                partySchCurr.Win_Rate1 = Company.Sfc1;
-                                partySchCurr.Win_Rate2 = Company.Sfc2;
-                                partySchCurr.Win_Rate3 = Company.Std1;
-                                partySchCurr.Win_Rate4 = Company.Std2;
-                            }
+                            //if (isFranchise)
+                            //{
+                            //    var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
+                            //    var values = resx.ResultObj;
+                            //    if (values is null)
+                            //    {
+                            //        return (false, "Error. There might be no active draws for this company");
+                            //    }
+                            //    partySchCurr.Win_Rate1 = values[0];
+                            //    partySchCurr.Win_Rate2 = values[1];
+                            //    partySchCurr.Win_Rate3 = values[2];
+                            //    partySchCurr.Win_Rate4 = values[3];
+                            //}
+                            //else
+                            //{
+                            partySchCurr.Win_Rate1 = Company.Sfc1;
+                            partySchCurr.Win_Rate2 = Company.Sfc2;
+                            partySchCurr.Win_Rate3 = Company.Std1;
+                            partySchCurr.Win_Rate4 = Company.Std2;
+                            //}
                             await SetpartySchTrans(partySchCurr).ConfigureAwait(false);
                         }
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -455,7 +455,7 @@ namespace XtremeWasmApp.Services
                 {
                     return (false, "There was an error in getting the data. Please try again later");
                 }
-                if (!isFranchise && DashData.partySch is not null)
+                if (DashData.partySch is not null)
                 {
                     DashData.partySch.Win_Rate1 = Company.Sfc1;
                     DashData.partySch.Win_Rate2 = Company.Sfc2;

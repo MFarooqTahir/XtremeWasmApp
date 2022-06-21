@@ -88,15 +88,15 @@
     }
     protected override async Task OnInitializedAsync()
     {
-               var drawSel = await ApiService.IsDrawSelected();
         IList<Schedule>? schT = null;
         if (onlyactive)
         {
-            schT = await ApiService.GetScheduleList(onlyactive,drawSel);
+            schT = await ApiService.GetScheduleList(onlyactive,false);
 
         }
         else
         {
+               var drawSel = await ApiService.IsDrawSelected();
             schT = await ApiService.GetAllSch();
             if (schT is null)
             {
