@@ -123,7 +123,6 @@ namespace XtremeWasmApp.Pages
             Js.InvokeVoidAsync("iphoneFocus");
             numberFormat = Curr.NumberFormat;
             numberFormat.CurrencySymbol = "";
-
         }
 
         private async Task digitKeyDown(KeyboardEventArgs x)
@@ -208,7 +207,7 @@ namespace XtremeWasmApp.Pages
                                         xxmkey = invInfo.propKey,
                                         xpid = txtDigit.Length.ToString(),
                                         xpkt = txtDigit,
-                                        xdtype = await Api.GetDtype(),
+                                        xdtype = Api.DType,
                                         xscode = txtDigit.Length == 3 ? "Ring" : "Packet",
                                         xwin1 = Convert.ToInt32(win[0]),
                                         xwin2 = Convert.ToInt32(win[1]),
@@ -481,7 +480,7 @@ namespace XtremeWasmApp.Pages
                             xref = "Online",
                             xsc = 0,
                             xvid = "1SM",
-                            xdtype = await Api.GetDtype(),
+                            xdtype = Api.DType,
                             xcode = cdrel.rCode,
                             sfcom = partySch.Sfc_com,
                             sfown = partySch.Sfc_own,

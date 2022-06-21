@@ -22,6 +22,7 @@ namespace XtremeWasmApp.Services
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
         private readonly NavigationManager _navigationManager;
+        public string DType { get; set; }
 
         public WebApiService(AuthenticationStateProvider authenticationStateProvider,
                            ILocalStorageService localStorage, HttpClient httpClient, NavigationManager navigationManager, HttpData httpData, IRefreshService refresh)
@@ -34,9 +35,10 @@ namespace XtremeWasmApp.Services
             _refresh = refresh;
         }
 
-        public async Task SetDtype(string dtype) => await _localStorage.SetItemAsync("dtype", dtype ?? "A");
+        public async Task SetDtype(string dtype)
+        { await _localStorage.SetItemAsync("dtype", dtype).ConfigureAwait(false); DType = dtype; }
 
-        public async Task<string> GetDtype() => (await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false)) ?? "A";
+        public async Task<string> GetDtype() => (await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false));
 
         public async Task<bool> GetCode(string Email)
         {

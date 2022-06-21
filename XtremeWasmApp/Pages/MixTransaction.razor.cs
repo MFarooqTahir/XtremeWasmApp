@@ -245,7 +245,7 @@ namespace XtremeWasmApp.Pages
                                         Prize2 = Prize2 ?? 0,
                                         MKey = invInfo.propKey,
                                     };
-                                    var d = (await Api.GetDtype());
+                                    var d = Api.DType;
                                     var invD = new EntryData()
                                     {
                                         transaction = trans,
@@ -447,7 +447,7 @@ namespace XtremeWasmApp.Pages
                         var sch = await Api.GetSch();
                         var qty = await Api.IsQtyUser();
                         var invD = new InvData()
-                        { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = (await Api.GetDtype())[0], db = "", };
+                        { dbf = "FAROOQ", xdemand = false, xmkey = 0, xid = cdrel.UName, xref = "Online", xsc = 0, xvid = "1SL", xdtype = Api.DType[0], db = "", };
                         //Dmode = 0
                         var nParty = (await Api.GetParty()).ShallowCopy();
                         if (sch.Prz2 == 5)
