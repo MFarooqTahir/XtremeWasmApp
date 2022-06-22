@@ -209,8 +209,16 @@ namespace XtremeWasmApp.Services
             return res?.ResultObj;
         }
 
+        public async Task<IList<InvoiceViewItem>> GetInvoiceList()
+        {
+            var cdRel = await GetCdrel();
+            var retList = await SendHttpRequest<ResultSet<List<InvoiceViewItem>>>($"api/Transactions/GetInvList/{cdRel.rCode}", RequestType.Get, linkType: LinkType.Invoice);
+            return retList.ResultObj;
+        }
+
         public async Task<(bool, string)> ChangeCompany(CDRelation cDRelation)
         {
+            string oldToken = await _localStorage.GetItemAsync<string>("authToken").ConfigureAwait(false);
             try
             {
                 await SetCompanySelected(value: false).ConfigureAwait(false);
@@ -222,12 +230,14 @@ namespace XtremeWasmApp.Services
                 var res = await SendHttpRequest<ResultSet<Company>>($"api/Company/GetCompanyDetails/{cDRelation.CompanyID}", RequestType.Get).ConfigureAwait(false);
                 if (res?.ResultObj is null)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "Error in changing company");
                 }
                 var Company = res.ResultObj;
                 var newToken = await SendHttpRequest<string>($"api/Login/ChangeCompany/0/{cDRelation.CompanyID}", RequestType.Get).ConfigureAwait(false);
                 if (newToken is null)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "Error in changing company");
                 }
                 await ChangeToken(newToken).ConfigureAwait(false);
@@ -252,10 +262,12 @@ namespace XtremeWasmApp.Services
                 var DashData = DashDataRes?.ResultObj;
                 if (DashData is null)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "Error. There might be no active draws for this company");
                 }
                 if (DashData.party is null || DashData.sch is null)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "There was an error in getting the data. Please try again later");
                 }
                 //await SetpartySchTrans(DashData.partySch).ConfigureAwait(false);
@@ -275,6 +287,7 @@ namespace XtremeWasmApp.Services
                             var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                             if (mkeys is null || mkeys.ResultObj is null)
                             {
+                                await ChangeToken(oldToken).ConfigureAwait(false);
                                 return (false, "Error in franchise Invoice");
                             }
                             mke = mkeys.ResultObj;
@@ -308,6 +321,7 @@ namespace XtremeWasmApp.Services
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                         if (!resl.ResultObj)
                         {
+                            await ChangeToken(oldToken).ConfigureAwait(false);
                             return (false, "Error occured, the draw is not available");
                         }
                         ExtraBalance = (await SendHttpRequest<ResultSet<int>>($"api/Inv/GetOtherBalance/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false)).ResultObj;
@@ -333,6 +347,7 @@ namespace XtremeWasmApp.Services
             }
             catch (Exception ex)
             {
+                await ChangeToken(oldToken).ConfigureAwait(false);
                 return (false, "Critical error occured");
             }
         }
@@ -416,6 +431,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<(bool, string)> ChangeSchedule(Schedule CurrSelectedSch, Timer timer)
         {
+            string oldToken = await _localStorage.GetItemAsync<string>("authToken").ConfigureAwait(false);
             try
             {
                 await SetDrawSelected(value: false).ConfigureAwait(false);
@@ -428,6 +444,7 @@ namespace XtremeWasmApp.Services
                 //{
                 //    return (false, "Cannot change the draw, the draw is not available");
                 //}
+
                 await SetSch(CurrSelectedSch).ConfigureAwait(false);
                 var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{CurrSelectedSch.mkey}", RequestType.Get).ConfigureAwait(false);
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
@@ -439,6 +456,7 @@ namespace XtremeWasmApp.Services
                     var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                     if (mkeys is null || mkeys.ResultObj is null)
                     {
+                        await ChangeToken(oldToken).ConfigureAwait(false);
                         return (false, "Error in franchise Invoice");
                     }
                     mke = mkeys.ResultObj;
@@ -449,10 +467,12 @@ namespace XtremeWasmApp.Services
                 var DashData = DashDataRes?.ResultObj;
                 if (DashData is null)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "Error. There might be no active draws for this company");
                 }
                 if (DashData.party is null || DashData.sch is null)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "There was an error in getting the data. Please try again later");
                 }
                 if (DashData.partySch is not null)
@@ -467,6 +487,7 @@ namespace XtremeWasmApp.Services
 
                 if (!res.ResultObj)
                 {
+                    await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "Draw unavailable");
                 }
                 var ExtraBalance = await SendHttpRequest<ResultSet<int>>($"api/Inv/GetOtherBalance/{cDRelation.rCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -481,6 +502,7 @@ namespace XtremeWasmApp.Services
             }
             catch (Exception ex)
             {
+                await ChangeToken(oldToken).ConfigureAwait(false);
                 return (false, "Critical Error");
             }
         }
