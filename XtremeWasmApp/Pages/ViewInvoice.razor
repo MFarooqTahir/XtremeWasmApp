@@ -1,30 +1,27 @@
 ﻿@page "/View"
+@using System.Data
 @using XtremeModels
+@using XtremeWasmApp.Components
+@inject IDialogService DialogService
 @inject WebApiService Api
 <AuthorizeView>
     <Authorized>
         <div align-center style="max-width:650px;
   margin: auto;">
-
-            <MudStack>
+            <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
                 @if (InvList is null)
                 {
                     <MudText Align="Align.Center">Loading...</MudText>
                 }
-                else if (InvList.Any())
+                else
                 {
-                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
-                       
-        <div class="d-flex">
-            <MudButton Class="mx-auto my-2" Color="Color.Surface" Variant="Variant.Filled" OnClick="@ChangeFilter">@CurrText</MudButton>
-            </div>
-                        @{
-                            var dict = new Dictionary<int, string>
-                            {
-                                {0,"Limit"},
-                                {1,"Demand"}
-                            };
-                        }
+
+
+                    <div class="d-flex">
+                        <MudButton Class="mx-auto my-2" Color="Color.Surface" Variant="Variant.Filled" OnClick="@ChangeFilter">@CurrText</MudButton>
+                    </div>
+                    @if (InvList.Any())
+                    {
                         <MudSimpleTable Striped="true" Dense="true" Hover="true" Bordered="true" FixedHeader="true" Style="height:450px;margin-top:5px;" Class="rounded-0">
                             <thead>
                                 <tr>
@@ -36,53 +33,96 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var invoice in InvListFiltered)
+                                @foreach (var invoice in InvList)
                                 {
-                                    <tr>
+                                    <tr @onclick="@((x)=>ShowInvoice(x,invoice.MKey,invoice.InvNo,invoice.Reference,invoice.Printable,invoice.Category,invoice.LD))">
                                         <td><b>@(dict[(int)invoice.LD])</b></td>
                                         <td><b>@invoice.InvNo.ToString("D5")</b></td>
                                         <td><b>@invoice.CatValue</b></td>
                                         <td><b>@invoice.Reference</b></td>
-                        <td style="display:flex"><MudIcon Class="mx-auto" Icon="@(Icons.Material.Filled.Lock)" Size="Size.Medium" Color="@(invoice.Printable?Color.Error:Color.Transparent)"></MudIcon></td>
-                                        
+                                        <td style="display:flex"><MudIcon Class="mx-auto" Icon="@(Icons.Material.Filled.Lock)" Size="Size.Medium" Color="@(invoice.Printable?Color.Error:Color.Transparent)"></MudIcon></td>
+
                                     </tr>
                                 }
 
                             </tbody>
                         </MudSimpleTable>
 
-                    </MudPaper>
+                    }
+                    else
+                    {
+                        <MudText Align="Align.Center">No Invoices</MudText>
+                    }
                 }
-                else
-                {
-                    <MudText Align="Align.Center">No Invoices</MudText>
-                }
-            </MudStack>
+            </MudPaper>
         </div>
     </Authorized>
 </AuthorizeView>
 
 @code {
-    IList<InvoiceViewItem> InvList { get; set; }
-    IList<InvoiceViewItem> InvListFiltered { get; set; }
-    string CurrText => ShowPurchase?"Purchase Invoices":"Sale Invoices";
+    IList<InvoiceViewItem> InvList => ShowPurchase ? InvListPurchase ??= new List<InvoiceViewItem>() : InvListSale ??= new List<InvoiceViewItem>();
+    IList<InvoiceViewItem> InvListSale { get; set; }
+    IList<InvoiceViewItem> InvListPurchase { get; set; }
+    IDictionary<int, string> dict = new Dictionary<int, string>
+                            {
+                                {0,"Limit"},
+                                {1,"Demand"}
+                            };
+    string CurrText => ShowPurchase ? "Purchase Invoices" : "Sale Invoices";
     bool ShowPurchase = false;
     string[] SaleFilters = new[] { "1SL", "1SM", "1PS" };
     protected async override Task OnInitializedAsync()
     {
-        InvList = await Api.GetInvoiceList();
-        InvListFiltered = InvList.Where(x=>SaleFilters.Contains(x.Category)).ToList();
+        var InvListtemp = await Api.GetInvoiceList();
+        if (InvListtemp is not null)
+        {
+            InvListSale = InvListtemp.Where(x => SaleFilters.Contains(x.Category))?.ToList();
+            InvListPurchase = InvListtemp.Where(x => !SaleFilters.Contains(x.Category))?.ToList();
+        }
+    }
+    public record Order(string Cat, LimDem l);
+
+    private async Task ShowInvoice(MouseEventArgs args, int Mkey,int InvNo,string Ref,bool Printable,string Category,LimDem limDem)
+    {
+        var data = await Api.GetInvoiceDetails(Mkey);
+        var cDRel = await Api.GetCdrel();
+        var AddRate = Category switch
+        {
+            "1SM" or "2SM" or "1PS" or "2PS"=>true,
+            _=>false
+        };
+        var pr = Category switch
+        {
+            "1PS" or "2PS"=>true,
+            _=>false
+        };
+        string Title= new Order(Category,limDem) switch
+        {
+            (Cat:"1SL",l:LimDem.L) =>"Mix Sale ( Limit )",
+            (Cat:"1SL",l:LimDem.D) =>"Mix Sale ( Demand )",
+            (Cat:"1SM",l:LimDem.L) =>"Scheme Sale ( Limit )",
+            (Cat:"1SM",l:LimDem.D) =>"Scheme Sale ( Demand )",
+            (Cat:"1PS",l:LimDem.L) =>"Scheme % Sale ( Limit )",
+            (Cat:"1PS",l:LimDem.D) =>"Scheme % Sale ( Demand )",
+            (Cat:"2PR",l:LimDem.L) =>"Mix Purchase ( Limit )",
+            (Cat:"2PR",l:LimDem.D) =>"Mix Purchase ( Demand )",
+            (Cat:"2SM",l:LimDem.L) =>"Scheme Purchase ( Limit )",
+            (Cat:"2SM",l:LimDem.D) =>"Scheme Purchase ( Demand )",
+            (Cat:"2PS",l:LimDem.L) =>"Scheme % Purchase ( Limit )",
+            (Cat:"2PS",l:LimDem.D) =>"Scheme % Purchase ( Demand )",
+            _=>""
+        };
+        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr};
+
+        var dialog = DialogService.Show<InvViewDialog>(Title, parameters,new DialogOptions() 
+        { 
+            MaxWidth = MaxWidth.Small, FullWidth = true,CloseButton=true,CloseOnEscapeKey=true
+        }
+        );
     }
     private void ChangeFilter(MouseEventArgs args)
     {
         ShowPurchase = !ShowPurchase;
-        if(ShowPurchase)
-        {
-            InvListFiltered = InvList.Where(x=>!SaleFilters.Contains(x.Category)).ToList();
-        }
-        else{
-            InvListFiltered = InvList.Where(x=>SaleFilters.Contains(x.Category)).ToList();
 
-        }
     }
 }

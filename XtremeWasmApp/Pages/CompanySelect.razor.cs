@@ -59,7 +59,7 @@ namespace XtremeWasmApp.Pages
             acCode = await ApiService.GetMbm().ConfigureAwait(false);
             var comp = await ApiService.GetCdRelations().ConfigureAwait(false);
 
-            if (comp?.Any() == true)
+            if (comp is not null && comp.Any())
             {
                 CompanyList = comp.ToList();
                 StateHasChanged();

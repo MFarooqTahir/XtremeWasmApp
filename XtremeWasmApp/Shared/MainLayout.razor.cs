@@ -61,6 +61,7 @@ namespace XtremeWasmApp.Shared
 
         private void RefreshMe()
         {
+            _timer.Change(0, 12000);
             StateHasChanged();
         }
 
@@ -75,32 +76,36 @@ namespace XtremeWasmApp.Shared
             var currMarq = MarqSet;
             if (firstRender)
             {
-                service.RefreshRequested += RefreshMe;
                 var dtype = await Js.InvokeAsync<string>("getOS") ?? "A";
                 await Auth.SetDtype(dtype);
                 _timer = new(async _ => {
-                    if (RunTimer && await Auth.GetRepeatDataWeb())
+                    if (RunTimer)
                     {
                         RunTimer = false;
-                        var newRepeat = await Auth.GetRepeatData();
-                        if (newRepeat is not null && newRepeat != repeatData)
+                        if (await Auth.GetRepeatDataWeb())
                         {
-                            repeatData = newRepeat;
-                            if (newRepeat.RelationBlocked)
+                            var newRepeat = await Auth.GetRepeatData();
+                            if (newRepeat is not null && newRepeat != repeatData)
                             {
-                                await Auth.SetCompanySelected(value: false);
-                                nav.NavigateTo("/CompanySelection");
-                            }
-                            else if (newRepeat.DrawBlocked)
-                            {
-                                await Auth.SetDrawSelected(value: false);
-                                nav.NavigateTo("/DrawSelection");
+                                repeatData = newRepeat;
+                                if (newRepeat.RelationBlocked)
+                                {
+                                    await Auth.SetCompanySelected(value: false);
+                                    nav.NavigateTo("/CompanySelection");
+                                }
+                                else if (newRepeat.DrawBlocked)
+                                {
+                                    await Auth.SetDrawSelected(value: false);
+                                    nav.NavigateTo("/DrawSelection");
+                                }
                             }
                         }
+                        MarqData = await Auth.GetMarqData();
                         RunTimer = true;
                         StateHasChanged();
                     }
                 }, state: null, 0, 12000);
+                service.RefreshRequested += RefreshMe;
                 await Auth.Logout();
                 var pal = _mudThemeProvider.Theme.Palette;
                 var palD = _mudThemeProvider.Theme.PaletteDark;
@@ -145,9 +150,7 @@ namespace XtremeWasmApp.Shared
                         nav.NavigateTo("/DrawSelection");
                     }
                 }
-                var currMarqData = MarqData;
-                MarqData = await Auth.GetMarqData();
-                rerender = rerender || MarqSet != currMarq || currMarqData != MarqData;
+
                 if (rerender)
                 {
                     StateHasChanged();

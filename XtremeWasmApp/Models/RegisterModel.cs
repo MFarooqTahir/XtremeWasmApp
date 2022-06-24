@@ -4,10 +4,15 @@ namespace XtremeWasmApp.Models
 {
     public class RegisterModel
     {
+        private string _email { get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email"), RegularExpression(".+@(g|G)mail.com", ErrorMessage = "Enter a gmail ID")]
-        public string Email { get; set; }
+        public string Email {
+            get => _email;
+            set => _email = value.ToLowerInvariant();
+        }
 
         [Required(ErrorMessage = "Phone Number is required"), DataType(DataType.PhoneNumber, ErrorMessage = "Not a valid phone number")]
         public string Phone { get; set; }

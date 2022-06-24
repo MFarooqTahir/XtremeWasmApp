@@ -105,6 +105,13 @@ namespace XtremeWasmApp.Services
             return loginResult;
         }
 
+        public async Task<IEnumerable<Transaction?>?> GetInvoiceDetails(int Mkey)
+        {
+            var cdRel = await GetCdrel();
+            var res = await SendHttpRequest<ResultSet<List<Transaction?>?>>($"api/Transactions/GetVouchersInvView/{cdRel.rCode}/{Mkey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
+
         private async Task<T?> SendHttpRequest<T>(string URL, RequestType type, object objPost = null, LinkType linkType = LinkType.Login)
         {
             try
@@ -198,7 +205,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<bool> GetDigitEnabled()
         {
-            var cdrel = await GetCdrel();
+            var cdrel = await GetCdrel().ConfigureAwait(false);
             return (cdrel?.Active ?? false) && (cdrel?.Enabled ?? false);
         }
 
@@ -211,8 +218,8 @@ namespace XtremeWasmApp.Services
 
         public async Task<IList<InvoiceViewItem>> GetInvoiceList()
         {
-            var cdRel = await GetCdrel();
-            var retList = await SendHttpRequest<ResultSet<List<InvoiceViewItem>>>($"api/Transactions/GetInvList/{cdRel.rCode}", RequestType.Get, linkType: LinkType.Invoice);
+            var cdRel = await GetCdrel().ConfigureAwait(false);
+            var retList = await SendHttpRequest<ResultSet<List<InvoiceViewItem>>>($"api/Transactions/GetInvList/{cdRel.rCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
             return retList.ResultObj;
         }
 
@@ -495,7 +502,7 @@ namespace XtremeWasmApp.Services
                 part.Balance += ExtraBalance?.ResultObj ?? 0;
                 await SetParty(part).ConfigureAwait(false);
                 await SetDrawSelected(value: true).ConfigureAwait(false);
-                timer.Change(0, 10000);
+                timer.Change(0, 12000);
                 _navigationManager.NavigateTo("/");
 
                 return (true, "");
