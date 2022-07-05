@@ -242,6 +242,8 @@ namespace XtremeWasmApp.Pages
                                     if (Editmode)
                                     {
                                         invD.xmkey = Tempdata?.MKey ?? 0;
+                                        invD.lmkey = Tempdata?.lmkey ?? 0;
+                                        invD.llmkey = Tempdata?.llmkey ?? 0;
                                     }
 
                                     Tempdata = await Api.MakeNewEntrySch(invD);

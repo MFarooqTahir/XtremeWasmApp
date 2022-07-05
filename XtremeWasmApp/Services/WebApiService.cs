@@ -38,7 +38,10 @@ namespace XtremeWasmApp.Services
         public async Task SetDtype(string dtype)
         { await _localStorage.SetItemAsync("dtype", dtype).ConfigureAwait(false); DType = dtype; }
 
-        public async Task<string> GetDtype() => (await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false));
+        public async Task<string> GetDtype()
+        {
+            return await _localStorage.GetItemAsync<string>("dtype").ConfigureAwait(false);
+        }
 
         public async Task<bool> GetCode(string Email)
         {
@@ -183,11 +186,12 @@ namespace XtremeWasmApp.Services
         {
             var isFranchise = await GetIsFranchise().ConfigureAwait(false);
             var mkey = 0;
+            var keys = await GetFranMkeys().ConfigureAwait(false);
             if (isFranchise)
             {
-                mkey = (await GetFranMkeys().ConfigureAwait(false))[0];
+                mkey = keys[0];
             }
-            var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntry/{isFranchise}/{mkey}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntry/{isFranchise}/{mkey}/{keys[3]}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
 
@@ -195,11 +199,12 @@ namespace XtremeWasmApp.Services
         {
             var isFranchise = await GetIsFranchise().ConfigureAwait(false);
             var mkey = 0;
+            var keys = await GetFranMkeys().ConfigureAwait(false);
             if (isFranchise)
             {
-                mkey = (await GetFranMkeys().ConfigureAwait(false))[1];
+                mkey = keys[1];
             }
-            var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntrySch/{isFranchise}/{mkey}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<Transaction?>>($"api/Transactions/InsertEntrySch/{isFranchise}/{mkey}/{keys[4]}", RequestType.Post, invD, LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
 
@@ -252,7 +257,9 @@ namespace XtremeWasmApp.Services
                 await SetCdrel(cDRelation).ConfigureAwait(false);
                 await SetCompany(Company).ConfigureAwait(false);
                 var isFranchise = Company.Stype == 'F';
+                var isDealer = Company.IsDealer || !string.IsNullOrWhiteSpace(Company.DCode);
                 await setIsFranchise(isFranchise).ConfigureAwait(false);
+                await setIsDealer(isDealer).ConfigureAwait(false);
                 await setFcode(Company.FCode).ConfigureAwait(false);
                 //List<int> mke = new() { 0, 0, 0 };
                 //if (isFranchise)
@@ -289,9 +296,9 @@ namespace XtremeWasmApp.Services
 
                         await ChangeToken(newTokenInv).ConfigureAwait(false);
                         List<int> mke = new() { 0, 0, 0 };
-                        if (isFranchise)
+                        if (isFranchise || isDealer)
                         {
-                            var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                            var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}/{Company.DealerCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                             if (mkeys is null || mkeys.ResultObj is null)
                             {
                                 await ChangeToken(oldToken).ConfigureAwait(false);
@@ -359,17 +366,43 @@ namespace XtremeWasmApp.Services
             }
         }
 
-        public async Task SetFranMkeys(IList<int>? mkeys) => await _localStorage.SetItemAsync("FranMkeys", mkeys).ConfigureAwait(false);
+        public async Task SetFranMkeys(IList<int>? mkeys)
+        {
+            await _localStorage.SetItemAsync("FranMkeys", mkeys).ConfigureAwait(false);
+        }
 
-        public async Task<IList<int>?> GetFranMkeys() => await _localStorage.GetItemAsync<List<int>>("FranMkeys").ConfigureAwait(false);
+        public async Task<IList<int>?> GetFranMkeys()
+        {
+            return await _localStorage.GetItemAsync<List<int>>("FranMkeys").ConfigureAwait(false);
+        }
 
-        public async Task setFcode(int fCode) => await _localStorage.SetItemAsync("FCode", fCode).ConfigureAwait(false);
+        public async Task setFcode(int fCode)
+        {
+            await _localStorage.SetItemAsync("FCode", fCode).ConfigureAwait(false);
+        }
 
-        public async Task setIsFranchise(bool v) => await _localStorage.SetItemAsync("Franchise", v).ConfigureAwait(false);
+        public async Task setIsFranchise(bool v)
+        {
+            await _localStorage.SetItemAsync("Franchise", v).ConfigureAwait(false);
+        }
+        public async Task<bool> GetIsFranchise()
+        {
+            return await _localStorage.GetItemAsync<bool>("Franchise").ConfigureAwait(false);
+        }
+        public async Task setIsDealer(bool v)
+        {
+            await _localStorage.SetItemAsync("isDealer", v).ConfigureAwait(false);
+        }
+        public async Task<bool> GetIsDealer()
+        {
+            return await _localStorage.GetItemAsync<bool>("isDealer").ConfigureAwait(false);
+        }
+        public async Task<int> GetFcode()
+        {
+            return await _localStorage.GetItemAsync<int>("FCode").ConfigureAwait(false);
+        }
 
-        public async Task<int> GetFcode() => await _localStorage.GetItemAsync<int>("FCode").ConfigureAwait(false);
 
-        public async Task<bool> GetIsFranchise() => await _localStorage.GetItemAsync<bool>("Franchise").ConfigureAwait(false);
 
         public async Task<TopMarqueData> GetMarqData()
         {
@@ -457,10 +490,11 @@ namespace XtremeWasmApp.Services
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
                 List<int> mke = new() { 0, 0, 0 };
                 var isFranchise = await GetIsFranchise().ConfigureAwait(false);
+                var IsDealer = await GetIsDealer().ConfigureAwait(false);
                 var Company = await GetCompany().ConfigureAwait(false);
-                if (isFranchise)
+                if (isFranchise || IsDealer)
                 {
-                    var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                    var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}/{Company.DealerCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
                     if (mkeys is null || mkeys.ResultObj is null)
                     {
                         await ChangeToken(oldToken).ConfigureAwait(false);
@@ -595,7 +629,10 @@ namespace XtremeWasmApp.Services
             }
         }
 
-        public async Task<bool> IsQtyUser() => (await GetCompany().ConfigureAwait(false)).Qtyuser;
+        public async Task<bool> IsQtyUser()
+        {
+            return (await GetCompany().ConfigureAwait(false)).Qtyuser;
+        }
 
         private async Task SetCompany(Company newCom)
         {
@@ -603,35 +640,50 @@ namespace XtremeWasmApp.Services
             await SetDataLink(newCom.WebApiD).ConfigureAwait(false);
         }
 
-        public async Task<Company?> GetCompany() => await _localStorage.GetItemAsync<Company?>("Company").ConfigureAwait(false);
+        public async Task<Company?> GetCompany()
+        {
+            return await _localStorage.GetItemAsync<Company?>("Company").ConfigureAwait(false);
+        }
 
         public async Task SetRepeatData(RepeatDataReturnWA newObj)
         {
             await _localStorage.SetItemAsync("RepeatData", newObj).ConfigureAwait(false);
         }
 
-        public async Task<RepeatDataReturnWA> GetRepeatData() => await _localStorage.GetItemAsync<RepeatDataReturnWA>("RepeatData").ConfigureAwait(false);
+        public async Task<RepeatDataReturnWA> GetRepeatData()
+        {
+            return await _localStorage.GetItemAsync<RepeatDataReturnWA>("RepeatData").ConfigureAwait(false);
+        }
 
         private async Task SetCdrel(CDRelation newcd)
         {
             await _localStorage.SetItemAsync("cdRel", newcd).ConfigureAwait(false);
         }
 
-        public async Task<CDRelation> GetCdrel() => await _localStorage.GetItemAsync<CDRelation>("cdRel").ConfigureAwait(false);
+        public async Task<CDRelation> GetCdrel()
+        {
+            return await _localStorage.GetItemAsync<CDRelation>("cdRel").ConfigureAwait(false);
+        }
 
         private async Task SetCurrentBalance(int amt)
         {
             await _localStorage.SetItemAsync("CurrBalanceAmount", amt).ConfigureAwait(false);
         }
 
-        public async Task<int> GetCurrentBalance() => await _localStorage.GetItemAsync<int>("CurrBalanceAmount").ConfigureAwait(false);
+        public async Task<int> GetCurrentBalance()
+        {
+            return await _localStorage.GetItemAsync<int>("CurrBalanceAmount").ConfigureAwait(false);
+        }
 
         private async Task SetpartySchTrans(PartySch partySch)
         {
             await _localStorage.SetItemAsync("partySchTrans", partySch).ConfigureAwait(false);
         }
 
-        public async Task<PartySch> GetpartySchTrans() => await _localStorage.GetItemAsync<PartySch>("partySchTrans").ConfigureAwait(false);
+        public async Task<PartySch> GetpartySchTrans()
+        {
+            return await _localStorage.GetItemAsync<PartySch>("partySchTrans").ConfigureAwait(false);
+        }
 
         private async Task SetSch(Schedule newCom)
         {
@@ -639,14 +691,20 @@ namespace XtremeWasmApp.Services
             await SetInvLink(newCom.WebApiI).ConfigureAwait(false);
         }
 
-        public async Task<Schedule> GetSch() => await _localStorage.GetItemAsync<Schedule>("sch").ConfigureAwait(false);
+        public async Task<Schedule> GetSch()
+        {
+            return await _localStorage.GetItemAsync<Schedule>("sch").ConfigureAwait(false);
+        }
 
         public async Task SetParty(Party newParty)
         {
             await _localStorage.SetItemAsync("party", newParty).ConfigureAwait(false);
         }
 
-        public async Task<Party> GetParty() => await _localStorage.GetItemAsync<Party>("party").ConfigureAwait(false);
+        public async Task<Party> GetParty()
+        {
+            return await _localStorage.GetItemAsync<Party>("party").ConfigureAwait(false);
+        }
 
         private async Task SetAllSch(IList<Schedule> lst)
         {
@@ -658,15 +716,30 @@ namespace XtremeWasmApp.Services
             await _localStorage.RemoveItemAsync("allSch").ConfigureAwait(false);
         }
 
-        public async Task<IList<Schedule>> GetAllSch() => await _localStorage.GetItemAsync<List<Schedule>>("allSch").ConfigureAwait(false);
+        public async Task<IList<Schedule>> GetAllSch()
+        {
+            return await _localStorage.GetItemAsync<List<Schedule>>("allSch").ConfigureAwait(false);
+        }
 
-        public async Task SetCompanySelected(bool value) => await _localStorage.SetItemAsync("IsCompSel", value).ConfigureAwait(false);
+        public async Task SetCompanySelected(bool value)
+        {
+            await _localStorage.SetItemAsync("IsCompSel", value).ConfigureAwait(false);
+        }
 
-        public async Task<bool> IsCompanySelected() => await _localStorage.GetItemAsync<bool>("IsCompSel").ConfigureAwait(false);
+        public async Task<bool> IsCompanySelected()
+        {
+            return await _localStorage.GetItemAsync<bool>("IsCompSel").ConfigureAwait(false);
+        }
 
-        public async Task SetDrawSelected(bool value) => await _localStorage.SetItemAsync("IsDrawSel", value).ConfigureAwait(false);
+        public async Task SetDrawSelected(bool value)
+        {
+            await _localStorage.SetItemAsync("IsDrawSel", value).ConfigureAwait(false);
+        }
 
-        public async Task<bool> IsDrawSelected() => await _localStorage.GetItemAsync<bool>("IsDrawSel").ConfigureAwait(false);
+        public async Task<bool> IsDrawSelected()
+        {
+            return await _localStorage.GetItemAsync<bool>("IsDrawSel").ConfigureAwait(false);
+        }
 
         //public async Task<bool> IsDrawSelected()
         //{

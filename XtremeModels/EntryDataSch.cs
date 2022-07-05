@@ -5,6 +5,8 @@
         public int xmkey { get; set; }
         public int xmode { get; set; }
         public int xxmkey { get; set; }
+        public int lmkey { get; set; }
+        public int llmkey { get; set; }
         public string xid { get; set; }
         public string xpid { get; set; }
         public string xpkt { get; set; }

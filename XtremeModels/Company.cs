@@ -7,6 +7,9 @@
         public string City { get; set; } = "";
         public byte[] Pic { get; set; } = Array.Empty<byte>();
         public string Pcode { get; set; } = "";
+        public bool IsDealer { get; set; }
+        public string DCode { get; set; }
+        public int DealerCode { get; set; }
         public bool Qtyuser { get; set; }
         public string WebApiD { get; set; } = "";
         public double Sfc1 { get; set; }

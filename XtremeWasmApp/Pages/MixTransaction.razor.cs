@@ -261,6 +261,7 @@ namespace XtremeWasmApp.Pages
                                     {
                                         invD.lmkey = Tempdata?.lmkey ?? 0;
                                         invD.xmkey = Tempdata?.MKey ?? 0;
+                                        invD.llmkey = Tempdata?.llmkey ?? 0;
                                     }
                                     Tempdata = await Api.MakeNewEntry(invD);
                                     if (string.Equals(Tempdata.code, cdRel.rCode, StringComparison.Ordinal))
