@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 
 using MudBlazor;
@@ -13,7 +14,8 @@ namespace XtremeWasmApp.Pages
     {
         [Inject]
         private IDialogService DialogService { get; set; }
-
+        [CascadingParameter]
+        private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
         [Inject]
         public WebApiService ApiService { get; set; }
 
@@ -47,9 +49,17 @@ namespace XtremeWasmApp.Pages
 
         private async Task OnNoParties()
         {
-            var result = await DialogService.ShowMessageBox(
-                "REG ID: " + acCode,
-                "You are not registered to any party", "Log Out");
+            var authState = await AuthenticationStateTask;
+            var user = authState.User;
+            var authen = user?
+                .Identity?
+                .IsAuthenticated == true;
+            if (authen)
+            {
+                var result = await DialogService.ShowMessageBox(
+                    "REG ID: " + acCode,
+                    "You are not registered to any party", "Log Out");
+            }
             StateHasChanged();
             await ApiService.Logout();
         }
