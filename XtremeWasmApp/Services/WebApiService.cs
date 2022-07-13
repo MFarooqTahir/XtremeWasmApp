@@ -22,7 +22,7 @@ namespace XtremeWasmApp.Services
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
         private readonly NavigationManager _navigationManager;
-        public string DType { get; set; }
+        public string DType { get; set; } = "";
 
         public WebApiService(AuthenticationStateProvider authenticationStateProvider,
                            ILocalStorageService localStorage, HttpClient httpClient, NavigationManager navigationManager, HttpData httpData, IRefreshService refresh)
@@ -295,7 +295,7 @@ namespace XtremeWasmApp.Services
                         var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{DashData.sch[0].mkey}", RequestType.Get).ConfigureAwait(false);
 
                         await ChangeToken(newTokenInv).ConfigureAwait(false);
-                        List<int> mke = new() { 0, 0, 0 };
+                        List<int> mke = new() { 0, 0, 0, 0, 0, 0 };
                         if (isFranchise || isDealer)
                         {
                             var mkeys = await SendHttpRequest<ResultSet<List<int>>>($"api/Transactions/CheckInvExist/{Company.FCode}/{Company.DealerCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -305,31 +305,16 @@ namespace XtremeWasmApp.Services
                                 return (false, "Error in franchise Invoice");
                             }
                             mke = mkeys.ResultObj;
-                            await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
                         }
+                        await SetFranMkeys(mke).ConfigureAwait(false);
+
                         var partySchCurr = await GetpartySchTrans().ConfigureAwait(false);
                         if (partySchCurr is not null)
                         {
-                            //if (isFranchise)
-                            //{
-                            //    var resx = await SendHttpRequest<ResultSet<List<double>>>($"api/Data/GetInvValues/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
-                            //    var values = resx.ResultObj;
-                            //    if (values is null)
-                            //    {
-                            //        return (false, "Error. There might be no active draws for this company");
-                            //    }
-                            //    partySchCurr.Win_Rate1 = values[0];
-                            //    partySchCurr.Win_Rate2 = values[1];
-                            //    partySchCurr.Win_Rate3 = values[2];
-                            //    partySchCurr.Win_Rate4 = values[3];
-                            //}
-                            //else
-                            //{
                             partySchCurr.Win_Rate1 = Company.Sfc1;
                             partySchCurr.Win_Rate2 = Company.Sfc2;
                             partySchCurr.Win_Rate3 = Company.Std1;
                             partySchCurr.Win_Rate4 = Company.Std2;
-                            //}
                             await SetpartySchTrans(partySchCurr).ConfigureAwait(false);
                         }
                         var resl = await SendHttpRequest<ResultSet<bool>>("api/Inv/CheckInvoiceDb", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
@@ -402,7 +387,11 @@ namespace XtremeWasmApp.Services
             return await _localStorage.GetItemAsync<int>("FCode").ConfigureAwait(false);
         }
 
-
+        public async Task<bool> GetIsCompanyBlocked()
+        {
+            var comp = await GetCompany().ConfigureAwait(false);
+            return await SendHttpRequest<bool>($"api/Login/FranBlock/{comp.ID}", RequestType.Get).ConfigureAwait(false);
+        }
 
         public async Task<TopMarqueData> GetMarqData()
         {
@@ -488,7 +477,7 @@ namespace XtremeWasmApp.Services
                 await SetSch(CurrSelectedSch).ConfigureAwait(false);
                 var newTokenInv = await SendHttpRequest<string>($"api/Login/ChangeDraw/{CurrSelectedSch.mkey}", RequestType.Get).ConfigureAwait(false);
                 await ChangeToken(newTokenInv).ConfigureAwait(false);
-                List<int> mke = new() { 0, 0, 0 };
+                List<int> mke = new() { 0, 0, 0, 0, 0, 0 };
                 var isFranchise = await GetIsFranchise().ConfigureAwait(false);
                 var IsDealer = await GetIsDealer().ConfigureAwait(false);
                 var Company = await GetCompany().ConfigureAwait(false);
@@ -501,8 +490,9 @@ namespace XtremeWasmApp.Services
                         return (false, "Error in franchise Invoice");
                     }
                     mke = mkeys.ResultObj;
-                    await SetFranMkeys(mkeys.ResultObj).ConfigureAwait(false);
                 }
+                await SetFranMkeys(mke).ConfigureAwait(false);
+
                 var cDRelation = await GetCdrel().ConfigureAwait(false);
                 var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}/{mke[1]}", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var DashData = DashDataRes?.ResultObj;

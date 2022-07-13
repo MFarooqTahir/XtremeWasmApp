@@ -47,7 +47,7 @@
                         {
                             transaction.sNo = snoCountStart.ToString("D5");
 
-                            <tr @onclick="@(()=>OnEntryClick(transaction.MKey))">
+                            <tr @onclick="@(()=>OnEntryClick(transaction))">
                                 <td><b>@transaction.sNo</b></td>
                                 <td><b>@transaction.Digit</b></td>
                                 <td style="text-align:right"><b>@transaction.Prize1.ToString("C2",numberFormat)</b></td>

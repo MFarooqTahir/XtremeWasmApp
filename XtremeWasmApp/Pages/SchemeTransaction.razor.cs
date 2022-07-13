@@ -243,39 +243,39 @@ namespace XtremeWasmApp.Pages
                                     {
                                         invD.xmkey = Tempdata?.MKey ?? 0;
                                         invD.lmkey = Tempdata?.lmkey ?? 0;
-                                        invD.llmkey = Tempdata?.llmkey ?? 0;
+                                        invD.llmkey = Tempdata?.LLMkey ?? 0;
                                     }
 
-                                    Tempdata = await Api.MakeNewEntrySch(invD);
-                                    if (string.Equals(Tempdata.code, "0", StringComparison.Ordinal))
+                                    var tmp = await Api.MakeNewEntrySch(invD);
+                                    if (string.Equals(tmp.code, "0", StringComparison.Ordinal))
                                     {
-                                        if (Transactions!.Any() && !string.Equals(Tempdata.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
+                                        if (Transactions!.Count > 0 && !string.Equals(tmp.sNo, Transactions[^1].sNo, StringComparison.OrdinalIgnoreCase))
                                         {
                                             listEnabled = Editmode;
                                             refreshPage();
                                         }
                                         else
                                         {
-                                            Transactions.Add(Tempdata);
-                                            Total += Tempdata.Prize1 + Tempdata.Prize2 + Rate ?? 0;
+                                            Transactions.Add(tmp);
+                                            Total += tmp.Prize1 + tmp.Prize2 + Rate ?? 0;
                                         }
                                     }
                                     else
                                     {
-                                        if (string.Equals(Tempdata.code, "1", StringComparison.Ordinal))
+                                        if (string.Equals(tmp.code, "1", StringComparison.Ordinal))
                                         {
                                             await showDialog("Draw Closed", "");
                                             nav.NavigateTo("/");
                                             Editmode = false;
                                             return;
                                         }
-                                        else if (string.Equals(Tempdata.code, "2", StringComparison.Ordinal))
+                                        else if (string.Equals(tmp.code, "2", StringComparison.Ordinal))
                                         {
                                             await showDialog("Limit has been reached", "");
                                             Editmode = false;
                                             return;
                                         }
-                                        else if (string.Equals(Tempdata.code, "3", StringComparison.Ordinal))
+                                        else if (string.Equals(tmp.code, "3", StringComparison.Ordinal))
                                         {
                                             await showDialog("Invoice has been closed", "");
                                             refreshPage();
@@ -311,6 +311,7 @@ namespace XtremeWasmApp.Pages
                 {
                     AddEntryDisabled = false;
                     Editmode = false;
+                    Tempdata = null;
                     Digits = null;
                     service.CallRequestRefresh();
                     await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
@@ -540,14 +541,14 @@ namespace XtremeWasmApp.Pages
             }
         }
 
-        private async Task OnEntryClick(int Mkey)
+        private async Task OnEntryClick(Transaction entry)
         {
             try
             {
-                var entry = Transactions.First(x => x.MKey == Mkey);
+                //var entry = Transactions.First(x => x.MKey == Mkey);
                 if (entry is not null)
                 {
-                    bool res = await Api.CheckEntryEdit(Mkey);
+                    bool res = await Api.CheckEntryEdit(entry.MKey);
                     if (res)
                     {
                         Tempdata = entry;

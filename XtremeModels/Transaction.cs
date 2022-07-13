@@ -13,6 +13,6 @@
         public int MKey { get; set; }
         public double sc_rate { get; set; }
         public int lmkey { get; set; }
-        public int llmkey { get; set; }
+        public int LLMkey { get; set; }
     }
 }

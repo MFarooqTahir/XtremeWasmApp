@@ -48,7 +48,7 @@
                         {
                             transaction.sNo = snoCountStart.ToString("D5");
 
-                            <tr @onclick="@(()=>OnEntryClick(transaction.MKey))">
+                            <tr @onclick="@(()=>OnEntryClick(transaction))">
                                 <td><b>@transaction.sNo</b></td>
                                 <td><b>@transaction.Digit</b></td>
                                 <td style="text-align:right"><b>@((Math.Abs(transaction.sc_rate % 1) <= (Double.Epsilon * 100))?transaction.sc_rate:transaction.sc_rate.ToString("C2",numberFormat))</b></td>

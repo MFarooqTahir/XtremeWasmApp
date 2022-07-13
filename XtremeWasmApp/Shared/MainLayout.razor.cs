@@ -79,7 +79,11 @@ namespace XtremeWasmApp.Shared
                 var dtype = await Js.InvokeAsync<string>("getOS") ?? "A";
                 await Auth.SetDtype(dtype);
                 _timer = new(async _ => {
-                    if (RunTimer)
+                    if (await Auth.IsCompanySelected() && await Auth.GetIsCompanyBlocked())
+                    {
+                        await Auth.Logout();
+                    }
+                    else if (RunTimer)
                     {
                         RunTimer = false;
                         if (await Auth.GetRepeatDataWeb())
