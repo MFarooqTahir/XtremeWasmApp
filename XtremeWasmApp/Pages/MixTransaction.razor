@@ -109,8 +109,8 @@
 
                 @*
                  Immediate="true" Immediate="true" *@
-                <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Label="I Prize" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
-                <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Label="II Prize" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @onfocus="@OnPrzFocus" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Label="I Prize" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown" @onfocus="@OnPrzFocus" @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Label="II Prize" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudIconButton Disabled="@AddEntryDisabled" Variant="Variant.Filled" Icon="@Icons.Material.Filled.Check" Color="Color.Tertiary" Size="Size.Small" OnClick="@OnDoneClick" Style="margin-top:6px;margin-left:auto;margin-right: 0;height:55px;"></MudIconButton>
                 @if(@Editmode)
                 {                

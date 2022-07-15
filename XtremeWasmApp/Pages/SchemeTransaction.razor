@@ -91,7 +91,7 @@
                 </div>
 
 
-                <MudNumericField id="Rate" OnKeyDown="@RateKeyDown" @bind-Value="Rate" Immediate="true" Label="Rate" Culture="@Curr" HelperText=@($"Limit: {prz1Limit:F0}  x  {prz2Limit:F0}") HideSpinButtons="true" Disabled="@(RateEnabled==false)" Variant="Variant.Outlined" Min="0" />
+                <MudNumericField id="Rate" @onfocus="@OnRateFocus" OnKeyDown="@RateKeyDown" @bind-Value="Rate" Immediate="true" Label="Rate" Culture="@Curr" HelperText=@($"Limit: {prz1Limit:F0}  x  {prz2Limit:F0}") HideSpinButtons="true" Disabled="@(RateEnabled==false)" Variant="Variant.Outlined" Min="0" />
                 @*<MudNumericField id="Prize1" OnKeyDown="@Prz1KeyDown" @bind-Value="Prize1" HelperText="@($"Limit: {prz1Limit}")" Immediate="true" Label="I Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz1Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 <MudNumericField id="Prize2" OnKeyDown="@Prz2KeyDown"  @bind-Value="Prize2" HelperText="@($"Limit: {prz2Limit}")" Immediate="true" Label="II Prize" Culture="@Curr" HideSpinButtons="true" Disabled="@(Prz2Enabled==false)" Variant="Variant.Outlined" Min="0" />
                 *@

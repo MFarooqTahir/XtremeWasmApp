@@ -357,7 +357,13 @@ namespace XtremeWasmApp.Pages
                 await OnDoneClick(null);
             }
         }
-
+        private async Task OnPrzFocus(FocusEventArgs args)
+        {
+            if (string.IsNullOrEmpty(Digits))
+            {
+                await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
+            }
+        }
         private async Task lostDigitFocus(FocusEventArgs args)
         {
             if (!string.IsNullOrEmpty(Digits))

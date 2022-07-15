@@ -462,11 +462,13 @@ namespace XtremeWasmApp.Pages
             }
         }
 
-        private async Task OnPrz1Focus(FocusEventArgs args)
+        private async Task OnRateFocus(FocusEventArgs args)
         {
-            // await jsModule.InvokeVoidAsync("scrollToTop");
+            if (string.IsNullOrEmpty(Digits))
+            {
+                await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
+            }
         }
-
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (repeatData?.Uac == false || repeatData?.DrawBlocked == true || repeatData?.DrawCompleted == true || repeatData?.RelationBlocked == true || repeatData?.RelationActive == false)
