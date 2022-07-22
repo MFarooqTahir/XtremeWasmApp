@@ -1,0 +1,64 @@
+﻿@using XtremeModels
+@inject WebApiService Api
+@inject IJSRuntime Js
+<MudDialog>
+    <DialogContent>
+       <MudRadioGroup @bind-SelectedOption="@Serial">
+           @if(disabled)
+           {
+               <MudText>Downloading report please wait...</MudText>
+           }
+            <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
+            <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un Seial</MudRadio>
+            <hr />
+        </MudRadioGroup>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Disabled="@disabled" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] 
+    MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public Inventory? Inv{ get; set; }
+    [Parameter]
+    public bool IsMixScheme{ get; set; }
+    public bool disabled{ get; set; }
+    public bool Serial { get; set; }
+    async void Submit()
+    {
+        disabled = true;
+        FileReturnModel? file = null;
+        if (IsMixScheme)
+        {
+            file = await Api.GetMixSchemeInvoiceReport(Inv!, Serial);
+        }
+        else
+        {
+            file = await Api.GetMixInvoiceSerialReport(Inv!, Serial);
+        }
+        if (file is not null)
+        {
+            if (file.File is null && file.FileName.Contains("error", StringComparison.CurrentCultureIgnoreCase))
+            {
+                MudDialog.Close(DialogResult.Ok(file.FileName));
+
+            }
+            else
+            {
+                await Js.SaveAs(file.FileName, file.File);
+                disabled = false;
+                MudDialog.Close(DialogResult.Ok(""));
+            }
+        }
+        else
+        {
+            disabled = false;
+            MudDialog.Close(DialogResult.Cancel());
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
+}

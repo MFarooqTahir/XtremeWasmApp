@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
+using Newtonsoft.Json;
+
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -21,11 +23,12 @@ namespace XtremeWasmApp.Services
         private readonly IRefreshService _refresh;
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         private readonly ILocalStorageService _localStorage;
+        //private readonly JSRuntime js;
         private readonly NavigationManager _navigationManager;
         public string DType { get; set; } = "";
 
         public WebApiService(AuthenticationStateProvider authenticationStateProvider,
-                           ILocalStorageService localStorage, HttpClient httpClient, NavigationManager navigationManager, HttpData httpData, IRefreshService refresh)
+                           ILocalStorageService localStorage, HttpClient httpClient, NavigationManager navigationManager, HttpData httpData, IRefreshService refresh)//, JSRuntime js)
         {
             _authenticationStateProvider = authenticationStateProvider;
             _localStorage = localStorage;
@@ -33,6 +36,7 @@ namespace XtremeWasmApp.Services
             _navigationManager = navigationManager;
             _httpData = httpData;
             _refresh = refresh;
+            //this.js = js;
         }
 
         public async Task SetDtype(string dtype)
@@ -110,20 +114,22 @@ namespace XtremeWasmApp.Services
 
         public async Task<IEnumerable<Transaction?>?> GetInvoiceDetails(int Mkey)
         {
-            var cdRel = await GetCdrel();
+            var cdRel = await GetCdrel().ConfigureAwait(false);
             var res = await SendHttpRequest<ResultSet<List<Transaction?>?>>($"api/Transactions/GetVouchersInvView/{cdRel.rCode}/{Mkey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
 
-        private async Task<T?> SendHttpRequest<T>(string URL, RequestType type, object objPost = null, LinkType linkType = LinkType.Login)
+        private async Task<T?> SendHttpRequest<T>(string URL, RequestType type, object? objPost = null!, LinkType linkType = LinkType.Login)
         {
             try
             {
+
                 var baseUri = linkType switch
                 {
                     LinkType.Login => _httpData.BaseAddress,
                     LinkType.Data => _httpData.DataLink,
                     LinkType.Invoice => _httpData.InvoiceLink,
+                    LinkType.Reporting => _httpData.ReportingLink,
                     _ => throw new Exception("Invalid link type")
                 };
                 if (baseUri is null)
@@ -147,7 +153,7 @@ namespace XtremeWasmApp.Services
                 var response = type switch
                 {
                     RequestType.Get => await _httpClient.GetAsync(baseUri.AbsoluteUri + URL).ConfigureAwait(false),
-                    RequestType.Post => await _httpClient.PostAsJsonAsync(baseUri.AbsoluteUri + URL, objPost).ConfigureAwait(false),
+                    RequestType.Post => await _httpClient.PostAsync(baseUri.AbsoluteUri + URL, new StringContent(JsonConvert.SerializeObject(objPost), Encoding.UTF8, "application/json")).ConfigureAwait(false),// await _httpClient.PostAsJsonAsync(baseUri.AbsoluteUri + URL, objPost).ConfigureAwait(false),
                     RequestType.Put => await _httpClient.PutAsJsonAsync(baseUri.AbsoluteUri + URL, objPost).ConfigureAwait(false),
                     RequestType.Delete => await _httpClient.DeleteAsync(baseUri.AbsoluteUri + URL).ConfigureAwait(false),
                     _ => throw new Exception("Invalid Http Request Type")
@@ -175,7 +181,149 @@ namespace XtremeWasmApp.Services
                 return default;
             }
         }
+        //public async ValueTask<object> GetReport(FileReturnModel? fileInfo)
+        //{
+        //return await js.SaveAs(fileInfo?.FileName ?? "", fileInfo?.File ?? Array.Empty<byte>()).ConfigureAwait(false);
+        //}
+        public async Task<FileReturnModel?> GetMixInvoiceSerialReport(Inventory inv, bool IsSerial)
+        {
+            try
+            {
+                var dt = await SendHttpRequest<ResultSet<List<DtReturn>>>($"api/Transactions/GetRdtDataSerial/{inv.vid}/{inv.Vno}/{(IsSerial ? 0 : 1)}/True/{inv.propKey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                if (dt is not null && (dt.ResultObj[0].Row.Count == 0 || dt.ResultObj[1].Row.Count == 0))
+                {
+                    return new()
+                    {
+                        FileName = "Error: No Records",
+                        File = null,
 
+                    };
+                }
+                var comp = await GetCompany().ConfigureAwait(false);
+                var cdRel = await GetCdrel().ConfigureAwait(false);
+                var party = await GetParty().ConfigureAwait(false);
+                var sch = await GetSch().ConfigureAwait(false);
+                MixInvSerialModel? model = new()
+                {
+                    DReturn = dt?.ResultObj,
+                    XDATE = DateTime.Now,
+                    Comp = comp?.Pcode,
+                    Vno = inv.Vno.ToString(CultureInfo.InvariantCulture),
+                    Ref = inv.Ref,
+                    Uid = cdRel.UName,//"{{{ " + cdRel.UName + " }}}",
+                    Lk = inv.lk,
+                    Lk2 = inv.lk2,
+                    VType = inv.vid,
+                    DMode = inv.dmode > 0,
+                    Code = party.Code,
+                    Name = party.Name,
+                    Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),
+                    Ld2 = sch.BId,
+                    Ld2c = sch.Cat,
+                    Ld3 = sch.Date.ToShortDateString(),
+                    Ld4 = sch.City,
+                    Osver = "Web Application { PBTS.Net } Version 1.1.2022",
+                    mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
+                };
+                return await SendHttpRequest<FileReturnModel?>("api/Reporting/MixInvSerialBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        public async Task<FileReturnModel?> GetMixSchemeInvoiceReport(Inventory inv, bool IsSerial)
+        {
+            try
+            {
+                var dt = await SendHttpRequest<ResultSet<List<DtReturn>>>($"api/Transactions/GetRdtDataSerial/{inv.vid}/{inv.Vno}/{(IsSerial ? 0 : 1)}/True/{inv.propKey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                if (dt is not null && (dt.ResultObj[0].Row.Count == 0 || dt.ResultObj[1].Row.Count == 0))
+                {
+                    return new()
+                    {
+                        FileName = "Error: No Records",
+                        File = null,
+
+                    };
+                }
+                var sch = await GetSch().ConfigureAwait(false);
+                var comp = await GetCompany().ConfigureAwait(false);
+                var cdRel = await GetCdrel().ConfigureAwait(false);
+                var party = await GetParty().ConfigureAwait(false);
+                MixSchemeModel? model = new()
+                {
+                    DReturn = dt?.ResultObj,
+                    Vid = inv.vid,
+                    Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),
+                    Ld2 = sch.BId,
+                    Ld2c = sch.Cat,
+                    Ld3 = sch.Date.ToShortDateString(),
+                    Ld4 = sch.City,
+                    Code = party.Code,
+                    Name = party.Name,
+                    Ref = inv.Ref,
+                    lk = inv.lk,
+                    lk2 = inv.lk2,
+                    dmode = inv.dmode > 0,
+                    Osver = "Web Application { PBTS.Net } Version 1.1.2022",
+                    mmptit = "R.M Software",
+                    uid = "{{{ " + cdRel.UName + " }}}",
+                    comp = comp?.Pcode,
+                    vno = inv.Vno,
+                };
+                return await SendHttpRequest<FileReturnModel?>("api/Reporting/MixSchemeBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+        public async Task<FileReturnModel?> GetSchemePacketInvoiceReport(InvoiceViewItem inv, bool IsSerial)
+        {
+            try
+            {
+                var dt = await SendHttpRequest<ResultSet<List<DtReturn>>>($"api/Transactions/GetRdtDataSerial/{inv.Category}/{inv.InvNo}/{(IsSerial ? 0 : 1)}/True/{inv.MKey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                if (dt is not null && (dt.ResultObj[0].Row.Count == 0 || dt.ResultObj[1].Row.Count == 0))
+                {
+                    return new()
+                    {
+                        FileName = "Error: No Records",
+                        File = null,
+
+                    };
+                }
+                var sch = await GetSch().ConfigureAwait(false);
+                var comp = await GetCompany().ConfigureAwait(false);
+                var cdRel = await GetCdrel().ConfigureAwait(false);
+                var party = await GetParty().ConfigureAwait(false);
+                SchemePacketModel? model = new()
+                {
+                    DReturn = dt?.ResultObj,
+                    Vno = inv.InvNo,
+                    Vid = "1PS",
+                    Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),
+                    Ld2 = sch.BId,
+                    Ld2c = sch.Cat,
+                    Ld3 = sch.Date.ToShortDateString(),
+                    Ld4 = sch.City,
+                    Code = party.Code,
+                    Name = party.Name,
+                    Ref = inv.Reference,
+                    lk = inv.Printable,
+                    lk2 = inv.Printable,
+                    dmode = (int)inv.LD > 0,
+                    Osver = "Web Application { PBTS.Net } Version 1.1.2022",
+                    mmptit = "R.M Software",
+                    uid = "{{{ " + cdRel.UName + " }}}",
+                    comp = comp?.Pcode,
+                };
+                return await SendHttpRequest<FileReturnModel?>("api/Reporting/SchemePktBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         public async Task<mixpktchkModel?> PktCheck(string? digits)
         {
             var res = await SendHttpRequest<ResultSet<mixpktchkModel?>>($"api/Transactions/MixPktChkWebApp/{digits}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);

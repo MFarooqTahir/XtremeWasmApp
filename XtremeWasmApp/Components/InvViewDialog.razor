@@ -1,6 +1,7 @@
 ﻿@using System.Globalization
 @using XtremeModels
-
+@inject WebApiService Api
+@inject IJSRuntime Js
 <MudDialog Style="min-height:600px;">
 
     <DialogContent>
@@ -69,8 +70,33 @@
             <MudText>No Entries</MudText>
 
         }
+        @if (Rep)
+        {
+            <hr />
+            <MudText Style="align-self:center;" Align="Align.Center">Report</MudText>
+            <MudRadioGroup @bind-SelectedOption="@Serial">
+                @if (disabled)
+                {
+                <MudText>Downloading report please wait...</MudText>
+                }
+            @if (!string.IsNullOrWhiteSpace(status))
+                {
+                <MudText>@status</MudText>
+                }
+            <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
+            <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un Seial</MudRadio>
+        </MudRadioGroup>
+            <hr />
+        }
     </DialogContent>
-</MudDialog>
+   
+     <DialogActions>
+         @if (Rep)
+        {
+            <MudButton Disabled="@disabled" OnClick="Cancel">Cancel</MudButton>
+            <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+        }
+    </DialogActions></MudDialog>
 
 @code {
     [CascadingParameter]
@@ -91,8 +117,14 @@
     public bool pr { get; set; }
     [Parameter]
     public bool Printable { get; set; }
+    [Parameter]
+    public InvoiceViewItem Inv{ get; set; }
+    [Parameter]
+    public bool Rep { get; set; }
     int snoCountStart = 1;
-
+    public bool Serial { get; set; }
+    public bool disabled{ get; set; }
+    public string status = "";
     private CultureInfo Curr = new CultureInfo("hi-IN");
     private NumberFormatInfo numberFormat { get; set; }
     protected override void OnInitialized()
@@ -100,5 +132,30 @@
         numberFormat = Curr.NumberFormat;
         numberFormat.CurrencySymbol = "";
     }
+    async void Submit()
+    {
+        status = "";
+        disabled = true;
+        var file = await Api.GetSchemePacketInvoiceReport(Inv, Serial);
+
+        if (file is not null)
+        {
+            if (file.File is null && file.FileName.Contains("error", StringComparison.CurrentCultureIgnoreCase))
+            {
+                status = file.FileName;
+                disabled = false;
+            }
+            else
+            {
+                await Js.SaveAs(file.FileName, file.File);
+                disabled = false;
+            }
+        }
+        else
+        {
+            disabled = false;
+        }
+    }
+    void Cancel() => MudDialog.Cancel();
 }
 

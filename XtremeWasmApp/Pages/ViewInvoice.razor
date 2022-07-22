@@ -96,7 +96,8 @@
             "1PS" or "2PS"=>true,
             _=>false
         };
-        string Title= new Order(Category,limDem) switch
+        var x = new Order(Category, limDem);
+        string Title=  x switch
         {
             (Cat:"1SL",l:LimDem.L) =>"Mix Sale ( Limit )",
             (Cat:"1SL",l:LimDem.D) =>"Mix Sale ( Demand )",
@@ -112,7 +113,24 @@
             (Cat:"2PS",l:LimDem.D) =>"Scheme % Purchase ( Demand )",
             _=>""
         };
-        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr};
+        var inv = new InvoiceViewItem()
+        {
+            MKey=Mkey,
+            Category=Category,
+            Printable=Printable,
+            InvNo=InvNo,
+            Reference=Ref,
+            LD=limDem,
+        };
+        var rep = x switch
+        {
+            (Cat:"1PS",l:LimDem.L) =>true,
+            (Cat:"1PS",l:LimDem.D) =>true,
+            (Cat:"2PS",l:LimDem.L) =>true,
+            (Cat:"2PS",l:LimDem.D) =>true,
+            _=>false
+        };
+        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["Rep"]=rep};
 
         var dialog = DialogService.Show<InvViewDialog>(Title, parameters,new DialogOptions() 
         { 

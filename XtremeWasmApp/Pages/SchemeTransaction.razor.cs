@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
+using MudBlazor;
+
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -9,6 +11,7 @@ using Throw;
 
 using XtremeModels;
 
+using XtremeWasmApp.Components;
 using XtremeWasmApp.Models;
 using XtremeWasmApp.Services;
 
@@ -16,8 +19,8 @@ namespace XtremeWasmApp.Pages
 {
     public partial class SchemeTransaction
     {
-        private Regex editMatch = new Regex(@"([a-zA-Z]+)(\d+)", RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
-        private Regex filter = new Regex("[^0-9]*", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
+        private Regex editMatch = new(@"([a-zA-Z]+)(\d+)", RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
+        private Regex filter = new("[^0-9]*", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
         private bool AddEntryDisabled = false;
 
         [Inject]
@@ -161,7 +164,23 @@ namespace XtremeWasmApp.Pages
             { CloseOnEscapeKey = true });
             return res;
         }
+        private async Task OnReportGet(MouseEventArgs args)
+        {
+            if (invInfo is not null)
+            {
+                var parameters = new DialogParameters { ["Inv"] = invInfo, ["IsMixScheme"] = true };
 
+                var dialog = DialogService.Show<MixInvoiceReportDialog>("Mix Scheme Invoice Report", parameters);
+                if (dialog is not null)
+                {
+                    var res = (await dialog.Result).Data.ToString();
+                    if (!string.Equals(res, "", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        await showDialog("", res);
+                    }
+                }
+            }
+        }
         private async Task OnEditCancel(MouseEventArgs args)
         {
             Tempdata = new();

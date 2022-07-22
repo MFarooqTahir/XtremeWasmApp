@@ -127,6 +127,32 @@
                 funct('Rate');
             }
         }
+        function saveAsFile(filename, bytesBase64) {
+            //var link = document.createElement('a');
+            //link.download = filename;
+            //link.href = "data:application/octet-stream;base64," + bytesBase64;
+            //document.body.appendChild(link);
+            //link.click();
+            //document.body.removeChild(link);
+            if (navigator.msSaveBlob) {
+                //Download document in Edge browser
+                var data = window.atob(bytesBase64);
+                var bytes = new Uint8Array(data.length);
+                for (var i = 0; i < data.length; i++) {
+                    bytes[i] = data.charCodeAt(i);
+                }
+                var blob = new Blob([bytes.buffer], { type: "application/octet-stream" });
+                navigator.msSaveBlob(blob, filename);
+            }
+            else {
+                var link = document.createElement('a');
+                link.download = filename;
+                link.href = "data:application/octet-stream;base64," + bytesBase64;
+                document.body.appendChild(link); // Needed for Firefox
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
     </script>
 </head>
 
@@ -176,6 +202,10 @@
             </div>-->
             <div class="fsh-wasm-cont">
                 <img src="/Images/defImg/logo.png" />
+                <div class="progress mt-2" style="height: 6px;">
+                    <div id="progressbar" class="progress-bar progress-bar-striped progress-bar-animated"
+                         style="width: 0; background-color: #204066;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -199,7 +229,45 @@
     </script>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
 
-    <script src="_framework/blazor.webassembly.js"></script>
+    <script src="_framework/blazor.webassembly.js" autostart="false"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        function StartBlazor() {
+            let loadedCount = 0;
+            let allRessources = 0;
+            Blazor.start({
+                // This function gets called by the Blazor pipeline
+                loadBootResource:
+                    function (type, filename, defaultUri, integrity) {
+                        if (type === "dotnetjs")
+                            return defaultUri;
+
+                        // As "fetchResources" is a promise we don't block
+                        const fetchResources = fetch(defaultUri, {
+                            cache: 'no-cache',
+                            integrity: integrity
+                        });
+
+                        // Add one to the total amount of stuff we have to fetch
+                        allRessources++;
+
+                        // That promise is fulfilled once one resource is done fetching
+                        // When this happens we update the progress bar
+                        fetchResources.then((_) => {
+                            // When fetching is done, indicate this in our loading bar
+                            loadedCount++;
+                            const percentLoaded = 100 * loadedCount / allRessources;
+                            const progressbar = document.getElementById('progressbar');
+                            progressbar.style.width = percentLoaded + '%';
+                        });
+
+                        return fetchResources;
+                    }
+            });
+        }
+
+        // Invoke the pipeline
+        StartBlazor();
+    </script>
 </body>
 </html>

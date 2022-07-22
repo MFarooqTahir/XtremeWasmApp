@@ -17,10 +17,18 @@ using XtremeWasmApp.Services;
 
 #if DEBUG
 //var HttpDataVar = new HttpData() { BaseAddress = new("http://localhost:2144/") };
-var HttpDataVar = new HttpData() { BaseAddress = new("https://pbtsweb.azurewebsites.net/") };
+var HttpDataVar = new HttpData()
+{
+    BaseAddress = new("https://pbtsweb.azurewebsites.net/"),
+    ReportingLink = new("https://xt.discreetnotation.com:8445/"),
+};
 
 #elif RELEASE
-var HttpDataVar = new HttpData() { BaseAddress = new("https://pbtsweb.azurewebsites.net/") };
+var HttpDataVar = new HttpData() 
+{
+    BaseAddress = new("https://pbtsweb.azurewebsites.net/"),
+    ReportingLink = new("https://xt.discreetnotation.com:8445/"),
+};
 #endif
 var cli = new HttpClient();
 cli.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -40,8 +48,8 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<WebApiService>();
 builder.Services.AddMudServices();
 builder.UseLoadingBar();
+builder.Services.AddScoped<WebApiService>();
 
 await builder.Build().RunAsync().ConfigureAwait(false);

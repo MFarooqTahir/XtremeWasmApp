@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
+using MudBlazor;
+
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -9,6 +11,7 @@ using Throw;
 
 using XtremeModels;
 
+using XtremeWasmApp.Components;
 using XtremeWasmApp.Models;
 using XtremeWasmApp.Services;
 
@@ -194,7 +197,23 @@ namespace XtremeWasmApp.Pages
             Prize2 = null;
             Editmode = false;
         }
+        private async Task OnReportGet(MouseEventArgs args)
+        {
+            if (invInfo is not null)
+            {
+                var parameters = new DialogParameters { ["Inv"] = invInfo, ["IsMixScheme"] = false };
 
+                var dialog = DialogService.Show<MixInvoiceReportDialog>("Mix Invoice Report", parameters);
+                if (dialog is not null)
+                {
+                    var res = (await dialog.Result).Data.ToString();
+                    if (!string.Equals(res, "", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        await showDialog("", res);
+                    }
+                }
+            }
+        }
         private async Task OnDoneClick(MouseEventArgs args)
         {
             if (!AddEntryDisabled)
