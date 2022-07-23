@@ -4,7 +4,7 @@ namespace XtremeWasmApp.Models
 {
     public class MixInvSerialModel
     {
-        public IList<DtReturn>? DReturn;
+        public IList<DtReturnString>? DReturn;
         public string? Comp;
         public string? Ref;
         public string? Uid;

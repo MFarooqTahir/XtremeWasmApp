@@ -21,6 +21,7 @@ var HttpDataVar = new HttpData()
 {
     BaseAddress = new("https://pbtsweb.azurewebsites.net/"),
     ReportingLink = new("https://xt.discreetnotation.com:8445/"),
+    //ReportingLink = new("https://localhost:44313/"),
 };
 
 #elif RELEASE

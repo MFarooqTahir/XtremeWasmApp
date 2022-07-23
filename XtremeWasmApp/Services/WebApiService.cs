@@ -199,13 +199,14 @@ namespace XtremeWasmApp.Services
 
                     };
                 }
+
                 var comp = await GetCompany().ConfigureAwait(false);
                 var cdRel = await GetCdrel().ConfigureAwait(false);
                 var party = await GetParty().ConfigureAwait(false);
                 var sch = await GetSch().ConfigureAwait(false);
                 MixInvSerialModel? model = new()
                 {
-                    DReturn = dt?.ResultObj,
+                    DReturn = dt?.ResultObj.Select(x => x.ToStringArrayRows())?.ToList(),
                     XDATE = DateTime.Now,
                     Comp = comp?.Pcode,
                     Vno = inv.Vno.ToString(CultureInfo.InvariantCulture),
@@ -252,7 +253,7 @@ namespace XtremeWasmApp.Services
                 var party = await GetParty().ConfigureAwait(false);
                 MixSchemeModel? model = new()
                 {
-                    DReturn = dt?.ResultObj,
+                    DReturn = dt?.ResultObj.Select(x => x.ToStringArrayRows())?.ToList(),
                     Vid = inv.vid,
                     Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),
                     Ld2 = sch.BId,
@@ -298,7 +299,7 @@ namespace XtremeWasmApp.Services
                 var party = await GetParty().ConfigureAwait(false);
                 SchemePacketModel? model = new()
                 {
-                    DReturn = dt?.ResultObj,
+                    DReturn = dt?.ResultObj.Select(x => x.ToStringArrayRows())?.ToList(),
                     Vno = inv.InvNo,
                     Vid = "1PS",
                     Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),

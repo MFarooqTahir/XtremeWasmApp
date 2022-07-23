@@ -65,7 +65,7 @@
                 <div style="align-items: center;align-content:center;display:flex;width:100%;height:50px;" class="mx-auto">
                     @if (repeatData?.RelationPrint == true)
                     {
-                        <MudIconButton Style="margin-left:auto;" OnClick="OnReportGet" Icon="@Icons.Custom.FileFormats.FilePdf" Color="@(Color.Warning)"></MudIconButton>
+                        <MudIconButton Style="margin-left:auto;" OnClick="OnReportGet" Icon="@Icons.Filled.Print" Color="@(Color.Surface)"></MudIconButton>
                     }
                     <MudToggleIconButton @bind-Toggled="@AutoPrize" Style=@($"margin-right:auto;{(repeatData?.RelationPrint == false?"margin-left:auto":"")}")
                                          Icon="@Icons.Material.Outlined.ContentCopy" Color="@Color.Default"

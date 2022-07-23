@@ -4,7 +4,7 @@ namespace XtremeWasmApp.Models
 {
     public class SchemePacketModel
     {
-        public IList<DtReturn>? DReturn;
+        public IList<DtReturnString>? DReturn;
         public bool? lk;
         public bool? lk2;
         public string? Vid;
