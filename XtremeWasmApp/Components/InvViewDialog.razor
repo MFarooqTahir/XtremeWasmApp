@@ -141,9 +141,13 @@
         {
             var inp = new Inventory()
             {
-                //vid=Inv.InvNo,
-                //Vno=Inv.Category,
-
+                vid=Inv.Category,
+                Vno=Inv.InvNo,
+                lk=Inv.Printable,
+                lk2=Inv.Printable,
+                Ref=Inv.Reference,
+                dmode=(int)Inv.LD,
+                propKey=Inv.MKey,
             };
             file = await Api.GetMixInvoiceSerialReport(inp, Serial);
         }
@@ -151,7 +155,13 @@
         {
             var inp = new Inventory()
             {
-
+                 vid=Inv.Category,
+                Vno=Inv.InvNo,
+                lk=Inv.Printable,
+                lk2=Inv.Printable,
+                Ref=Inv.Reference,
+                 dmode=(int)Inv.LD,
+                propKey=Inv.MKey,
             };
             file = await Api.GetMixSchemeInvoiceReport(inp, Serial);
         }

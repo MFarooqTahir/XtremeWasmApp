@@ -126,19 +126,19 @@
         {
            (Cat:"1SL",l:LimDem.L) =>"mix",
             (Cat:"1SL",l:LimDem.D) =>"mix",
-            (Cat:"1SM",l:LimDem.L) =>"Scheme Sale ( Limit )",
-            (Cat:"1SM",l:LimDem.D) =>"Scheme Sale ( Demand )",
-            (Cat:"1PS",l:LimDem.L) =>"Scheme % Sale ( Limit )",
-            (Cat:"1PS",l:LimDem.D) =>"Scheme % Sale ( Demand )",
-            (Cat:"2PR",l:LimDem.L) =>"Mix Purchase ( Limit )",
-            (Cat:"2PR",l:LimDem.D) =>"Mix Purchase ( Demand )",
-            (Cat:"2SM",l:LimDem.L) =>"Scheme Purchase ( Limit )",
-            (Cat:"2SM",l:LimDem.D) =>"Scheme Purchase ( Demand )",
-            (Cat:"2PS",l:LimDem.L) =>"Scheme % Purchase ( Limit )",
-            (Cat:"2PS",l:LimDem.D) =>"Scheme % Purchase ( Demand )",
+            (Cat:"1SM",l:LimDem.L) =>"sch",
+            (Cat:"1SM",l:LimDem.D) =>"sch",
+            (Cat:"1PS",l:LimDem.L) =>"per",
+            (Cat:"1PS",l:LimDem.D) =>"per",
+            (Cat:"2PR",l:LimDem.L) =>"mix",
+            (Cat:"2PR",l:LimDem.D) =>"mix",
+            (Cat:"2SM",l:LimDem.L) =>"sch",
+            (Cat:"2SM",l:LimDem.D) =>"sch",
+            (Cat:"2PS",l:LimDem.L) =>"per",
+            (Cat:"2PS",l:LimDem.D) =>"per",
             _=>""
         };
-        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["Rep"]=rep};
+        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["RepType"]=rep};
 
         var dialog = DialogService.Show<InvViewDialog>(Title, parameters,new DialogOptions() 
         { 
