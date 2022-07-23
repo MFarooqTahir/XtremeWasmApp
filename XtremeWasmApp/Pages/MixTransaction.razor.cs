@@ -211,6 +211,7 @@ namespace XtremeWasmApp.Pages
                     {
                         await showDialog("", res);
                     }
+                    refreshPage();
                 }
             }
         }

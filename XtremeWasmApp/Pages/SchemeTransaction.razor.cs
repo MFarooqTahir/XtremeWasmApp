@@ -160,7 +160,7 @@ namespace XtremeWasmApp.Pages
         private async Task<bool?> showDialog(string Title, string message)
         {
             await Js.InvokeVoidAsync("document.activeElement.blur");
-            var res = await DialogService.ShowMessageBox(Title, message, options: new MudBlazor.DialogOptions()
+            var res = await DialogService.ShowMessageBox(Title, message, options: new DialogOptions()
             { CloseOnEscapeKey = true });
             return res;
         }
@@ -178,6 +178,8 @@ namespace XtremeWasmApp.Pages
                     {
                         await showDialog("", res);
                     }
+                    refreshPage();
+
                 }
             }
         }

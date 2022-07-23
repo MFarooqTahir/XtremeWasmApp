@@ -2,7 +2,7 @@
 @using XtremeModels
 @inject WebApiService Api
 @inject IJSRuntime Js
-<MudDialog Style="min-height:600px;">
+<MudDialog Style="max-height:500px;overflow-y: scroll;">
 
     <DialogContent>
         <MudText Style="align-self:center;" Align="Align.Center"><MudIcon Icon="@Icons.Material.Filled.Lock" Color="@(Printable?Color.Error:Color.Transparent)" Size="Size.Small"></MudIcon> Inv#: <span style="color:red;margin-right:10px;">@InvNo</span>A/c: <span style="color:darkcyan;margin-right:10px;">@Code</span>Ref: <span style="color:forestgreen">@Ref</span></MudText>
@@ -11,7 +11,7 @@
         {
             snoCountStart = 1;
 
-            <MudSimpleTable Dense="true" Bordered="true" Striped="true" Hover="true" FixedHeader="true" Style="height:405px;">
+            <MudSimpleTable Dense="true" Bordered="true" Striped="true" Hover="true" FixedHeader="true" Style="margin-top:3px;margin-bottom:3px;max-height:250px;overflow-y: scroll;">
                 <thead>
                     <tr>
                         <th style="background-color: #ffe4b5;color:black;"><b>S #</b></th>
@@ -59,10 +59,9 @@
             </MudSimpleTable>
             <MudStack Row=true>
                 <MudText>Total = @(Math.Ceiling(AddRate? AllItems.Sum(x=>x.sc_rate):AllItems.Sum(x=>x.Prize1+x.Prize2)).ToString("C0",numberFormat))</MudText>
-                @if (repeatData?.RelationPrint == true)
-                {
-                    <MudIconButton Style="margin-left:auto;" Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>
-                }
+               
+                    @*<MudIconButton Style="margin-left:auto;" Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>*@
+                
             </MudStack>
         }
         else
@@ -70,8 +69,8 @@
             <MudText>No Entries</MudText>
 
         }
-            <hr />
-            <MudText Style="align-self:center;" Align="Align.Center">Report</MudText>
+         @if (showrep)
+        {
             <MudRadioGroup @bind-SelectedOption="@Serial">
                 @if (disabled)
                 {
@@ -81,16 +80,20 @@
                 {
                 <MudText>@status</MudText>
                 }
-            <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
-            <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Seial</MudRadio>
+            <MudStack Row="true">
+
+                <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
+                <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Seial</MudRadio>
+                <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Style="margin-left:auto" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+
+            </MudStack>
+
         </MudRadioGroup>
             <hr />
-        
+        }
     </DialogContent>
    
      <DialogActions>
-            <MudButton Disabled="@disabled" OnClick="Cancel">Cancel</MudButton>
-            <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
         
     </DialogActions></MudDialog>
 
@@ -117,6 +120,9 @@
     public InvoiceViewItem Inv{ get; set; }
     [Parameter]
     public string RepType { get; set; }
+    [Parameter]
+    public bool showrep { get; set; }
+    
     int snoCountStart = 1;
     public bool Serial { get; set; }
     public bool disabled{ get; set; }

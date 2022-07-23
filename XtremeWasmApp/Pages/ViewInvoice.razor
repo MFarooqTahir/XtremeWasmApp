@@ -60,6 +60,8 @@
 </AuthorizeView>
 
 @code {
+    [CascadingParameter]
+        public RepeatDataReturnWA repeatData { get; set; }
     IList<InvoiceViewItem> InvList => ShowPurchase ? InvListPurchase ??= new List<InvoiceViewItem>() : InvListSale ??= new List<InvoiceViewItem>();
     IList<InvoiceViewItem> InvListSale { get; set; }
     IList<InvoiceViewItem> InvListPurchase { get; set; }
@@ -138,7 +140,7 @@
             (Cat:"2PS",l:LimDem.D) =>"per",
             _=>""
         };
-        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["RepType"]=rep};
+        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["RepType"]=rep,["showrep"]=repeatData.RelationPrint};
 
         var dialog = DialogService.Show<InvViewDialog>(Title, parameters,new DialogOptions() 
         { 
