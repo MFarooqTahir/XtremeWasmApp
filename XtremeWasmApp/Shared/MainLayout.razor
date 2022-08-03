@@ -22,11 +22,11 @@
                         <MudIconButton Color="Color.Dark" Icon="@Icons.Material.Filled.Menu" Edge="Edge.Start" Size=Size.Small OnClick="@((e) => DrawerToggle())" />
 
                     }
-                    @if (MarqSet)
+                    @if (MarqSet && compSel)
                     {
                         <MudStack Row="true" Justify="@Justify.Center" AlignItems="AlignItems.Start">
                             <MudIcon Icon="@(repeatData?.Uac==true?Icons.Material.Filled.LockOpen:Icons.Material.Filled.Lock)" Size="Size.Small" Color="@(repeatData?.RelationActive==true?Color.Success:Color.Error)" />
-                            <a href="/CompanySelection">
+                            <a @onclick="@(async (x)=>{await Auth.SetDrawSelected(false);await Auth.SetCompanySelected(false);_drawerOpen=false;})" href="/CompanySelection">
                                 <MudText Typo="Typo.body2" Style="color:#000000;font-size:medium;"><b>@MarqData.PCode - @MarqData.PName</b></MudText>
                             </a>
 
@@ -63,21 +63,23 @@
                                     {
                                         <MudNavLink Href="/Mix" Match="NavLinkMatch.Prefix"
                                             Icon="@Icons.Material.Filled.StackedBarChart">
-                                            Mix Trans
+                                            Mix Sale Trans
                                         </MudNavLink>
-
+                                     
                                         <MudNavLink Href="/Scheme" Match="NavLinkMatch.Prefix"
                                             Icon="@Icons.Material.Filled.StackedLineChart">
-                                        Scheme Trans
+                                        Scheme Sale Trans
                                     </MudNavLink>
                                     }
                                     @*<MudNavLink Href="/Scheme" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Percent">Scheme % Trans</MudNavLink>*@
                                     <MudNavLink Href="/Search" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Search Digit</MudNavLink>
+                                    <MudNavLink Href="/View" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CreditCard">View Invoice</MudNavLink>
                                     @if (repeatData?.RelationPrize==true)
                                     {
                                         <MudNavLink Href="/Win" Match="NavLinkMatch.Prefix" Icon="@Icons.Filled.PriceCheck">Win Prize</MudNavLink>
                                     }
-                                    <MudNavLink Href="/View" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CreditCard">View Invoice</MudNavLink>
+                                    <MudNavLink Href="" Disabled="true" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Book">Book Sale</MudNavLink>
+                                    
                                     @if (repeatData?.RelationBill==true) {
                                         <MudNavLink Href="/Bill" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PriceChange">Party Bill</MudNavLink>
                                     }
@@ -87,7 +89,7 @@
                                 <MudNavLink Href="/DrawSelection" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.CardMembership">Draw Selection</MudNavLink>
                                 @if(Company is not null)
                                 {
-                                    <div class="mt-3 mx-auto" style="max-width:90px;" align-center> <a @onclick="@((x)=>_drawerOpen=false)" href="/CompanySelection">
+                                    <div class="mt-3 mx-auto" style="max-width:90px;" align-center> <a @onclick="@(async (x)=>{await Auth.SetDrawSelected(false);await Auth.SetCompanySelected(false);_drawerOpen=false;})" href="/CompanySelection">
                                                                   <MudImage align-center Src=@($"data:image/gif;base64,{Convert.ToBase64String(Company?.Pic)}") Width="90" Height="90" Alt="Icon" Elevation="25" Class="rounded-lg" />
                                                                   </a></div>
                                 }

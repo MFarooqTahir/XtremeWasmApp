@@ -3,6 +3,7 @@
 @inject IJSRuntime Js
 <MudDialog>
     <DialogContent>
+        <div style="margin-left:auto;margin-right:auto">
        <MudRadioGroup @bind-SelectedOption="@Serial">
            @if(disabled)
            {
@@ -12,6 +13,7 @@
             <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Serial</MudRadio>
             <hr />
         </MudRadioGroup>
+        </div>
     </DialogContent>
     <DialogActions>
         <MudButton Disabled="@disabled" OnClick="Cancel">Cancel</MudButton>

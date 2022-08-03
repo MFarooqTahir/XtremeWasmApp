@@ -173,7 +173,7 @@ namespace XtremeWasmApp.Pages
                 var dialog = DialogService.Show<MixInvoiceReportDialog>("Mix Scheme Invoice Report", parameters);
                 if (dialog is not null)
                 {
-                    var res = (await dialog.Result).Data.ToString();
+                    var res = (await dialog.Result)?.Data?.ToString();
                     if (!string.Equals(res, "", StringComparison.CurrentCultureIgnoreCase))
                     {
                         await showDialog("", res);

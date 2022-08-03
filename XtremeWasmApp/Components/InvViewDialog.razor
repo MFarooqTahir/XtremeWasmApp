@@ -80,20 +80,19 @@
                 {
                 <MudText>@status</MudText>
                 }
-            <MudStack Row="true">
-
+            <MudStack AlignItems="@AlignItems.Center" Row="true">
+                <div style="margin-left:auto;margin-right:auto">
                 <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
-                <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Seial</MudRadio>
-                <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Style="margin-left:auto" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
-
+                <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Serial</MudRadio>
+                </div>
             </MudStack>
 
         </MudRadioGroup>
-            <hr />
         }
     </DialogContent>
    
      <DialogActions>
+                <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Style="margin-left:auto;margin-right:auto" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
         
     </DialogActions></MudDialog>
 

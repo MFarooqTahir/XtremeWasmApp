@@ -267,8 +267,8 @@ namespace XtremeWasmApp.Services
                     lk2 = inv.lk2,
                     dmode = inv.dmode > 0,
                     Osver = "Web Application { PBTS.Net } Version 1.1.2022",
-                    mmptit = "R.M Software",
-                    uid = "{{{ " + cdRel.UName + " }}}",
+                    mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
+                    uid = cdRel.UName,
                     comp = comp?.Pcode,
                     vno = inv.Vno,
                 };
@@ -314,8 +314,8 @@ namespace XtremeWasmApp.Services
                     lk2 = inv.Printable,
                     dmode = (int)inv.LD > 0,
                     Osver = "Web Application { PBTS.Net } Version 1.1.2022",
-                    mmptit = "R.M Software",
-                    uid = "{{{ " + cdRel.UName + " }}}",
+                    mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
+                    uid = cdRel.UName,
                     comp = comp?.Pcode,
                 };
                 return await SendHttpRequest<FileReturnModel?>("api/Reporting/SchemePktBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);

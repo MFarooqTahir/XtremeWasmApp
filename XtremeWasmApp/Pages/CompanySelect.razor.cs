@@ -44,7 +44,7 @@ namespace XtremeWasmApp.Pages
             var result = await DialogService.ShowMessageBox(
                 "Error",
                 "Account is blocked");
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged);
         }
 
         private async Task OnNoParties()
