@@ -99,7 +99,7 @@
 
 @code {
     [Inject]
-public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [CascadingParameter]
@@ -124,7 +124,7 @@ public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
     public string RepType { get; set; }
     [Parameter]
     public bool showrep { get; set; }
-    
+
     int snoCountStart = 1;
     public bool Serial { get; set; }
     public bool disabled{ get; set; }
@@ -185,12 +185,15 @@ public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
                 //await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
                 await Js.SaveAs(file.FileName, file.File);
                 disabled = false;
+                MudDialog.Close(DialogResult.Ok(""));
             }
         }
         else
         {
             disabled = false;
+                MudDialog.Close(DialogResult.Cancel());
         }
+        
     }
     void Cancel() => MudDialog.Cancel();
 }
