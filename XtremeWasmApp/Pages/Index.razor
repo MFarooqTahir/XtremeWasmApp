@@ -11,12 +11,19 @@
         <MudImage Src="Images/defImg/logo.png" ObjectFit="ObjectFit.Fill" Height="200" Width="200" Class="rounded-lg;" Style="
   margin: auto;
   display: block;"/>
+        @if (pageResModel is not null && (pageResModel.First.Any() || pageResModel.Second.Any()))
+                {
+                    <MudText Style="font-size:16px;font-weight:bold;color:#E53935">@pageResModel?.First.Aggregate((x,y)=>x+" - "+y)</MudText>
+                    <MudText Style="font-size:16px;font-weight:bold;color:#388E3C">@pageResModel?.Second.Aggregate((x,y)=>x+" - "+y)</MudText>
+                    <hr class="my-1"/>
+                }
         <MudText Typo="Typo.h5"><b>@CompanyDetails @CurrCity</b></MudText>
        
-        <hr/>
-        <MudText Typo="Typo.h6">Reg ID: <b>@MBM</b></MudText>
-        <hr/>
-        <div style="text-align:left;margin: 0 auto;">
+        <hr class="my-1"/>
+        <MudText Style="margin:0px;" Typo="Typo.h6">Reg ID: <b>@MBM</b></MudText>
+        <hr class="my-1"/>
+                
+        <div style="text-align:center;margin: 0 auto;">
         
         <MudText>A/C: @CurrCode - @CurrName</MudText>
         <MudText>Relation ID: @RelID</MudText>
@@ -38,11 +45,12 @@
     string CompanyDetails = string.Empty;
     string RelID = string.Empty;
     string MBM = string.Empty;
+    HomePageResultsModel? pageResModel = null;
     protected override async Task OnInitializedAsync()
     {
         await Api.UnsetAllSch();
                 MBM = await Api.GetMbm();
         
-        (CurrName,CurrCity,CurrCode,CurrLimit,CompanyDetails,RelID)=await Api.GetDashboardData();
+        (CurrName,CurrCity,CurrCode,CurrLimit,CompanyDetails,RelID,pageResModel)=await Api.GetDashboardData();
     }
 }

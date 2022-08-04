@@ -423,6 +423,9 @@ namespace XtremeWasmApp.Services
                 //}
                 var DashDataRes = await SendHttpRequest<ResultSet<DashBoardData>>($"api/Data/GetDashData/{cDRelation.rCode}/0", RequestType.Get, linkType: LinkType.Data).ConfigureAwait(false);
                 var DashData = DashDataRes?.ResultObj;
+                var homepageres = await SendHttpRequest<ResultSet<HomePageResultsModel>>("api/Inv/GetHomePageResults", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                await SetHomePageResult(homepageres?.ResultObj).ConfigureAwait(false);
+
                 if (DashData is null)
                 {
                     await ChangeToken(oldToken).ConfigureAwait(false);
@@ -650,6 +653,8 @@ namespace XtremeWasmApp.Services
                     await ChangeToken(oldToken).ConfigureAwait(false);
                     return (false, "Error. There might be no active draws for this company");
                 }
+                var homepageres = await SendHttpRequest<ResultSet<HomePageResultsModel>>("api/Inv/GetHomePageResults", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                await SetHomePageResult(homepageres?.ResultObj).ConfigureAwait(false);
                 if (DashData.party is null || DashData.sch is null)
                 {
                     await ChangeToken(oldToken).ConfigureAwait(false);
@@ -686,7 +691,6 @@ namespace XtremeWasmApp.Services
                 return (false, "Critical Error");
             }
         }
-
         private async Task<string> UpdateBalance(CDRelation cdrel, Party part)
         {
             var amt = (await SendHttpRequest<ResultSet<int>>($"api/DataSet/Login/GetPartyLimit/{cdrel.CompanyID}/{cdrel.rCode}", RequestType.Get, linkType: LinkType.Login).ConfigureAwait(false))?.ResultObj ?? 0;
@@ -744,13 +748,13 @@ namespace XtremeWasmApp.Services
             return res?.ResultObj;
         }
 
-        public async Task<(string Name, string city, string Code, string Balance, string CompanyDetails, string pname)> GetDashboardData()
+        public async Task<(string Name, string City, string Code, string, string, string UName, HomePageResultsModel HomePageResult)> GetDashboardData()
         {
             var party = await GetParty().ConfigureAwait(false) ?? new();
             var comp = await GetCompany().ConfigureAwait(false) ?? new();
             var cdRel = await GetCdrel().ConfigureAwait(false) ?? new();
-
-            return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F0", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName);
+            var HomePageResult = await GetHomePageResult().ConfigureAwait(false);
+            return (party.Name, comp.City, party.Code, cdRel.Limit.ToString("F0", CultureInfo.CurrentCulture), comp.Pcode + " - " + comp.PName, cdRel.UName, HomePageResult);
         }
 
         public async Task<IList<Schedule>> GetScheduleList(bool notall, bool isSelected = false)
@@ -782,6 +786,14 @@ namespace XtremeWasmApp.Services
         public async Task<Company?> GetCompany()
         {
             return await _localStorage.GetItemAsync<Company?>("Company").ConfigureAwait(false);
+        }
+        private async Task SetHomePageResult(HomePageResultsModel newCom)
+        {
+            await _localStorage.SetItemAsync("HomePageResult", newCom).ConfigureAwait(false);
+        }
+        private async Task<HomePageResultsModel> GetHomePageResult()
+        {
+            return await _localStorage.GetItemAsync<HomePageResultsModel>("HomePageResult").ConfigureAwait(false);
         }
 
         public async Task SetRepeatData(RepeatDataReturnWA newObj)
