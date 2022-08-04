@@ -54,8 +54,8 @@ public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
             }
             else
             {
-                //await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
-                await Js.SaveAs(file.FileName, file.File);
+                await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
+                //await Js.SaveAs(file.FileName, file.File);
                 disabled = false;
                 MudDialog.Close(DialogResult.Ok(""));
             }
