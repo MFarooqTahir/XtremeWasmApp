@@ -51,6 +51,7 @@ builder.Services.AddOptions();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddMudServices();
 builder.UseLoadingBar();
+builder.Services.AddBlazorDownloadFile();
 builder.Services.AddScoped<WebApiService>();
 
 await builder.Build().RunAsync().ConfigureAwait(false);
