@@ -1,0 +1,100 @@
+﻿@page "/book"
+@using XtremeWasmApp.Components
+@inject WebApiService Api
+
+<AuthorizeView>
+    <Authorized>
+        <h3 style="text-align:center;">Book Sale</h3>
+        <div align-center style="max-width:650px;margin: auto;">
+            @if (bookSaleResponses is not null)
+            {
+                <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+
+                    <BookSaleTable Title="O p e n"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"1",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==1).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="C l o s e"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"1",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==2).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="C e n t e r"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"1",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==3).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="X O p e n"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"1",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==4).ToList().ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="A k a r a"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"2",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==2).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="X - A k a r a"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"2",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==3).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="X X - A k a r a"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"2",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==4).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="T a n d e l a"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"3",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==3).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="X - T a n d e l a"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"3",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==4).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="F o r e c a s t"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"4",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==4).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="F i v e - D o t"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"5",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==2).ToList()"></BookSaleTable>
+
+                    <BookSaleTable Title="S i x - D o t"
+                               SourceList="@bookSaleResponses.Where(x=>string.Equals(x.Pid,"6",StringComparison.InvariantCultureIgnoreCase)
+                            && x.Pkt.Trim().Length==2).ToList()"></BookSaleTable>
+
+
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:20px;">Total</MudText>
+                    <MudSimpleTable Bordered="true">
+                        <thead>
+                            <tr>
+                                <th id="prz">1<sup>st</sup> Amount</th>
+                                <th id="prz">2<sup>nd</sup> Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="prz">@(bookSaleResponses?.Sum(x=>x?.Prize1??0).ToString("N0"))</td>
+                                <td id="prz">@(bookSaleResponses?.Sum(x=>x?.Prize2??0).ToString("N0"))</td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </MudPaper>
+            }
+            else
+            {
+                @if (isloading)
+                {
+                    <MudText Typo="Typo.h4">Loading</MudText>
+
+                }
+                else if (!initale)
+                {
+                    <MudText Typo="Typo.h4">No Results</MudText>
+
+                }
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
+<style>
+    #prz {
+        text-align: center;
+    }
+</style>
+

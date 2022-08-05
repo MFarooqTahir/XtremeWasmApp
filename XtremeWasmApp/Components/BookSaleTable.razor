@@ -1,0 +1,131 @@
+﻿@using XtremeModels
+<style>
+    tfoot tr {
+        background-color: var(--mud-palette-surface);
+    }
+
+        tfoot tr td {
+            border-top: 1px solid var(--mud-palette-table-lines);
+            background-color: var(--mud-palette-surface);
+            position: sticky;
+            bottom: 0;
+        }
+</style>
+@if (SourceList?.Count > 0)
+{
+    <MudText Align="Align.Center" Color="Color.Dark" Typo="Typo.h6" Style="margin-top:10px;background-color: #ffe4b5;"><b>@Title</b></MudText>
+
+
+  @*@if (sec)
+    {
+        <MudStack Row="true" Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center">
+        <MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="max-height:250px;overflow-y:auto;margin-top:5px;" Class="rounded-0 mx-0">
+            <thead>
+                <tr>
+                    <th style="text-align:center" class="ml-n5">PKT</th>
+                    <th style="text-align:center">1<sup>st</sup> Prize</th>
+                    <th style="text-align:center">2<sup>nd</sup> Prize</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var TransSearchItem in SourceListFirst)
+                {
+                    <tr>
+                        <td style="text-align:center" class="ml-n1">@TransSearchItem.Pkt</td>
+                        <td style="text-align:center">@TransSearchItem?.Prize1.ToString("N0")</td>
+                        <td style="text-align:center">@TransSearchItem?.Prize2.ToString("N0")</td>
+                    </tr>
+                }
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td style="text-align:center">@SourceListFirst.Sum(x=>x.Prize1).ToString("N0")</td>
+                    <td style="text-align:center">@SourceListFirst.Sum(x=>x.Prize2).ToString("N0")</td>
+                </tr>
+            </tfoot>
+        </MudSimpleTable>
+
+        <MudSimpleTable Dense="true" Striped="true" Hover="true" FixedHeader="true" Style="max-height:250px;overflow-y:auto;margin-top:5px;" Class="rounded-0 mx-0">
+            <thead>
+                <tr>
+                    <th style="text-align:center" class="ml-n5">PKT</th>
+                    <th style="text-align:center">1<sup>st</sup> Prize</th>
+                    <th style="text-align:center">2<sup>nd</sup> Prize</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var TransSearchItem in SourceListSecond)
+                {
+                    <tr>
+                        <td style="text-align:center" class="ml-n1">@TransSearchItem.Pkt</td>
+                        <td style="text-align:center">@TransSearchItem.Prize1.ToString("N0")</td>
+                        <td style="text-align:center">@TransSearchItem.Prize2.ToString("N0")</td>
+                    </tr>
+                }
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td style="text-align:center">@SourceListSecond?.Sum(x=>x.Prize1).ToString("N0")</td>
+                    <td style="text-align:center">@SourceListSecond?.Sum(x=>x.Prize2).ToString("N0")</td>
+                </tr>
+            </tfoot>
+        </MudSimpleTable></MudStack>
+    }
+    else
+    {*@
+        <MudSimpleTable Dense="true" Outlined="true" Bordered="true" Striped="true" Hover="true" FixedHeader="true" Style="max-height:250px;overflow-y:auto;margin-top:5px;" Class="rounded-0">
+            <thead>
+                <tr>
+                    <th style="text-align:center" class="ml-n5"><b>Digit</b></th>
+                    <th style="text-align:center"><b>1<sup>st</sup> Amount</b></th>
+                    <th style="text-align:center"><b>2<sup>nd</sup> Amount</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var TransSearchItem in SourceList)
+                {
+                    <tr>
+                        <td style="text-align:center" class="ml-n1">@TransSearchItem.Pkt</td>
+                        <td style="text-align:center">@TransSearchItem?.Prize1.ToString("N0")</td>
+                        <td style="text-align:center">@TransSearchItem?.Prize2.ToString("N0")</td>
+                    </tr>
+                }
+
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                    <td style="text-align:center"><b>@SourceList.Sum(x=>x.Prize1).ToString("N0")</b></td>
+                    <td style="text-align:center"><b>@SourceList.Sum(x=>x.Prize2).ToString("N0")</b></td>
+                </tr>
+            </tfoot>
+        </MudSimpleTable>
+   @* }*@
+}
+@code {
+    [Parameter]
+    public List<BookSaleResponse?>? SourceList { get; set; }
+
+    //public BookSaleResponse?[] SourceListFirst { get; set; }
+    //public BookSaleResponse?[] SourceListSecond { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+    bool sec = false;
+    //protected override void OnParametersSet()
+    //{
+    //    base.OnParametersSet();
+    //    if (SourceList?.Any() == true)
+    //    {
+    //        var mid = SourceList.Count / 2;
+    //        SourceListFirst = SourceList.Take(mid).ToArray();
+    //        SourceListSecond = SourceList.Skip(mid).ToArray();
+    //        sec = SourceListSecond?.Count() > 0;
+    //    }
+    //}
+}

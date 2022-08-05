@@ -3,6 +3,18 @@
 @using XtremeModels
 @inject WebApiService Api
 @inject IJSRuntime Js
+<style>
+    tfoot tr {
+        background-color: var(--mud-palette-surface);
+    }
+
+        tfoot tr td {
+            border-top: 1px solid var(--mud-palette-table-lines);
+            background-color: var(--mud-palette-surface);
+            position: sticky;
+            bottom: 0;
+        }
+</style>
 <MudDialog Style="max-height:500px;overflow-y: scroll;">
 
     <DialogContent>
@@ -60,9 +72,9 @@
             </MudSimpleTable>
             <MudStack Row=true>
                 <MudText>Total = @(Math.Ceiling(AddRate? AllItems.Sum(x=>x.sc_rate):AllItems.Sum(x=>x.Prize1+x.Prize2)).ToString("C0",numberFormat))</MudText>
-               
-                    @*<MudIconButton Style="margin-left:auto;" Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>*@
-                
+
+                @*<MudIconButton Style="margin-left:auto;" Icon="@Icons.Material.Filled.Print" Color="@(Color.Warning)"></MudIconButton>*@
+
             </MudStack>
         }
         else
@@ -70,7 +82,7 @@
             <MudText>No Entries</MudText>
 
         }
-         @if (showrep)
+        @if (showrep)
         {
             <MudRadioGroup @bind-SelectedOption="@Serial">
                 @if (disabled)
@@ -83,19 +95,22 @@
                 }
             <MudStack AlignItems="@AlignItems.Center" Row="true">
                 <div style="margin-left:auto;margin-right:auto">
-                <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
-                <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Serial</MudRadio>
+                    <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
+                    <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Serial</MudRadio>
                 </div>
             </MudStack>
 
         </MudRadioGroup>
         }
     </DialogContent>
-   
-     <DialogActions>
-                <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Style="margin-left:auto;margin-right:auto" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
-        
-    </DialogActions></MudDialog>
+
+    <DialogActions>
+        @if (showrep)
+        {
+            <MudButton Disabled="@disabled" Color="Color.Success" OnClick="Submit" Style="margin-left:auto;margin-right:auto" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+        }
+    </DialogActions>
+</MudDialog>
 
 @code {
     [Inject]
@@ -119,7 +134,7 @@
     [Parameter]
     public bool Printable { get; set; }
     [Parameter]
-    public InvoiceViewItem Inv{ get; set; }
+    public InvoiceViewItem Inv { get; set; }
     [Parameter]
     public string RepType { get; set; }
     [Parameter]
@@ -127,7 +142,7 @@
 
     int snoCountStart = 1;
     public bool Serial { get; set; }
-    public bool disabled{ get; set; }
+    public bool disabled { get; set; }
     public string status = "";
     private CultureInfo Curr = new CultureInfo("hi-IN");
     private NumberFormatInfo numberFormat { get; set; }
@@ -141,36 +156,36 @@
         status = "";
         disabled = true;
         FileReturnModel file = null;
-        if (string.Equals(RepType,"per",StringComparison.CurrentCultureIgnoreCase))
+        if (string.Equals(RepType, "per", StringComparison.CurrentCultureIgnoreCase))
         {
             file = await Api.GetSchemePacketInvoiceReport(Inv, Serial);
         }
-        if (string.Equals(RepType,"mix",StringComparison.CurrentCultureIgnoreCase))
+        if (string.Equals(RepType, "mix", StringComparison.CurrentCultureIgnoreCase))
         {
             var inp = new Inventory()
-            {
-                vid=Inv.Category,
-                Vno=Inv.InvNo,
-                lk=Inv.Printable,
-                lk2=Inv.Printable,
-                Ref=Inv.Reference,
-                dmode=(int)Inv.LD,
-                propKey=Inv.MKey,
-            };
+                {
+                    vid = Inv.Category,
+                    Vno = Inv.InvNo,
+                    lk = Inv.Printable,
+                    lk2 = Inv.Printable,
+                    Ref = Inv.Reference,
+                    dmode = (int)Inv.LD,
+                    propKey = Inv.MKey,
+                };
             file = await Api.GetMixInvoiceSerialReport(inp, Serial);
         }
-        if (string.Equals(RepType,"sch",StringComparison.CurrentCultureIgnoreCase))
+        if (string.Equals(RepType, "sch", StringComparison.CurrentCultureIgnoreCase))
         {
             var inp = new Inventory()
-            {
-                 vid=Inv.Category,
-                Vno=Inv.InvNo,
-                lk=Inv.Printable,
-                lk2=Inv.Printable,
-                Ref=Inv.Reference,
-                 dmode=(int)Inv.LD,
-                propKey=Inv.MKey,
-            };
+                {
+                    vid = Inv.Category,
+                    Vno = Inv.InvNo,
+                    lk = Inv.Printable,
+                    lk2 = Inv.Printable,
+                    Ref = Inv.Reference,
+                    dmode = (int)Inv.LD,
+                    propKey = Inv.MKey,
+                };
             file = await Api.GetMixSchemeInvoiceReport(inp, Serial);
         }
         if (file is not null)
@@ -182,8 +197,8 @@
             }
             else
             {
-                await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
-                //await Js.SaveAs(file.FileName, file.File);
+                //await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
+                await Js.SaveAs(file.FileName, file.File);
                 disabled = false;
                 MudDialog.Close(DialogResult.Ok(""));
             }
@@ -191,9 +206,9 @@
         else
         {
             disabled = false;
-                MudDialog.Close(DialogResult.Cancel());
+            MudDialog.Close(DialogResult.Cancel());
         }
-        
+
     }
     void Cancel() => MudDialog.Cancel();
 }

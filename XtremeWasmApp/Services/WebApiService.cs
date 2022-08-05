@@ -118,7 +118,12 @@ namespace XtremeWasmApp.Services
             var res = await SendHttpRequest<ResultSet<List<Transaction?>?>>($"api/Transactions/GetVouchersInvView/{cdRel.rCode}/{Mkey}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
             return res?.ResultObj;
         }
-
+        public async Task<IList<BookSaleResponse?>?> GetBookSale()
+        {
+            var CdRel = await GetCdrel().ConfigureAwait(false);
+            var res = await SendHttpRequest<ResultSet<List<BookSaleResponse?>?>>($"api/Inv/GetBookSale/{CdRel.rCode}", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+            return res?.ResultObj;
+        }
         private async Task<T?> SendHttpRequest<T>(string URL, RequestType type, object? objPost = null!, LinkType linkType = LinkType.Login)
         {
             try
