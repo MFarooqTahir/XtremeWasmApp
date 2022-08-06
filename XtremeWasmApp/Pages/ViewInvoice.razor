@@ -124,20 +124,11 @@
             Reference=Ref,
             LD=limDem,
         };
-        var rep = x switch
+        var rep = Category switch
         {
-           (Cat:"1SL",l:LimDem.L) =>"mix",
-            (Cat:"1SL",l:LimDem.D) =>"mix",
-            (Cat:"1SM",l:LimDem.L) =>"sch",
-            (Cat:"1SM",l:LimDem.D) =>"sch",
-            (Cat:"1PS",l:LimDem.L) =>"per",
-            (Cat:"1PS",l:LimDem.D) =>"per",
-            (Cat:"2PR",l:LimDem.L) =>"mix",
-            (Cat:"2PR",l:LimDem.D) =>"mix",
-            (Cat:"2SM",l:LimDem.L) =>"sch",
-            (Cat:"2SM",l:LimDem.D) =>"sch",
-            (Cat:"2PS",l:LimDem.L) =>"per",
-            (Cat:"2PS",l:LimDem.D) =>"per",
+            "1SL" or "2PR"=>"mix",
+            "1SM" or "2SM"=>"sch",
+            "1PS" or "2PS"=>"per",
             _=>""
         };
         var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["RepType"]=rep,["showrep"]=repeatData.RelationPrint};

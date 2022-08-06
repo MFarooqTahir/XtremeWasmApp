@@ -1,0 +1,155 @@
+﻿@page "/Win"
+<style>
+    tfoot tr {
+        background-color: var(--mud-palette-surface);
+    }
+
+        tfoot tr td {
+            border-top: 1px solid var(--mud-palette-table-lines);
+            background-color: var(--mud-palette-surface);
+            position: sticky;
+            bottom: 0;
+        }
+
+    tbody tr td {
+        text-align: center;
+    }
+
+    thead tr th {
+        text-align: center;
+    }
+</style>
+@inject WebApiService Api
+
+<AuthorizeView>
+    <Authorized>
+        <h3 style="text-align:center;">Win Prize</h3>
+        <div align-center style="max-width:650px;margin: auto;">
+            @if (SourceList?.Any() == true)
+            {
+                if (SaleList?.Any() == true)
+                {
+                    
+                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">Sale</MudText>
+                    <MudSimpleTable Striped="true" Hover="true" Outlined="true" Bordered="true" FixedHeader="true" Style="max-height:300px;margin-top:5px;overflow-y:auto" Class="rounded-0">
+                        <thead>
+                            <tr>
+                                <th>Inv</th>
+                                <th>Cat</th>
+                                <th>Digit</th>
+                                <th>1<sup>st</sup></th>
+                                <th>2<sup>nd</sup></th>
+                                <th>Prize</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var TransSearchItem in SaleList)
+                            {
+                                <tr>
+                                    <td>@TransSearchItem?.Vno.ToString("D4")</td>
+                                    <td>@ToCategory(TransSearchItem?.Vid)</td>
+                                    <td>@TransSearchItem?.Pkt</td>
+                                    <td>@TransSearchItem?.Prize1</td>
+                                    <td>@TransSearchItem?.Prize2</td>
+                                    <td>@TransSearchItem?.Win_Amt</td>
+                                </tr>
+                            }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>@SaleList.Sum(x=>x?.Win_qty)</td>
+                        </tr>
+                    </tfoot>
+                </MudSimpleTable>
+                </MudPaper>
+                }
+                if (PurchaseList?.Any() == true)
+                {
+                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">Purchase</MudText>
+                    <MudSimpleTable Striped="true" Hover="true" Outlined="true" Bordered="true" FixedHeader="true" Style="max-height:300px;margin-top:5px;overflow-y:auto" Class="rounded-0">
+                        <thead>
+                            <tr>
+                                <th>Inv</th>
+                                <th>Cat</th>
+                                <th>Digit</th>
+                                <th>1<sup>st</sup></th>
+                                <th>2<sup>nd</sup></th>
+                                <th>Prize</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var TransSearchItem in PurchaseList)
+                            {
+                                <tr>
+                                    <td>@TransSearchItem?.Vno.ToString("D4")</td>
+                                    <td>@ToCategory(TransSearchItem?.Vid)</td>
+                                    <td>@TransSearchItem?.Pkt</td>
+                                    <td>@TransSearchItem?.Prize1</td>
+                                    <td>@TransSearchItem?.Prize2</td>
+                                    <td>@TransSearchItem?.Win_Amt</td>
+                                </tr>
+                            }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>@PurchaseList.Sum(x=>x?.Win_qty)</td>
+                        </tr>
+                    </tfoot>
+                </MudSimpleTable>
+                </MudPaper>
+                }
+            }
+            else
+            {
+                @if (isloading)
+                {
+                    <MudText Typo="Typo.h4">Loading</MudText>
+
+                }
+                else if (!initale)
+                {
+                    <MudText Typo="Typo.h4">No Results</MudText>
+
+                }
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    public IList<WinPrizeResponse?>? SourceList { get; set; }
+    public IList<WinPrizeResponse?>? SaleList { get; set; }
+    public IList<WinPrizeResponse?>? PurchaseList { get; set; }
+    bool initale = true;
+    bool isloading;
+    protected async override Task OnInitializedAsync()
+    {
+        initale = false;
+        isloading = true;
+        SourceList = await Api.GetWinPrize();
+        SaleList = SourceList?.Where(x => x.Vid.StartsWith("1"))?.ToList();
+        PurchaseList = SourceList?.Where(x => x.Vid.StartsWith("2"))?.ToList();
+        isloading = false;
+    }
+    private string ToCategory(string? Vid) => Vid switch
+    {
+        "1SL" or "2PR" => "mix",
+        "1SM" or "2SM" => "sch",
+        "1PS" or "2PS" => "per",
+        _ => ""
+    };
+}
