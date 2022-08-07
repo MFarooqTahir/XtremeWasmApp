@@ -4,7 +4,7 @@ namespace XtremeWasmApp.Models
 {
     public class RoundWinModel
     {
-        public DtReturn? DReturn;
+        public DtReturnString? DReturn;
         public string? comp;
         public string? uid;
         public string? Code;

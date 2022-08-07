@@ -199,14 +199,14 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    if (Rate > 0 && (await Api.GetCurrentBalance() - (Prize1 + Prize2)) < 0)
+                    if (Rate > 0 && (await Api.GetCurrentBalance() - ((Prize1 ?? 0) + (Prize2 ?? 0))) < 0)
                     {
                         await showDialog("Limit Exceeded", "");
                     }
                     else
                     {
-                        Digits.Throw().IfNullOrWhiteSpace(x => x);
-                        if (Digits.Length != 3 && Digits.Length != 4)
+                        Digits?.Throw().IfNullOrWhiteSpace(x => x);
+                        if (Digits?.Length != 3 && Digits?.Length != 4)
                         {
                             await showDialog("Invalid Digit", "");
                         }

@@ -196,6 +196,49 @@ namespace XtremeWasmApp.Services
         //{
         //return await js.SaveAs(fileInfo?.FileName ?? "", fileInfo?.File ?? Array.Empty<byte>()).ConfigureAwait(false);
         //}
+        public async Task<FileReturnModel?> GetRoundWinReport()
+        {
+            try
+            {
+                var cdRel = await GetCdrel();
+                var dt = await SendHttpRequest<ResultSet<DtReturn>>($"api/Inv/Checker/{cdRel.rCode}/33/1/ /0", RequestType.Get, linkType: LinkType.Invoice).ConfigureAwait(false);
+                if (dt is not null && (dt.ResultObj?.Row?.Count == 0))
+                {
+                    return new()
+                    {
+                        FileName = "Error: No Records",
+                        File = null,
+
+                    };
+                }
+
+                var comp = await GetCompany().ConfigureAwait(false);
+                var party = await GetParty().ConfigureAwait(false);
+                var sch = await GetSch().ConfigureAwait(false);
+                RoundWinModel? model = new()
+                {
+                    DReturn = dt?.ResultObj?.ToStringArrayRows(),
+
+                    Code = party.Code,
+                    Name = party.Name,
+                    Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),
+                    Ld2 = sch.BId,
+                    Ld2c = sch.Cat,
+                    Ld3 = sch.Date.ToShortDateString(),
+                    Ld4 = sch.City,
+                    Osver = "Web Application { PBTS.Net } Version 1.1.2022",
+                    mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
+                    comp = comp?.Pcode,
+                    uid = cdRel.UName,
+
+                };
+                return await SendHttpRequest<FileReturnModel?>("api/Reporting/RoundWinBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
         public async Task<FileReturnModel?> GetMixInvoiceSerialReport(Inventory inv, bool IsSerial)
         {
             try

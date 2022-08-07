@@ -1,26 +1,46 @@
-﻿@*@page "/Win"*@
+﻿@page "/Win"
 @inject WebApiService Api
 
 <AuthorizeView>
     <Authorized>
-        <h3>WinPrizeReport</h3>
         <h3 style="text-align:center;">Win Prize</h3>
-        @*<div align-center style="max-width:650px;margin: auto;">
-            @if (pdf is not null && pdf.Length > 0)
-                if (isloading)
+        <div align-center style="max-width:650px;margin: auto;">
+            
+            @if (report?.File?.Length> 0)
+            {
+
+            }
+            else
+            {
+                if (IsLoading)
                 {
                     <MudText Typo="Typo.h4">Loading</MudText>
 
                 }
-                else if (!initale)
+                else if (!Initale)
                 {
                     <MudText Typo="Typo.h4">No Results</MudText>
 
                 }
-                }
-        </div>*@
+            }
+        </div>
     </Authorized>
 </AuthorizeView>
 @code {
-    private byte[]? pdf = Array.Empty<byte>();
+    bool IsLoading = false;
+    bool Initale = true;
+    FileReturnModel report = null;
+    protected override async Task OnInitializedAsync()
+    {
+        Initale = false;
+        IsLoading = true;
+        try
+        {
+            report = await Api?.GetRoundWinReport();
+         }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
 }
