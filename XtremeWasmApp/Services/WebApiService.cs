@@ -711,7 +711,7 @@ namespace XtremeWasmApp.Services
             await SetParty(part).ConfigureAwait(false);
             cdrel.Limit = amt;
             await SetCdrel(cdrel).ConfigureAwait(false);
-            var bal = amt - amt2;
+            var bal = amt + amt2;
 
             await SetCurrentBalance(bal).ConfigureAwait(false);
             if (amt > 0)
