@@ -223,7 +223,9 @@ namespace XtremeWasmApp.Pages
                 try
                 {
                     int currbalance = await Api.GetCurrentBalance();
-                    if ((Editmode || ((Prize1 ?? 0) > 0 && (Prize2 ?? 0) > 0)) && (currbalance - (Prize1 + Prize2)) < 0)
+                    int inbal = currbalance - ((Prize1 ?? 0) + (Prize2 ?? 0));
+                    bool inballess = inbal < 0;
+                    if ((Editmode || ((Prize1 ?? 0) >= 0 && (Prize2 ?? 0) >= 0)) && inballess)
                     {
                         await showDialog("Limit Exceeded", "");
                     }

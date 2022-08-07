@@ -20,7 +20,7 @@ namespace XtremeModels
         public DtReturnString ToStringArrayRows()
         {
             return new DtReturnString()
-            { Columns = Columns, Row = Row?.Select(x => x?.Select(y => y?.ToString())) };
+            { Columns = Columns, Row = Row?.Select(x => x?.Select(y => y?.ToString())?.ToList())?.ToList() };
 
         }
     }
@@ -28,7 +28,7 @@ namespace XtremeModels
     {
 
         public IList<string> Columns { get; set; }
-        public IEnumerable<IEnumerable<string?>?> Row { get; set; }
+        public List<List<string?>?>? Row { get; set; }
 
         public DataTable ToTable()
         {

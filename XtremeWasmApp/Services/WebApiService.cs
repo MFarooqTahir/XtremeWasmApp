@@ -232,7 +232,9 @@ namespace XtremeWasmApp.Services
                     uid = cdRel.UName,
 
                 };
-                return await SendHttpRequest<FileReturnModel?>("api/Reporting/RoundWinBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+                var convert = JsonConvert.SerializeObject(model.DReturn);
+                var res = await SendHttpRequest<FileReturnModel?>("api/Reporting/RoundWinBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+                return res;
             }
             catch (Exception ex)
             {
