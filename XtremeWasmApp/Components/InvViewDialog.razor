@@ -82,6 +82,11 @@
             <MudText>No Entries</MudText>
 
         }
+        @* @if (pdf is not null && pdf.Length > 0)
+            {
+                <iframe src=@("data:application/pdf;base64,"+Convert.ToBase64String(pdf))>
+                </iframe>
+            }*@
         @if (showrep)
         {
             <MudRadioGroup @bind-SelectedOption="@Serial">
@@ -146,6 +151,7 @@
     public string status = "";
     private CultureInfo Curr = new CultureInfo("hi-IN");
     private NumberFormatInfo numberFormat { get; set; }
+    //private byte[]? pdf = Array.Empty<byte>();
     protected override void OnInitialized()
     {
         numberFormat = Curr.NumberFormat;
@@ -197,9 +203,11 @@
             }
             else
             {
+                //pdf = file.File;
                 //await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
                 await Js.SaveAs(file.FileName, file.File);
                 disabled = false;
+                await InvokeAsync(StateHasChanged);
                 MudDialog.Close(DialogResult.Ok(""));
             }
         }

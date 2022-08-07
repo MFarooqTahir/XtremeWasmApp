@@ -222,7 +222,8 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    if (Prize1 is not null && Prize2 is not null && (Editmode || (Prize1 > 0 && Prize2 > 0)) && (await Api.GetCurrentBalance() - Prize1 + Prize2) < 0)
+                    int currbalance = await Api.GetCurrentBalance();
+                    if (Prize1 is not null && Prize2 is not null && (Editmode || (Prize1 > 0 && Prize2 > 0)) && (currbalance - (Prize1 + Prize2)) < 0)
                     {
                         await showDialog("Limit Exceeded", "");
                     }

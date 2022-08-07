@@ -199,7 +199,7 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    if (Rate > 0 && (await Api.GetCurrentBalance() - Prize1 + Prize2) < 0)
+                    if (Rate > 0 && (await Api.GetCurrentBalance() - (Prize1 + Prize2)) < 0)
                     {
                         await showDialog("Limit Exceeded", "");
                     }

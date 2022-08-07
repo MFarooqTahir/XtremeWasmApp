@@ -5,15 +5,20 @@
 <MudDialog>
     <DialogContent>
         <div style="margin-left:auto;margin-right:auto">
-       <MudRadioGroup @bind-SelectedOption="@Serial">
-           @if(disabled)
-           {
-               <MudText>Downloading report please wait...</MudText>
-           }
-            <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
-            <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Serial</MudRadio>
-            <hr />
-        </MudRadioGroup>
+            <MudRadioGroup @bind-SelectedOption="@Serial">
+                @if (disabled)
+                {
+                    <MudText>Downloading report please wait...</MudText>
+                }
+                <MudRadio Disabled="@disabled" Option="true" UnCheckedColor="Color.Surface" Color="Color.Warning">Serial</MudRadio>
+                <MudRadio Disabled="@disabled" Option="false" UnCheckedColor="Color.Surface" Color="Color.Warning">Un-Serial</MudRadio>
+                <hr />
+            </MudRadioGroup>
+           @* @if (pdf is not null && pdf.Length > 0)
+            {
+                <iframe src=@("data:application/pdf;base64,"+Convert.ToBase64String(pdf))>
+                </iframe>
+            }*@
         </div>
     </DialogContent>
     <DialogActions>
@@ -24,15 +29,20 @@
 
 @code {
     [Inject]
-public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-    [CascadingParameter] 
+    public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+    [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     [Parameter]
-    public Inventory? Inv{ get; set; }
+    public Inventory? Inv { get; set; }
     [Parameter]
-    public bool IsMixScheme{ get; set; }
-    public bool disabled{ get; set; }
-    public bool Serial { get; set; }
+    public bool IsMixScheme { get; set; }
+    public bool disabled { get; set; }
+    public bool Serial
+    {
+        get; set;
+    }
+    //private byte[] pdf = Array.Empty<byte>();
+
     async void Submit()
     {
         disabled = true;
@@ -54,8 +64,9 @@ public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
             }
             else
             {
+                //pdf = file.File;
                 //await BlazorDownloadFileService.DownloadFileAsync(file.FileName??"", file.File??Array.Empty<byte>());
-                await Js.SaveAs(file.FileName, file.File);
+        await Js.SaveAs(file.FileName, file.File);
                 disabled = false;
                 MudDialog.Close(DialogResult.Ok(""));
             }
@@ -67,4 +78,4 @@ public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
         }
     }
     void Cancel() => MudDialog.Cancel();
-}
+    }}

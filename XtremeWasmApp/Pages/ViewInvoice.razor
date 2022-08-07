@@ -13,16 +13,21 @@
                 {
                     <MudText Align="Align.Center">Loading...</MudText>
                 }
+
                 else
                 {
 
+                    if (isDisabled)
+                    {
+                        <MudText Align="Align.Center">Loading invoice...</MudText>
 
+                    }
                     <div class="d-flex">
-                        <MudButton Class="mx-auto my-2" Color="Color.Surface" Variant="Variant.Filled" OnClick="@ChangeFilter">@CurrText</MudButton>
+                        <MudButton Disabled="@isDisabled" Class="mx-auto my-2" Color="Color.Surface" Variant="Variant.Filled" OnClick="@ChangeFilter">@CurrText</MudButton>
                     </div>
                     @if (InvList.Any())
                     {
-                        <MudSimpleTable Striped="true" Dense="true" Hover="true" Bordered="true" FixedHeader="true" Style="height:450px;margin-top:5px;" Class="rounded-0">
+                        <MudSimpleTable Disabled="@isDisabled" Striped="true" Dense="true" Hover="true" Bordered="true" FixedHeader="true" Style="height:450px;margin-top:5px;" Class="rounded-0">
                             <thead>
                                 <tr>
                                     <th style="background-color: #ffe4b5;color:black;"><b>L/D</b></th>
@@ -60,8 +65,9 @@
 </AuthorizeView>
 
 @code {
+    bool isDisabled;
     [CascadingParameter]
-        public RepeatDataReturnWA repeatData { get; set; }
+    public RepeatDataReturnWA repeatData { get; set; }
     IList<InvoiceViewItem> InvList => ShowPurchase ? InvListPurchase ??= new List<InvoiceViewItem>() : InvListSale ??= new List<InvoiceViewItem>();
     IList<InvoiceViewItem> InvListSale { get; set; }
     IList<InvoiceViewItem> InvListPurchase { get; set; }
@@ -84,60 +90,73 @@
     }
     public record Order(string Cat, LimDem l);
 
-    private async Task ShowInvoice(MouseEventArgs args, int Mkey,int InvNo,string Ref,bool Printable,string Category,LimDem limDem)
+    private async Task ShowInvoice(MouseEventArgs args, int Mkey, int InvNo, string Ref, bool Printable, string Category, LimDem limDem)
     {
-        var data = await Api.GetInvoiceDetails(Mkey);
-        var cDRel = await Api.GetCdrel();
-        var AddRate = Category switch
+        try
         {
-            "1SM" or "2SM" or "1PS" or "2PS"=>true,
-            _=>false
-        };
-        var pr = Category switch
-        {
-            "1PS" or "2PS"=>true,
-            _=>false
-        };
-        var x = new Order(Category, limDem);
-        string Title=  x switch
-        {
-            (Cat:"1SL",l:LimDem.L) =>"Mix Sale ( Limit )",
-            (Cat:"1SL",l:LimDem.D) =>"Mix Sale ( Demand )",
-            (Cat:"1SM",l:LimDem.L) =>"Scheme Sale ( Limit )",
-            (Cat:"1SM",l:LimDem.D) =>"Scheme Sale ( Demand )",
-            (Cat:"1PS",l:LimDem.L) =>"Scheme % Sale ( Limit )",
-            (Cat:"1PS",l:LimDem.D) =>"Scheme % Sale ( Demand )",
-            (Cat:"2PR",l:LimDem.L) =>"Mix Purchase ( Limit )",
-            (Cat:"2PR",l:LimDem.D) =>"Mix Purchase ( Demand )",
-            (Cat:"2SM",l:LimDem.L) =>"Scheme Purchase ( Limit )",
-            (Cat:"2SM",l:LimDem.D) =>"Scheme Purchase ( Demand )",
-            (Cat:"2PS",l:LimDem.L) =>"Scheme % Purchase ( Limit )",
-            (Cat:"2PS",l:LimDem.D) =>"Scheme % Purchase ( Demand )",
-            _=>""
-        };
-        var inv = new InvoiceViewItem()
-        {
-            MKey=Mkey,
-            Category=Category,
-            Printable=Printable,
-            InvNo=InvNo,
-            Reference=Ref,
-            LD=limDem,
-        };
-        var rep = Category switch
-        {
-            "1SL" or "2PR"=>"mix",
-            "1SM" or "2SM"=>"sch",
-            "1PS" or "2PS"=>"per",
-            _=>""
-        };
-        var parameters = new DialogParameters { ["AllItems"]=data,["InvNo"]= InvNo,["Code"]=cDRel.rCode,["Ref"]=Ref,["Printable"]=Printable,["AddRate"]=AddRate,["pr"]=pr, ["Inv"]=inv,["RepType"]=rep,["showrep"]=repeatData.RelationPrint};
+            isDisabled = true;
+            await InvokeAsync(StateHasChanged);
+            var data = await Api.GetInvoiceDetails(Mkey);
+            var cDRel = await Api.GetCdrel();
+            var AddRate = Category switch
+            {
+                "1SM" or "2SM" or "1PS" or "2PS" => true,
+                _ => false
+            };
+            var pr = Category switch
+            {
+                "1PS" or "2PS" => true,
+                _ => false
+            };
+            var x = new Order(Category, limDem);
+            string Title = x switch
+            {
+                (Cat: "1SL", l: LimDem.L) => "Mix Sale ( Limit )",
+                (Cat: "1SL", l: LimDem.D) => "Mix Sale ( Demand )",
+                (Cat: "1SM", l: LimDem.L) => "Scheme Sale ( Limit )",
+                (Cat: "1SM", l: LimDem.D) => "Scheme Sale ( Demand )",
+                (Cat: "1PS", l: LimDem.L) => "Scheme % Sale ( Limit )",
+                (Cat: "1PS", l: LimDem.D) => "Scheme % Sale ( Demand )",
+                (Cat: "2PR", l: LimDem.L) => "Mix Purchase ( Limit )",
+                (Cat: "2PR", l: LimDem.D) => "Mix Purchase ( Demand )",
+                (Cat: "2SM", l: LimDem.L) => "Scheme Purchase ( Limit )",
+                (Cat: "2SM", l: LimDem.D) => "Scheme Purchase ( Demand )",
+                (Cat: "2PS", l: LimDem.L) => "Scheme % Purchase ( Limit )",
+                (Cat: "2PS", l: LimDem.D) => "Scheme % Purchase ( Demand )",
+                _ => ""
+            };
+            var inv = new InvoiceViewItem()
+                {
+                    MKey = Mkey,
+                    Category = Category,
+                    Printable = Printable,
+                    InvNo = InvNo,
+                    Reference = Ref,
+                    LD = limDem,
+                };
+            var rep = Category switch
+            {
+                "1SL" or "2PR" => "mix",
+                "1SM" or "2SM" => "sch",
+                "1PS" or "2PS" => "per",
+                _ => ""
+            };
+            var parameters = new DialogParameters { ["AllItems"] = data, ["InvNo"] = InvNo, ["Code"] = cDRel.rCode, ["Ref"] = Ref, ["Printable"] = Printable, ["AddRate"] = AddRate, ["pr"] = pr, ["Inv"] = inv, ["RepType"] = rep, ["showrep"] = repeatData.RelationPrint };
 
-        var dialog = DialogService.Show<InvViewDialog>(Title, parameters,new DialogOptions() 
-        { 
-            MaxWidth = MaxWidth.Small, FullWidth = true,CloseButton=true,CloseOnEscapeKey=true
+            var dialog = DialogService.Show<InvViewDialog>(Title, parameters, new DialogOptions()
+                {
+                    MaxWidth = MaxWidth.Small,
+                    FullWidth = true,
+                    CloseButton = true,
+                    CloseOnEscapeKey = true
+                }
+            );
         }
-        );
+        finally
+        {
+            isDisabled = false;
+            await InvokeAsync(StateHasChanged);
+        }
     }
     private void ChangeFilter(MouseEventArgs args)
     {
