@@ -10,9 +10,12 @@
             <br />
             @if (report?.File?.Length > 0)
             {
-                string pd="data:application/pdf;base64,"+Convert.ToBase64String(report?.File??Array.Empty<byte>());
-                <object style="height:700px;width:100%;margin-top:25px;" data=@pd>
-                </object>
+                string pd = "data:application/pdf;base64," + Convert.ToBase64String(report?.File ?? Array.Empty<byte>());
+                <div style="overflow: auto; -webkit-overflow-scrolling: touch;">
+                    <object style="height:700px;width:100%;margin-top:25px;" data=@pd type="application/pdf">
+                        Cannot Display pdf file
+                    </object>
+                </div>
             }
             else
             {
@@ -41,7 +44,7 @@
         try
         {
             report = await Api?.GetRoundWinReport();
-            if (report?.File is null ||report.File.Length==0)
+            if (report?.File is null || report.File.Length == 0)
             {
                 report = null;
             }
@@ -58,7 +61,7 @@
         {
             if (report is not null)
             {
-                await Js.SaveAs(report?.FileName??"", report?.File??Array.Empty<byte>());
+                await Js.SaveAs(report?.FileName ?? "", report?.File ?? Array.Empty<byte>());
             }
         }
         finally
