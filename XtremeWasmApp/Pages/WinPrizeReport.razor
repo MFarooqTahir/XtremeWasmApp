@@ -13,7 +13,7 @@
                 string pd = "data:application/pdf;base64," + Convert.ToBase64String(report?.File ?? Array.Empty<byte>());
                 <div style="overflow: auto; -webkit-overflow-scrolling: touch;">
                     <object style="height:700px;width:100%;margin-top:25px;" data=@pd type="application/pdf">
-                        Cannot Display pdf file
+                        <embed data=@pd type="application/pdf" style="height:700px;width:100%;margin-top:25px;" >
                     </object>
                 </div>
             }
