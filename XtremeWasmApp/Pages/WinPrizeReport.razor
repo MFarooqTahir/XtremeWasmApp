@@ -5,17 +5,17 @@
     <Authorized>
         <h3 style="text-align:center;">Win Prize</h3>
         <div align-center style="max-width:725px;margin: auto;">
-            <MudButton Disabled="@(IsLoading || report is null || report?.File?.Length==0)" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+            <MudButton Disabled="@(IsLoading || report is null || report?.File?.Length==0)" Class="mx-auto" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
             <br />
             @if (report?.File?.Length > 0)
             {
                 string pd = "data:application/pdf;base64," + Convert.ToBase64String(report?.File ?? Array.Empty<byte>());
                 <div style="overflow: auto; -webkit-overflow-scrolling: touch;">
-                    <object style="min-height:700px;max-height:100%;width:100%;margin-top:25px;background:White;" data=@pd type="application/pdf">
+                    @*<object style="min-height:700px;max-height:100%;width:100%;margin-top:25px;background:White;" data=@pd type="application/pdf">*@
                         <iframe style="min-height:700px;max-height:100%;width:100%;margin-top:25px;background:White;" src=@pd frameborder="0">
                             Browser doesnt support pdf viewer, download and view pdf
                             </iframe>
-                    </object>
+                    @*</object>*@
                 </div>
             }
             else
