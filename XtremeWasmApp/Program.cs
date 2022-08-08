@@ -40,6 +40,8 @@ CultureInfo.CurrentCulture = Curr;
 CultureInfo.CurrentUICulture = Curr;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
+
+
 builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddLoadingBar(o => o.LoadingBarColor = "linear-gradient(90deg, rgba(227,0,0,1) 0%, rgba(37,33,98,1) 100%)");
 builder.Services.AddScoped(_ => HttpDataVar);
