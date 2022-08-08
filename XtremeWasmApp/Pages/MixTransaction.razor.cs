@@ -398,6 +398,7 @@ namespace XtremeWasmApp.Pages
                 }
                 else
                 {
+                    Digits = Digits.Replace('+', 'X').ToUpperInvariant();
                     var ret = await Api.PktCheck((CurrentDigit + Digits).ToUpperInvariant());
                     if (ret is not null)
                     {

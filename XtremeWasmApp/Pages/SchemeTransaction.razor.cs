@@ -360,6 +360,8 @@ namespace XtremeWasmApp.Pages
                 }
                 else
                 {
+                    Digits = Digits.Replace('+', 'X').ToUpperInvariant();
+
                     var ret = await Api.PktCheck(Digits);
                     if (ret is not null)
                     {
