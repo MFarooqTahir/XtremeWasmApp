@@ -7,11 +7,12 @@
         <h3 style="text-align:center;">Win Prize</h3>
         <div align-center style="max-width:725px;margin: auto;">
             <MudButton Disabled="@(IsLoading || report is null || report?.File?.Length==0)" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
-
+            <br />
             @if (report?.File?.Length > 0)
             {
-                <iframe style="height:700px;margin-top:25px;" src=@("data:application/pdf;base64,"+Convert.ToBase64String(report?.File??Array.Empty<byte>()))>
-                </iframe>
+                string pd="data:application/pdf;base64,"+Convert.ToBase64String(report?.File??Array.Empty<byte>());
+                <object style="height:700px;width:100%;margin-top:25px;" data=@pd>
+                </object>
             }
             else
             {
