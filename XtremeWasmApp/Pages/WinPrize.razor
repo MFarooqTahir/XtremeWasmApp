@@ -1,4 +1,4 @@
-﻿@*@page "/Win"*@
+﻿@page "/Win"
 <style>
     tfoot tr {
         background-color: var(--mud-palette-surface);
@@ -21,108 +21,113 @@
 </style>
 @inject WebApiService Api
 
+@inject IJSRuntime Js
 <AuthorizeView>
     <Authorized>
-        <h3 style="text-align:center;">Win Prize</h3>
+        <MudStack Row="true">
+            <h3 style="margin-left:auto" class="my-auto">Win Prize</h3><MudButton Disabled="@isloading" Class="me-auto" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+        </MudStack>
+        <br />
         <div align-center style="max-width:650px;margin: auto;">
             @if (SourceList?.Any() == true)
             {
                 if (SaleList?.Any() == true)
                 {
-                    
-                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
-                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">Sale</MudText>
-                    <MudSimpleTable  Hover="true" Outlined="true" Bordered="true" FixedHeader="true" Style="max-height:300px;margin-top:5px;overflow-y:auto" Class="rounded-0">
-                        <thead>
-                            <tr>
-                                <th>Inv</th>
-                                <th>Cat</th>
-                                <th>Digit</th>
-                                <th>1<sup>st</sup></th>
-                                <th>2<sup>nd</sup></th>
-                                <th>Prize</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var TransSearchItem in SaleList)
-                            {
-                                <tr>
-                                    <td>@TransSearchItem?.Vno.ToString("D4")</td>
-                                    <td>@ToCategory(TransSearchItem?.Vid)</td>
-                                    <td>@TransSearchItem?.Pkt</td>
-                                    <td>@TransSearchItem?.Prize1</td>
-                                    <td>@TransSearchItem?.Prize2</td>
-                                    <td>@TransSearchItem?.Win_Amt</td>
-                                </tr>
-                            }
 
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>@SaleList.Sum(x=>x?.Win_qty)</td>
-                        </tr>
-                    </tfoot>
-                </MudSimpleTable>
-                </MudPaper>
+                    <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
+                        <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">Sale Prize</MudText>
+                        <MudSimpleTable Hover="true" Outlined="true" Bordered="true" FixedHeader="true" Style="max-height:300px;margin-top:5px;overflow-y:auto" Class="rounded-0">
+                            <thead style="background-color: #ffe4b5;color:black;">
+                                <tr>
+                                    <th style="background-color: #ffe4b5;">Inv #</th>
+                                    <th style="background-color: #ffe4b5;">Cat</th>
+                                    <th style="background-color: #ffe4b5;">Digit</th>
+                                    <th style="background-color: #ffe4b5;text-align:right;">1<sup>st</sup></th>
+                                    <th style="background-color: #ffe4b5;text-align:right;">2<sup>nd</sup></th>
+                                    <th style="background-color: #ffe4b5;text-align:right;">Prize</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var TransSearchItem in SaleList)
+                                {
+                                    <tr>
+                                        <td>@TransSearchItem?.Vno.ToString("D4")</td>
+                                        <td>@ToCategory(TransSearchItem?.Vid)</td>
+                                        <td>@TransSearchItem?.Pkt</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1)</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2)</td>
+                                        <td style="text-align:right;">@TransSearchItem?.Win_Amt</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right;"></td>
+                                    <td style="text-align:right;"></td>
+                                    <td style="text-align:right;">@SaleList.Sum(x=>x?.Win_Amt)</td>
+                                </tr>
+                            </tfoot>
+                        </MudSimpleTable>
+                    </MudPaper>
                 }
                 if (PurchaseList?.Any() == true)
                 {
                     <MudPaper Style="background-color:transparent;padding-right:5px;padding-left:5px; padding-bottom:5px; margin-top:10px;" Outlined="true">
-                    <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">Purchase</MudText>
-                    <MudSimpleTable  Hover="true" Outlined="true" Bordered="true" FixedHeader="true" Style="max-height:300px;margin-top:5px;overflow-y:auto" Class="rounded-0">
-                        <thead>
-                            <tr>
-                                <th>Inv</th>
-                                <th>Cat</th>
-                                <th>Digit</th>
-                                <th>1<sup>st</sup></th>
-                                <th>2<sup>nd</sup></th>
-                                <th>Prize</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var TransSearchItem in PurchaseList)
-                            {
-                                <tr>
-                                    <td>@TransSearchItem?.Vno.ToString("D4")</td>
-                                    <td>@ToCategory(TransSearchItem?.Vid)</td>
-                                    <td>@TransSearchItem?.Pkt</td>
-                                    <td>@TransSearchItem?.Prize1</td>
-                                    <td>@TransSearchItem?.Prize2</td>
-                                    <td>@TransSearchItem?.Win_Amt</td>
-                                </tr>
-                            }
+                        <MudText Align="Align.Center" Typo="Typo.h6" Style="margin-top:10px;">Purchase Prize</MudText>
+                        <MudSimpleTable Hover="true" Outlined="true" Bordered="true" FixedHeader="true" Style="max-height:300px;margin-top:5px;overflow-y:auto" Class="rounded-0">
+                            <thead style="background-color: #ffe4b5;color:black;">
 
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td>@PurchaseList.Sum(x=>x?.Win_qty)</td>
-                        </tr>
-                    </tfoot>
-                </MudSimpleTable>
-                </MudPaper>
+                                <tr>
+                                    <th style="background-color: #ffe4b5;">Inv #</th>
+                                    <th style="background-color: #ffe4b5;">Cat</th>
+                                    <th style="background-color: #ffe4b5;">Digit</th>
+                                    <th style="background-color: #ffe4b5;text-align:right;">1<sup>st</sup></th>
+                                    <th style="background-color: #ffe4b5;text-align:right;">2<sup>nd</sup></th>
+                                    <th style="background-color: #ffe4b5;text-align:right;">Prize</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var TransSearchItem in PurchaseList)
+                                {
+                                    <tr>
+                                        <td>@TransSearchItem?.Vno.ToString("D4")</td>
+                                        <td>@ToCategory(TransSearchItem?.Vid)</td>
+                                        <td>@TransSearchItem?.Pkt</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1)</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2)</td>
+                                        <td style="text-align:right;">@TransSearchItem?.Win_Amt</td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right;"></td>
+                                    <td style="text-align:right;"></td>
+                                    <td style="text-align:right;">@PurchaseList.Sum(x=>x?.Win_Amt)</td>
+                                </tr>
+                            </tfoot>
+                        </MudSimpleTable>
+                    </MudPaper>
                 }
             }
             else
             {
                 @if (isloading)
                 {
-                    <MudText Typo="Typo.h4">Loading</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h4">Loading</MudText>
 
                 }
                 else if (!initale)
                 {
-                    <MudText Typo="Typo.h4">No Results</MudText>
+                    <MudText Align="Align.Center" Typo="Typo.h4">No Results</MudText>
 
                 }
             }
@@ -135,6 +140,7 @@
     public IList<WinPrizeResponse?>? SaleList { get; set; }
     public IList<WinPrizeResponse?>? PurchaseList { get; set; }
     bool initale = true;
+    FileReturnModel report = null;
     bool isloading;
     protected async override Task OnInitializedAsync()
     {
@@ -147,9 +153,29 @@
     }
     private string ToCategory(string? Vid) => Vid switch
     {
-        "1SL" or "2PR" => "mix",
-        "1SM" or "2SM" => "sch",
-        "1PS" or "2PS" => "per",
+        "1SL" or "2PR" => "Mix",
+        "1SM" or "2SM" => "Sch",
+        "1PS" or "2PS" => "Per",
         _ => ""
     };
+    private async Task DownloadReport(MouseEventArgs args)
+    {
+        isloading = true;
+        try
+        {
+            report ??= await Api?.GetRoundWinReport();
+            if (report?.File is null || report.File.Length == 0)
+            {
+                report = null;
+            }
+            else
+            {
+                await Js.SaveAs(report?.FileName ?? "", report?.File ?? Array.Empty<byte>());
+            }
+        }
+        finally
+        {
+            isloading = false;
+        }
+    }
 }

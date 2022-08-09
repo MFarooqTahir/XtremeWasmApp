@@ -1,23 +1,116 @@
-﻿@page "/Win"
+﻿@*@page "/Win"*@
 @inject WebApiService Api
 @inject IJSRuntime Js
+@*<style>
+
+
+    #upload-button {
+        width: 150px;
+        display: block;
+        margin: 20px auto;
+    }
+
+    #file-to-upload {
+        display: none;
+    }
+
+    #pdf-main-container {
+        width: 400px;
+        margin: 20px auto;
+    }
+
+    #pdf-loader {
+        display: none;
+        text-align: center;
+        color: #999999;
+        font-size: 13px;
+        line-height: 100px;
+        height: 100px;
+    }
+
+    #pdf-contents {
+        display: none;
+    }
+
+    #pdf-meta {
+        overflow: auto;
+        margin: 0 0 20px 0;
+        width: 100%;
+    }
+
+    #pdf-buttons {
+        float: left;
+    }
+
+    #page-count-container {
+        float: right;
+    }
+
+    #pdf-current-page {
+        display: inline;
+    }
+
+    #pdf-total-pages {
+        display: inline;
+    }
+
+    #pdf-canvas {
+        border: 1px solid rgba(0,0,0,0.2);
+        box-sizing: border-box;
+        max-width: 600px;
+    }
+
+    #page-loader {
+        height: 100px;
+        line-height: 100px;
+        text-align: center;
+        display: none;
+        color: #999999;
+        font-size: 13px;
+    }
+
+    #download-image {
+        width: 150px;
+        display: block;
+        margin: 20px auto 0 auto;
+        font-size: 13px;
+        text-align: center;
+    }
+</style>*@
 <AuthorizeView>
     <Authorized>
-        
+
         <div align-center style="max-width:725px;margin: auto;">
-            <MudStack Row="true"><h3 style="margin-left:auto" class="my-auto">Win Prize</h3><MudButton Disabled="@(IsLoading || report is null || report?.File?.Length==0)" Class="me-auto" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+            <MudStack Row="true">
+                <h3 style="margin-left:auto" class="my-auto">Win Prize</h3><MudButton Disabled="@(IsLoading || report is null || report?.File?.Length==0)" Class="me-auto" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
             </MudStack>
             <br />
-            @if (report?.File?.Length > 0)
-            {
-                string pd = "data:application/pdf;base64," + Convert.ToBase64String(report?.File ?? Array.Empty<byte>());
-                <div style="overflow: auto; -webkit-overflow-scrolling: touch;">
-                    @*<object style="min-height:700px;max-height:100%;width:100%;margin-top:25px;background:White;" data=@pd type="application/pdf">*@
-                        <embed style="min-height:700px;max-height:100%;width:100%;margin-top:10px" src=@pd frameborder="0">
-                    @*</object>*@
-                </div>
-            }
-            else
+            @*@if (report?.File?.Length > 0)
+            {*@
+
+
+            <div style="overflow: auto; -webkit-overflow-scrolling: touch;">
+                <object style="min-height:700px;max-height:100%;width:100%;margin-top:25px;background:White;" data=@pd type="application/pdf">
+                    Cannot shwo report, Download and view.
+                   @* <div id="pdf-main-container">
+                        <div id="pdf-loader"></div>
+                        <div id="pdf-contents">
+                            <div class="mx-auto" id="pdf-meta">
+                                <div id="pdf-buttons">
+                                    <button id="pdf-prev">Previous</button>
+                                    <button id="pdf-next">Next</button>
+                                </div>
+                                <div id="page-count-container">Page <div id="pdf-current-page"></div> of <div id="pdf-total-pages"></div></div>
+                            </div>
+                            <canvas class="mx-auto" id="pdf-canvas"></canvas>
+                            <div id="page-loader"></div>
+                        </div>
+                    </div>*@
+                </object>
+            </div>
+            @*}
+            else*@
+            @if (report?.File?.Length == 0)
             {
                 if (IsLoading)
                 {
@@ -37,8 +130,11 @@
     bool IsLoading = false;
     bool Initale = true;
     FileReturnModel report = null;
+    string reportHtml = string.Empty;
+    string pd => "data:application/pdf;base64," + Convert.ToBase64String(report?.File ?? Array.Empty<byte>());
     protected override async Task OnInitializedAsync()
     {
+        //showPDF
         Initale = false;
         IsLoading = true;
         try
@@ -48,6 +144,10 @@
             {
                 report = null;
             }
+            //else
+            //{
+            //    await Js.InvokeVoidAsync("showPDF", report.File);
+            //}
         }
         finally
         {
@@ -69,4 +169,5 @@
             IsLoading = false;
         }
     }
+
 }
