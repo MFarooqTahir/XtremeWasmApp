@@ -830,7 +830,8 @@ namespace XtremeWasmApp.Services
 
         public async Task<bool> IsQtyUser()
         {
-            return (await GetCompany().ConfigureAwait(false)).Qtyuser;
+            var res = (await GetCompany().ConfigureAwait(false));
+            return res?.Qtyuser ?? false;
         }
 
         private async Task SetCompany(Company newCom)
