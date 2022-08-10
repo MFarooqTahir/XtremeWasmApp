@@ -1,4 +1,5 @@
 ﻿@page "/Win"
+@using System.Globalization
 <style>
     tfoot tr {
         background-color: var(--mud-palette-surface);
@@ -25,7 +26,7 @@
 <AuthorizeView>
     <Authorized>
         <MudStack Row="true">
-            <h3 style="margin-left:auto" class="my-auto">Win Prize</h3><MudButton Disabled="@isloading" Class="me-auto" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+            <h3 style="margin-left:auto" class="my-auto">Win Prize</h3><MudButton Disabled="@(isloading || SourceList is null || !SourceList.Any())" Class="me-auto" Color="Color.Success" OnClick="DownloadReport" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
         </MudStack>
         <br />
         <div align-center style="max-width:650px;margin: auto;">
@@ -54,21 +55,21 @@
                                         <td>@TransSearchItem?.Vno.ToString("D4")</td>
                                         <td>@ToCategory(TransSearchItem?.Vid)</td>
                                         <td>@TransSearchItem?.Pkt</td>
-                                        <td style="text-align:right;">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1)</td>
-                                        <td style="text-align:right;">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2)</td>
-                                        <td style="text-align:right;">@TransSearchItem?.Win_Amt</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1.ToString("C0",numberFormat))</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2.ToString("C0", numberFormat))</td>
+                                        <td style="text-align:right;">@TransSearchItem?.Win_Amt.ToString("C0",numberFormat)</td>
                                     </tr>
                                 }
 
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td style="text-align:right;"></td>
-                                    <td style="text-align:right;"></td>
-                                    <td style="text-align:right;">@SaleList.Sum(x=>x?.Win_Amt)</td>
+                                <tr style="background-color: var(--mud-palette-surface);">
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:right;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:right;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:right;">@((SaleList?.Sum(x=>x?.Win_Amt)??0).ToString("C0",numberFormat))</td>
                                 </tr>
                             </tfoot>
                         </MudSimpleTable>
@@ -97,21 +98,21 @@
                                         <td>@TransSearchItem?.Vno.ToString("D4")</td>
                                         <td>@ToCategory(TransSearchItem?.Vid)</td>
                                         <td>@TransSearchItem?.Pkt</td>
-                                        <td style="text-align:right;">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1)</td>
-                                        <td style="text-align:right;">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2)</td>
-                                        <td style="text-align:right;">@TransSearchItem?.Win_Amt</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1.ToString("C0", numberFormat))</td>
+                                        <td style="text-align:right;">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2.ToString("C0",numberFormat))</td>
+                                        <td style="text-align:right;">@TransSearchItem?.Win_Amt.ToString("C0",numberFormat)</td>
                                     </tr>
                                 }
 
                             </tbody>
                             <tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td style="text-align:right;"></td>
-                                    <td style="text-align:right;"></td>
-                                    <td style="text-align:right;">@PurchaseList.Sum(x=>x?.Win_Amt)</td>
+                                <tr style="background-color: var(--mud-palette-surface);">
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:right;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:right;"></td>
+                                    <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:right;">@((PurchaseList?.Sum(x => x?.Win_Amt) ?? 0).ToString("C0", numberFormat))</td>
                                 </tr>
                             </tfoot>
                         </MudSimpleTable>
@@ -139,16 +140,20 @@
     public IList<WinPrizeResponse?>? SourceList { get; set; }
     public IList<WinPrizeResponse?>? SaleList { get; set; }
     public IList<WinPrizeResponse?>? PurchaseList { get; set; }
+    private CultureInfo Curr = new CultureInfo("hi-IN");
+    private NumberFormatInfo numberFormat { get; set; }
     bool initale = true;
-    FileReturnModel report = null;
+    FileReturnModel? report = null;
     bool isloading;
     protected async override Task OnInitializedAsync()
     {
         initale = false;
+        numberFormat = Curr.NumberFormat;
+        numberFormat.CurrencySymbol = "";
         isloading = true;
         SourceList = await Api.GetWinPrize();
-        SaleList = SourceList?.Where(x => x.Vid.StartsWith("1"))?.ToList();
-        PurchaseList = SourceList?.Where(x => x.Vid.StartsWith("2"))?.ToList();
+        SaleList = SourceList?.Where(x => x?.Vid.StartsWith("1")??false)?.ToList();
+        PurchaseList = SourceList?.Where(x => x?.Vid.StartsWith("2")??false)?.ToList();
         isloading = false;
     }
     private string ToCategory(string? Vid) => Vid switch

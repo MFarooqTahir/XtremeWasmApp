@@ -16,7 +16,7 @@
     <MudText Align="Align.Center" Color="Color.Dark" Typo="Typo.h6" Style="margin-top:10px;background-color: #ffe4b5;"><b>@Title</b></MudText>
 
 
-  @*@if (sec)
+    @*@if (sec)
     {
         <MudStack Row="true" Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center">
         <MudSimpleTable Dense="true"  Hover="true" FixedHeader="true" Style="max-height:250px;overflow-y:auto;margin-top:5px;" Class="rounded-0 mx-0">
@@ -78,34 +78,34 @@
     }
     else
     {*@
-        <MudSimpleTable Dense="true" Outlined="true" Bordered="true"  Hover="true" FixedHeader="true" Style="max-height:250px;overflow-y:auto;margin-top:5px;" Class="rounded-0">
-            <thead>
+    <MudSimpleTable Dense="true" Outlined="true" Bordered="true" Hover="true" FixedHeader="true" Style="max-height:250px;overflow-y:auto;margin-top:5px;" Class="rounded-0">
+        <thead>
+            <tr>
+                <th style="text-align:center" class="ml-n5"><b>Digit</b></th>
+                <th style="text-align:center"><b>1<sup>st</sup> Amount</b></th>
+                <th style="text-align:center"><b>2<sup>nd</sup> Amount</b></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var TransSearchItem in SourceList)
+            {
                 <tr>
-                    <th style="text-align:center" class="ml-n5"><b>Digit</b></th>
-                    <th style="text-align:center"><b>1<sup>st</sup> Amount</b></th>
-                    <th style="text-align:center"><b>2<sup>nd</sup> Amount</b></th>
+                    <td style="text-align:center" class="ml-n1">@TransSearchItem.Pkt</td>
+                    <td style="text-align:center">@(TransSearchItem?.Prize1 == 0 ? "" : TransSearchItem?.Prize1.ToString("N0"))</td>
+                    <td style="text-align:center">@(TransSearchItem?.Prize2 == 0 ? "" : TransSearchItem?.Prize2.ToString("N0"))</td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var TransSearchItem in SourceList)
-                {
-                    <tr>
-                        <td style="text-align:center" class="ml-n1">@TransSearchItem.Pkt</td>
-                        <td style="text-align:center">@TransSearchItem?.Prize1.ToString("N0")</td>
-                        <td style="text-align:center">@TransSearchItem?.Prize2.ToString("N0")</td>
-                    </tr>
-                }
+            }
 
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td></td>
-                    <td style="text-align:center"><b>@SourceList.Sum(x=>x.Prize1).ToString("N0")</b></td>
-                    <td style="text-align:center"><b>@SourceList.Sum(x=>x.Prize2).ToString("N0")</b></td>
-                </tr>
-            </tfoot>
-        </MudSimpleTable>
-   @* }*@
+        </tbody>
+        <tfoot>
+            <tr style="background-color: var(--mud-palette-surface);">
+                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
+                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:center"><b>@SourceList.Sum(x=>x.Prize1).ToString("N0")</b></td>
+                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:center"><b>@SourceList.Sum(x=>x.Prize2).ToString("N0")</b></td>
+            </tr>
+        </tfoot>
+    </MudSimpleTable>
+    @* }*@
 }
 @code {
     [Parameter]

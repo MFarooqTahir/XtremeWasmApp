@@ -758,12 +758,12 @@ namespace XtremeWasmApp.Services
             await SetCdrel(cdrel).ConfigureAwait(false);
             var bal = amt + amt2;
 
-            await SetCurrentBalance(bal).ConfigureAwait(false);
+            await SetCurrentBalance(amt <= 0 ? int.MaxValue : bal).ConfigureAwait(false);
             if (amt > 0)
             {
                 return $"Bal: {bal}";
             }
-            return $"Sale: {amt2}";
+            return $"Sale: {amt2 * -1}";
         }
 
         internal async Task<bool> CheckEntryEdit(int mkey)

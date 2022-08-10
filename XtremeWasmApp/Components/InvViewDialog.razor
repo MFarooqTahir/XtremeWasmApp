@@ -47,7 +47,7 @@
 
                     @foreach (var transaction in AllItems)
                     {
-                        transaction.sNo = snoCountStart.ToString("D3");
+                        transaction.sNo = snoCountStart.ToString("N4");
 
                         <tr>
                             <td><b>@transaction.sNo</b></td>
