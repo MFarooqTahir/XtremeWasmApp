@@ -100,8 +100,12 @@
         <tfoot>
             <tr style="background-color: var(--mud-palette-surface);">
                 <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;"></td>
-                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:center"><b>@SourceList.Sum(x=>x.Prize1).ToString("N0")</b></td>
-                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:center"><b>@SourceList.Sum(x=>x.Prize2).ToString("N0")</b></td>
+                @{
+                    var currSum1 = SourceList.Sum(x => x?.Prize1??0);
+                    var currSum2 = SourceList.Sum(x => x?.Prize2??0);
+                }
+                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:center"><b>@(currSum1==0?"":currSum1.ToString("N0"))</b></td>
+                <td style="border-top: 1px solid var(--mud-palette-table-lines);background-color: var(--mud-palette-surface);position: sticky;bottom: 0;text-align:center"><b>@(currSum2==0?"":currSum2.ToString("N0"))</b></td>
             </tr>
         </tfoot>
     </MudSimpleTable>
