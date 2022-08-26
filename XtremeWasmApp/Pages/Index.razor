@@ -7,38 +7,60 @@
   justify-content: center;
   align-items: center;">
             <MudStack Spacing=0>
-        <h5>PBTS.Net Web App</h5>
+                <h5>PBTS.Net Web App</h5>
 
-        <MudImage Src="Images/defImg/logo.png" ObjectFit="ObjectFit.Fill" Height="200" Width="200" Class="rounded-lg;" Style="
+                <MudImage Src="Images/defImg/logo.png" ObjectFit="ObjectFit.Fill" Height="200" Width="200" Class="rounded-lg;" Style="
   margin: auto;
-  display: block;"/>
-        @if (pageResModel is not null && (pageResModel.First.Any() || pageResModel.Second.Any()))
+  display: block;" />
+                @if (pageResModel is not null && (pageResModel.First.Any() || pageResModel.Second.Any()))
                 {
                     <MudText Style="font-size:16px;font-weight:bold;color:#E53935">@pageResModel?.First.Aggregate((x,y)=>x+" - "+y)</MudText>
                     <MudText Style="font-size:16px;font-weight:bold;color:#388E3C">@pageResModel?.Second.Aggregate((x,y)=>x+" - "+y)</MudText>
-                    <hr class="my-1"/>
+                    <hr class="my-1" />
                 }
-        <MudText Typo="Typo.h5"><b>@CompanyDetails @CurrCity</b></MudText>
-       
-        <hr class="my-1"/>
-        <MudText Style="margin:0px;" Typo="Typo.h6">Reg ID: <b>@MBM</b></MudText>
-        <hr class="my-1"/>
-                
-        <div style="text-align:center;margin: 0 auto;">
-        
-        <MudText>A/C: @CurrCode - @CurrName</MudText>
-        <MudText>Relation ID: @RelID</MudText>
-        <MudText>Sale Limit: @(CurrLimit)</MudText>
-        </div>
-        </MudStack>
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <h1>You are not logged in</h1>
-    </NotAuthorized>
-</AuthorizeView>
+                <MudText Typo="Typo.h5"><b>@CompanyDetails @CurrCity</b></MudText>
+
+                <hr class="my-1" />
+                <MudText Style="margin:0px;" Typo="Typo.h6">Reg ID: <b>@MBM</b></MudText>
+                <hr class="my-1" />
+
+                <div style="text-align:center;margin: 0 auto;">
+
+                    <MudText>A/C: @CurrCode - @CurrName</MudText>
+                    <MudText>Relation ID: @RelID</MudText>
+                    <MudText>Sale Limit: @(CurrLimit)</MudText>
+                    </div>
+                @if (!ac)
+                {
+                    <MudStack Row="true" Class="mt-2">
+                        <MudButton Href="/Mix"
+                               Variant="Variant.Outlined"
+                               Style="text-transform:none"
+                               StartIcon="@Icons.Material.Filled.StackedBarChart"
+                               Color="Color.Primary">
+                            Mix Sale
+                        </MudButton>
+                        <MudButton Href="/Scheme"
+                               Variant="Variant.Outlined"
+                               Style="text-transform:none"
+                               StartIcon="@Icons.Material.Filled.StackedLineChart"
+                               Color="Color.Primary">
+                            Scheme Sale
+                        </MudButton>
+                    </MudStack>
+                    }
+                </MudStack>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <h1>You are not logged in</h1>
+        </NotAuthorized>
+    </AuthorizeView>
 
     @code {
+    [CascadingParameter]
+    public RepeatDataReturnWA repeatData { get; set; }
+    bool ac => repeatData?.RelationActive == false || repeatData?.Uac == false || repeatData?.DrawCompleted == true;
     string CurrName = string.Empty;
     string CurrCity = string.Empty;
     string CurrCode = string.Empty;
@@ -53,7 +75,7 @@
         await Api.UnsetAllSch();
         MBM = await Api.GetMbm();
 
-        (CurrName,CurrCity,CurrCode,CurrLimit,CompanyDetails,RelID,pageResModel)=await Api.GetDashboardData();
+        (CurrName, CurrCity, CurrCode, CurrLimit, CompanyDetails, RelID, pageResModel) = await Api.GetDashboardData();
 
         refresh.CallRequestRefresh();
     }

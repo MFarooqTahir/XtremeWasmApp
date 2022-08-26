@@ -1088,6 +1088,7 @@ namespace XtremeWasmApp.Services
         public async Task Logout()
         {
             _httpClient.DefaultRequestHeaders.Authorization = null;
+            await SetDrawSelected(false).ConfigureAwait(false);
             await _localStorage.ClearAsync().ConfigureAwait(false);
             ((ApiAuthenticationStateProvider)_authenticationStateProvider)
                 .MarkUserAsLoggedOut();

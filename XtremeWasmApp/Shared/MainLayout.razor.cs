@@ -171,6 +171,7 @@ namespace XtremeWasmApp.Shared
                     async x => {
                         if (x)
                         {
+                            MarqData = null;
                             await Auth.Logout().ConfigureAwait(false);
                             await InvokeAsync(StateHasChanged);
                         }

@@ -74,7 +74,7 @@ namespace XtremeWasmApp.Pages
             if (comp is not null && comp.Any())
             {
                 CompanyList = comp.ToList();
-                if (CompanyList.Count == 1)
+                if (CompanyList.Count == 1 && (!CompanyList[0].rBlocked || !CompanyList[0].Block))
                 {
                     await onRowSelection(0);
                 }
