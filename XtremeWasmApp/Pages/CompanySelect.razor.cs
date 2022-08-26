@@ -14,8 +14,10 @@ namespace XtremeWasmApp.Pages
     {
         [Inject]
         private IDialogService DialogService { get; set; }
+
         [CascadingParameter]
         private Task<AuthenticationState> AuthenticationStateTask { get; set; } = null!;
+
         [Inject]
         public WebApiService ApiService { get; set; }
 
@@ -72,7 +74,14 @@ namespace XtremeWasmApp.Pages
             if (comp is not null && comp.Any())
             {
                 CompanyList = comp.ToList();
-                StateHasChanged();
+                if (CompanyList.Count == 1)
+                {
+                    await onRowSelection(0);
+                }
+                else
+                {
+                    await InvokeAsync(StateHasChanged).ConfigureAwait(false);
+                }
             }
             else
             {

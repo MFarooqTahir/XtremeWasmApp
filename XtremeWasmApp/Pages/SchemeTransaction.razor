@@ -65,9 +65,9 @@
             <MudStack Row="true">
                 <MudText Class="me-3 mt-3" Style="font-size:20"><b>@Total.ToString("C2",numberFormat)</b></MudText>
                 <div style="align-items: center;align-content:center;display:flex;width:100%;height:50px;" class="mx-auto">
-                    @if (repeatData?.RelationPrint == true && Transactions?.Count>0)
+                    @if (repeatData?.RelationPrint == true)
                     {
-                        <MudIconButton Style="margin-left:auto;" OnClick="OnReportGet" Icon="@Icons.Filled.Print" Color="@(Color.Surface)"></MudIconButton>
+                        <MudIconButton Style="margin-left:auto;" Disabled="Transactions?.Count==0" OnClick="OnReportGet" Icon="@Icons.Filled.Print" Color="@(Color.Surface)"></MudIconButton>
                     }
                     <MudToggleIconButton @bind-Toggled="@AutoPrize" Style=@($"margin-right:auto;{(repeatData?.RelationPrint == false?"margin-left:auto":"")}")
                                          Icon="@Icons.Material.Outlined.ContentCopy" Color="@Color.Default"

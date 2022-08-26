@@ -15,6 +15,11 @@
         public bool RelationLedger { get; set; }
         public bool RelationPrize { get; set; }
 
+        public RepeatDataReturnWA ShallowCopy()
+        {
+            return (RepeatDataReturnWA)MemberwiseClone();
+        }
+
         public override bool Equals(object? obj)
         {
             return obj is RepeatDataReturnWA wA &&

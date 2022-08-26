@@ -16,7 +16,7 @@ namespace XtremeWasmApp.Pages
             ShowErrors = false;
             if (!string.IsNullOrWhiteSpace(RegisterModel.Email))
             {
-                bool Code = await AuthService.GetCode(RegisterModel.Email);
+                var Code = await AuthService.GetCode(RegisterModel.Email);
                 if (Code)
                 {
                     var dialog = DialogService.Show<CodeDialog>("Enter Code");

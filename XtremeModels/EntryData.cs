@@ -12,6 +12,7 @@
         public double xpamt1 { get; set; }
         public double xpamt2 { get; set; }
         public int lmkey { get; set; }
+        public int RelationID { get; set; }
         public int llmkey { get; set; }
     }
 }

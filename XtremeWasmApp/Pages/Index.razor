@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject WebApiService Api
+@inject IRefreshService refresh
 <AuthorizeView>
     <Authorized>
         <div align-center style="text-align:center;display: flex;
@@ -37,7 +38,7 @@
     </NotAuthorized>
 </AuthorizeView>
 
-@code {
+    @code {
     string CurrName = string.Empty;
     string CurrCity = string.Empty;
     string CurrCode = string.Empty;
@@ -46,11 +47,14 @@
     string RelID = string.Empty;
     string MBM = string.Empty;
     HomePageResultsModel? pageResModel = null;
+
     protected override async Task OnInitializedAsync()
     {
         await Api.UnsetAllSch();
-                MBM = await Api.GetMbm();
-        
+        MBM = await Api.GetMbm();
+
         (CurrName,CurrCity,CurrCode,CurrLimit,CompanyDetails,RelID,pageResModel)=await Api.GetDashboardData();
+
+        refresh.CallRequestRefresh();
     }
 }

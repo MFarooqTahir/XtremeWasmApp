@@ -96,7 +96,7 @@
         }
         else
         {
-               var drawSel = await ApiService.IsDrawSelected();
+            var drawSel = await ApiService.IsDrawSelected();
             schT = await ApiService.GetAllSch();
             if (schT is null)
             {
@@ -112,7 +112,7 @@
             {
                 ErrorsList = new List<string>() { res.Item2, "Either the draw is closed, or there was an error" };
                 schedules = schT;
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged).ConfigureAwait(false);
             }
         }
         else
@@ -135,7 +135,7 @@
             windowWidth = dimension.Width;
             if ((prevHeight, prevWidth) != (windowHeight, windowWidth))
             {
-                StateHasChanged();
+                await InvokeAsync(StateHasChanged).ConfigureAwait(false);
             }
         }
     }
@@ -145,14 +145,14 @@
         if (currSel.blocked)
         {
             ErrorsList = new List<string>() { "This draw is blocked" };
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged).ConfigureAwait(false);
             return;
         }
         var res = await ApiService.ChangeSchedule(currSel,_timer);
         if (!res.Item1)
         {
             ErrorsList = new List<string>() { res.Item2, "Either the draw is closed, or there was an error" };
-            StateHasChanged();
+            await InvokeAsync(StateHasChanged).ConfigureAwait(false);
         }
 
     }

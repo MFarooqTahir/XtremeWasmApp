@@ -18,6 +18,7 @@
         public int xwin1 { get; set; }
         public int xwin2 { get; set; }
         public int xwin3 { get; set; }
+        public int RelationID { get; set; }
         public double xsamt1 { get; set; }
         public double xsamt2 { get; set; }
         public double xpamt1 { get; set; }

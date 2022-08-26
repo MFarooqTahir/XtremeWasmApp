@@ -145,7 +145,6 @@ namespace XtremeWasmApp.Pages
             {
                 Xwin2 = Company.Sfc2;
                 Xwin4 = Company.Std2;
-
             }
         }
 
@@ -179,7 +178,6 @@ namespace XtremeWasmApp.Pages
                         await showDialog("", res);
                     }
                     refreshPage();
-
                 }
             }
         }
@@ -199,11 +197,15 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    if (Rate > 0 && (await Api.GetCurrentBalance() - ((Prize1 ?? 0) + (Prize2 ?? 0))) < 0)
+                    var ed = Editmode || ((Prize1 ?? 0) != 0 || (Prize2 ?? 0) != 0);
+                    var currbalance = await Api.GetCurrentBalance();
+                    var inbal = currbalance - ((Prize1 ?? 0) + (Prize2 ?? 0));
+                    var inballess = inbal < 0;
+                    if (Rate > 0 && inballess)
                     {
                         await showDialog("Limit Exceeded", "");
                     }
-                    else
+                    else if (ed)
                     {
                         Digits?.Throw().IfNullOrWhiteSpace(x => x);
                         if (Digits?.Length != 3 && Digits?.Length != 4)
@@ -345,7 +347,7 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
-                await OnDoneClick(null);
+                await OnDoneClick(args: null);
             }
         }
 
@@ -581,7 +583,7 @@ namespace XtremeWasmApp.Pages
                 //var entry = Transactions.First(x => x.MKey == Mkey);
                 if (entry is not null)
                 {
-                    bool res = await Api.CheckEntryEdit(entry.MKey);
+                    var res = await Api.CheckEntryEdit(entry.MKey);
                     if (res)
                     {
                         Tempdata = entry;
@@ -589,7 +591,7 @@ namespace XtremeWasmApp.Pages
                         Prize2 = Prize1 = null;
                         StateHasChanged();
                         Digits = entry.Digit;
-                        await lostDigitFocus(null);
+                        await lostDigitFocus(args: null);
                         Rate = entry.sc_rate;
                         Prize1 = double.Parse(entry.Prize1.ToString(), Curr);
                         Prize2 = double.Parse(entry.Prize2.ToString(), Curr);

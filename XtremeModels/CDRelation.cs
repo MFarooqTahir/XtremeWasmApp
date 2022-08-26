@@ -1,9 +1,8 @@
-﻿using System;
-
-namespace XtremeModels
+﻿namespace XtremeModels
 {
     public class CDRelation
     {
+        public int ID { get; set; }
         public int CompanyID { get; set; } = -1;
         public int DeviceID { get; set; } = -1;
         public int Limit { get; set; } = -1;

@@ -184,7 +184,7 @@ namespace XtremeWasmApp.Pages
         {
             Prz1Enabled = Prz2Enabled = false;
             await Js.InvokeVoidAsync("document.activeElement.blur");
-            var res = await DialogService.ShowMessageBox(Title, message, options: new MudBlazor.DialogOptions() { CloseOnEscapeKey = true });
+            var res = await DialogService.ShowMessageBox(Title, message, options: new DialogOptions() { CloseOnEscapeKey = true });
             Prz1Enabled = Prz2Enabled = true;
             return res;
         }
@@ -197,6 +197,7 @@ namespace XtremeWasmApp.Pages
             Prize2 = null;
             Editmode = false;
         }
+
         private async Task OnReportGet(MouseEventArgs args)
         {
             if (invInfo is not null)
@@ -215,6 +216,7 @@ namespace XtremeWasmApp.Pages
                 }
             }
         }
+
         private async Task OnDoneClick(MouseEventArgs args)
         {
             if (!AddEntryDisabled)
@@ -222,14 +224,15 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    int currbalance = await Api.GetCurrentBalance();
-                    int inbal = currbalance - ((Prize1 ?? 0) + (Prize2 ?? 0));
-                    bool inballess = inbal < 0;
-                    if ((Editmode || ((Prize1 ?? 0) >= 0 && (Prize2 ?? 0) >= 0)) && inballess)
+                    var ed = Editmode || ((Prize1 ?? 0) != 0 || (Prize2 ?? 0) != 0);
+                    var currbalance = await Api.GetCurrentBalance();
+                    var inbal = currbalance - ((Prize1 ?? 0) + (Prize2 ?? 0));
+                    var inballess = inbal < 0;
+                    if (inballess)
                     {
                         await showDialog("Limit Exceeded", "");
                     }
-                    else
+                    else if (ed)
                     {
                         Digits.Throw().IfNullOrWhiteSpace(x => x);
                         if (DropSel != 1 && Digits.Length != SearchLimit)
@@ -377,9 +380,10 @@ namespace XtremeWasmApp.Pages
         {
             if (string.Equals(x.Key, "Enter", StringComparison.OrdinalIgnoreCase))
             {
-                await OnDoneClick(null);
+                await OnDoneClick(args: null);
             }
         }
+
         private async Task OnPrzFocus(FocusEventArgs args)
         {
             if (string.IsNullOrEmpty(Digits))
@@ -387,6 +391,7 @@ namespace XtremeWasmApp.Pages
                 await Js.InvokeVoidAsync("focusInput", "MixDigitInput");
             }
         }
+
         private async Task lostDigitFocus(FocusEventArgs args)
         {
             if (!string.IsNullOrEmpty(Digits))
@@ -538,7 +543,7 @@ namespace XtremeWasmApp.Pages
                 //var entry = Transactions.First(x => x.MKey == Mkey);
                 if (entry is not null)
                 {
-                    bool res = await Api.CheckEntryEdit(entry.MKey);
+                    var res = await Api.CheckEntryEdit(entry.MKey);
                     if (res)
                     {
                         Tempdata = entry;
@@ -594,7 +599,7 @@ namespace XtremeWasmApp.Pages
                             }
                         }
                         Digits = numberPart;
-                        await lostDigitFocus(null);
+                        await lostDigitFocus(args: null);
                         Prize1 = int.Parse(entry.Prize1.ToString(), Curr);
                         Prize2 = int.Parse(entry.Prize2.ToString(), Curr);
                         StateHasChanged();

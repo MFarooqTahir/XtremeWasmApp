@@ -5,7 +5,7 @@
         public string? PCode { get; set; }
         public string? PName { get; set; }
         // public bool Active { get; set; }
-        public string Balance { get; set; }
+        //public string Balance { get; set; }
         public int? DId { get; set; }
         public string? BId { get; set; }
         public string? City { get; set; }
@@ -18,7 +18,7 @@
             return obj is TopMarqueData data &&
 string.Equals(PCode, data.PCode, StringComparison.Ordinal) &&
 string.Equals(PName, data.PName, StringComparison.Ordinal) &&
-string.Equals(Balance, data.Balance, StringComparison.Ordinal) &&
+                   //string.Equals(Balance, data.Balance, StringComparison.Ordinal) &&
                    DId == data.DId &&
 string.Equals(BId, data.BId, StringComparison.Ordinal) &&
 string.Equals(City, data.City, StringComparison.Ordinal) &&
