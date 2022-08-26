@@ -53,7 +53,6 @@ namespace XtremeWasmApp.Shared
             }
         }
 
-
         private bool RunTimer, ac;
 
         private bool _isDarkMode;
@@ -161,8 +160,10 @@ namespace XtremeWasmApp.Shared
                        {
                            await Auth.SetCurrentDisplayBalance($"Bal: {bal}").ConfigureAwait(false);
                        }
-                       await Auth.SetCurrentDisplayBalance($"Sale: {(x.Balance != 0 ? x.Balance * -1 : 0)}").ConfigureAwait(false);
-
+                       else
+                       {
+                           await Auth.SetCurrentDisplayBalance($"Sale: {(x.Balance != 0 ? x.Balance * -1 : 0)}").ConfigureAwait(false);
+                       }
                        await InvokeAsync(StateHasChanged);
                    });
 
@@ -185,7 +186,6 @@ namespace XtremeWasmApp.Shared
                         x.Uac = oldRepeat.Uac;
                         await Auth.SetRepeatData(repeatData).ConfigureAwait(false);
                         repeatData = x;
-
                     });
                 _hub.On<bool>(
                     "UpdateIPrint",
@@ -195,7 +195,6 @@ namespace XtremeWasmApp.Shared
                         newRepeat.RelationPrint = x;
                         await Auth.SetRepeatData(repeatData).ConfigureAwait(false);
                         repeatData = newRepeat;
-
                     });
                 _hub.On<bool>(
                    "UpdateWPrize",
@@ -205,7 +204,6 @@ namespace XtremeWasmApp.Shared
                        newRepeat.RelationPrize = x;
                        await Auth.SetRepeatData(repeatData).ConfigureAwait(false);
                        repeatData = newRepeat;
-
                    });
                 _hub.On<bool>(
                    "UpdateActive",
@@ -229,7 +227,6 @@ namespace XtremeWasmApp.Shared
                        newRepeat.RelationBill = x;
                        await Auth.SetRepeatData(repeatData).ConfigureAwait(false);
                        repeatData = newRepeat;
-
                    });
                 _hub.On<bool>(
                    "UpdateLedger",
@@ -239,7 +236,6 @@ namespace XtremeWasmApp.Shared
                        newRepeat.RelationLedger = x;
                        await Auth.SetRepeatData(repeatData).ConfigureAwait(false);
                        repeatData = newRepeat;
-
                    });
                 _hub.On(
                    "RelUnblock",
@@ -264,7 +260,6 @@ namespace XtremeWasmApp.Shared
                        newRepeat.RelationActive = false;
                        await Auth.SetRepeatData(repeatData).ConfigureAwait(false);
                        repeatData = newRepeat;
-
                    });
                 //_hub.Closed += async (ex) => {
                 //    await Task.Delay(TimeSpan.FromSeconds(5));
@@ -348,7 +343,7 @@ namespace XtremeWasmApp.Shared
                 var newRepeat = await Auth.GetRepeatData().ConfigureAwait(false);
 
                 //var newMarq = (await Auth.GetTopMarqData().ConfigureAwait(false));
-                var newMarq = (await Auth.GetMarqData().ConfigureAwait(false));// (await Auth.GetTopMarqData().ConfigureAwait(false)) ?? 
+                var newMarq = (await Auth.GetMarqData().ConfigureAwait(false));// (await Auth.GetTopMarqData().ConfigureAwait(false)) ??
 
                 var r = newMarq != MarqData;
                 MarqData = newMarq;

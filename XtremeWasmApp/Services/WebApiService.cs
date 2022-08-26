@@ -792,6 +792,7 @@ namespace XtremeWasmApp.Services
             if (amt > 0)
             {
                 await SetCurrentDisplayBalance($"Bal: {bal}").ConfigureAwait(false);
+                return;
             }
             await SetCurrentDisplayBalance($"Sale: {(amt2 != 0 ? amt2 * -1 : 0)}").ConfigureAwait(false);
         }
@@ -916,16 +917,26 @@ namespace XtremeWasmApp.Services
             return await _localStorage.GetItemAsync<TopMarqueData?>("TopMarqData").ConfigureAwait(false);
         }
 
-        public async Task SetCdrel(CDRelation newcd)
+        public async Task SetCdrel(CDRelation? newcd)
         {
             //await SetCurrentDisplayBalance(null).ConfigureAwait(false);
             //await SetTopMarqData(null).ConfigureAwait(false);
             var previous = await GetCdrel().ConfigureAwait(false);
             if (previous?.ID > 0)
             {
-                await _hub.SendAsync("RemoveFromRelation", previous.ID.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+                try
+                {
+                    if (_hub.State == HubConnectionState.Connected)
+                    {
+                        await _hub.SendAsync("RemoveFromRelation", previous.ID.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+                    }
+                }
+                catch { }
             }
-            await _hub.SendAsync("AddToRelation", newcd.ID.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            if (newcd is not null)
+            {
+                await _hub.SendAsync("AddToRelation", newcd.ID.ToString(CultureInfo.InvariantCulture)).ConfigureAwait(false);
+            }
             await _localStorage.SetItemAsync("cdRel", newcd).ConfigureAwait(false);
         }
 
@@ -1089,6 +1100,7 @@ namespace XtremeWasmApp.Services
         {
             _httpClient.DefaultRequestHeaders.Authorization = null;
             await SetDrawSelected(false).ConfigureAwait(false);
+            await SetCdrel(null).ConfigureAwait(false);
             await _localStorage.ClearAsync().ConfigureAwait(false);
             ((ApiAuthenticationStateProvider)_authenticationStateProvider)
                 .MarkUserAsLoggedOut();
