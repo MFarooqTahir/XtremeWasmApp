@@ -120,6 +120,7 @@ namespace XtremeWasmApp.Services
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new AuthenticationHeaderValue("bearer", loginResult.Token);
                 await _localStorage.SetItemAsync("FALoggedIn", data: false).ConfigureAwait(false);
+                await _hub.SendAsync("LogIn", loginResult.ID.ToString()).ConfigureAwait(false);
             }
             return loginResult;
         }
@@ -1100,7 +1101,11 @@ namespace XtremeWasmApp.Services
         {
             _httpClient.DefaultRequestHeaders.Authorization = null;
             await SetDrawSelected(false).ConfigureAwait(false);
-            await SetCdrel(null).ConfigureAwait(false);
+            if (_hub.State == HubConnectionState.Connected)
+            {
+                await _hub.SendAsync("LogOut", await GetUserID().ConfigureAwait(false)).ConfigureAwait(false);
+            }
+            //await SetCdrel(null).ConfigureAwait(false);
             await _localStorage.ClearAsync().ConfigureAwait(false);
             ((ApiAuthenticationStateProvider)_authenticationStateProvider)
                 .MarkUserAsLoggedOut();

@@ -69,7 +69,7 @@ namespace XtremeWasmApp.Shared
         private bool compSel;
         private bool drawSel;
         private bool MarqSet => MarqData is not null;
-        private TopMarqueData MarqData;
+        private TopMarqueData? MarqData;
 
         private bool Check(bool authen)
         {
@@ -82,7 +82,7 @@ namespace XtremeWasmApp.Shared
             return true;
         }
 
-        public string Balance = string.Empty;
+        public string? Balance { get; set; }
 
         private async void RefreshMe()
         {
@@ -98,7 +98,6 @@ namespace XtremeWasmApp.Shared
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             Company = await Auth.GetCompany();
-            var currMarq = MarqSet;
             if (firstRender)
             {
                 var dtype = await Js.InvokeAsync<string>("getOS") ?? "A";
@@ -177,6 +176,9 @@ namespace XtremeWasmApp.Shared
                             await InvokeAsync(StateHasChanged);
                         }
                     });
+                _ = _hub.On("LogOut",
+                    async () =>
+                    await Auth.Logout());
                 _hub.On<RepeatDataReturnWA>(
                     "UpdateRepeat",
                     async x => {
@@ -326,6 +328,7 @@ namespace XtremeWasmApp.Shared
 
         public async ValueTask DisposeAsync()
         {
+            GC.SuppressFinalize(this);
             nav.LocationChanged -= OnLocationChanged;
             await _timer.DisposeAsync();
             await Auth.Logout();
