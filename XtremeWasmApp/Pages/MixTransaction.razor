@@ -102,7 +102,7 @@
                         <span class="input-group-text" style="background-color:transparent;color:var(--mud-palette-text-primary);border-right:0px;margin-right:0px;padding-right:0px;">@CurrentDigit</span>
                     }
                     <input type="text" style="background-color:transparent;color:var(--mud-palette-text-primary);@(DropSel!=1?"border-left:0px;margin-left:0px;padding-left:0px":"")"
-                           placeholder="@(new string('#', @SearchLimit))" inputmode="numeric" class="form-control" pattern="[0-9]*" id="MixDigitInput"
+                           placeholder="@(new string('#', SearchLimit))" inputmode="numeric" class="form-control" id="MixDigitInput"
                            disabled="@(DigitEnabled==false)" @onkeypress="@digitKeyDown" @onblur="@lostDigitFocus" @onfocus="@OnDigitFocus"
                            @bind-value="@Digits" maxlength="@SearchLimit" />
                 </div>

@@ -21,7 +21,7 @@ namespace XtremeWasmApp.Pages
     {
         private Regex editMatch = new Regex(@"([a-zA-Z]+)(\d+)", RegexOptions.Compiled | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
 
-        private Regex filter = new Regex("[^0-9XSD]*", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
+        private Regex filter = new("[^0-9XSD+]+", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
         private bool AddEntryDisabled = false;
 
         [Inject]
