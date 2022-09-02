@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
+		<RunAOTCompilation>true</RunAOTCompilation>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EmccTotalMemory>16777216</EmccTotalMemory>
@@ -19,7 +20,7 @@
 	<ItemGroup>
 		<PackageReference Include="BlazorDownloadFileFast" Version="0.2.0" />
 		<PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
-		<PackageReference Include="Meziantou.Analyzer" Version="1.0.708">
+		<PackageReference Include="Meziantou.Analyzer" Version="1.0.721">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

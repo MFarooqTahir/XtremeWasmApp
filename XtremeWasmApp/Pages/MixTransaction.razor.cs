@@ -292,7 +292,7 @@ namespace XtremeWasmApp.Pages
                                     var tmp = await Api.MakeNewEntry(invD);
                                     if (string.Equals(tmp.code, cdRel.rCode, StringComparison.Ordinal))
                                     {
-                                        if (Transactions!.Count > 0 && !string.Equals(tmp.sNo, int.Parse(Transactions[^1].sNo).ToString(), StringComparison.OrdinalIgnoreCase))
+                                        if (Transactions!.Count > 0 && !string.Equals(tmp.sNo, int.Parse(Transactions[^1].sNo).ToString(CultureInfo.InvariantCulture), StringComparison.OrdinalIgnoreCase))
                                         {
                                             listEnabled = Editmode;
 
