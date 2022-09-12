@@ -11,7 +11,6 @@ using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
-using System.Web;
 
 using XtremeModels;
 
@@ -340,16 +339,16 @@ namespace XtremeWasmApp.Services
             }
         }
 
-        public async Task<FileReturnModel?> GetLedgerReport(int PartyCode, DateTime From, DateTime To)
+        public async Task<FileReturnModel?> GetLedgerReport(DateTime From, DateTime To)
         {
             try
             {
                 var comp = await GetCompany().ConfigureAwait(false);
                 var cdRel = await GetCdrel().ConfigureAwait(false);
                 var party = await GetParty().ConfigureAwait(false);
-                var fromEncoded = HttpUtility.HtmlEncode(From.ToString("o"));
-                var toEncoded = HttpUtility.HtmlEncode(To.ToString("o"));
-                var ledRes = await SendHttpRequest<ResultSet<LedgerList?>?>($"api/Data/GetLedger/{fromEncoded}/{toEncoded}/{PartyCode}", RequestType.Get, LinkType.Data).ConfigureAwait(false);
+                //var fromEncoded = HttpUtility.HtmlEncode(From.ToString("o"));
+                //var toEncoded = HttpUtility.HtmlEncode(To.ToString("o"));
+                var ledRes = await SendHttpRequest<ResultSet<LedgerList?>?>($"api/Data/GetLedger/{From:yyyy-MM-dd}/{To:yyyy-MM-dd}/{party.Code}", RequestType.Get, LinkType.Data).ConfigureAwait(false);
                 if (ledRes?.ResultObj is null)
                 {
                     return new()
@@ -357,9 +356,16 @@ namespace XtremeWasmApp.Services
                         FileName = ledRes.Status,
                     };
                 }
+                if (ledRes?.ResultObj.LedgerL.Count == 0)
+                {
+                    return new()
+                    {
+                        FileName = "No Entries",
+                    };
+                }
                 LedgerReportModel? model = new()
                 {
-                    code = PartyCode.ToString(CultureInfo.InvariantCulture),
+                    code = party.Code,
                     From = From,
                     To = To,
                     Ledger = ledRes.ResultObj,

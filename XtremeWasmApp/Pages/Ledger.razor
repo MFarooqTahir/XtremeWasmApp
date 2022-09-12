@@ -1,6 +1,8 @@
 ﻿@page "/Ledger"
 @inject WebApiService Api
 @inject IJSRuntime Js
+@inject IDialogService DialogService
+
 <AuthorizeView>
     <Authorized>
 
@@ -9,13 +11,14 @@
                 <h3>Account Statement</h3>
                 <MudGrid Spacing="0" Justify="Justify.Center">
                     <MudItem xs="12">
-                        <MudNumericField Label="Party Code" HideSpinButtons="true" Disabled="@loading" Immediate="true" @bind-Value="@CodeInput">
-                        </MudNumericField>
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="From date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-Date="From" Editable="true">
+
+                        </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudDateRangePicker PickerVariant="PickerVariant.Dialog" HelperText="From date ➜ To date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-DateRange="_dateRange" Editable="true">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="To date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-Date="To" Editable="true">
 
-                        </MudDateRangePicker>
+                        </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12">
                         <MudButton Disabled="@loading" Color="Color.Success" Class="mx-auto mt-4" OnClick="Download" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
@@ -27,14 +30,47 @@
 </AuthorizeView>
 @code {
     private bool loading = false;
-    private int? CodeInput { get; set; }
-    private DateRange _dateRange = new DateRange(DateTime.Now.Date, DateTime.Now.Date);
+    private DateTime? _To = DateTime.Now;
 
+    public DateTime? To
+    {
+        get { return _To; }
+        set 
+        {
+            if (value <From)
+            {
+                _To = From;
+                return;
+            }
+            _To = value; 
+        }
+    }
+    private DateTime? _From = DateTime.Now;
+
+    public DateTime? From
+    {
+        get { return _From; }
+        set 
+        { 
+            if(value>To)
+            {
+                _From = To;
+                return;
+            }
+            _From = value; 
+        }
+    }
+    
     private async Task Download(MouseEventArgs args)
     {
         loading = true;
-        var file = await Api.GetLedgerReport(CodeInput ?? 0, _dateRange.Start ??= DateTime.Now, _dateRange.End ??= DateTime.Now).ConfigureAwait(false);
-        if (file?.FileName?.Contains("error", StringComparison.CurrentCultureIgnoreCase) == false)
+        var file = await Api.GetLedgerReport(From ??= DateTime.Now, To ??= DateTime.Now).ConfigureAwait(false);
+        if (file is null || string.Equals(file.FileName, "No Entries",StringComparison.OrdinalIgnoreCase))
+        {
+            var options = new DialogOptions { CloseOnEscapeKey = true,CloseButton=true, MaxWidth=MaxWidth.Medium };
+            await DialogService.ShowMessageBox("Error", "No Entries",options:options);
+        }
+        else if (file?.FileName?.Contains("error", StringComparison.CurrentCultureIgnoreCase) == false && file.File is not null)
         {
 
             await Js.SaveAs(file.FileName, file?.File);

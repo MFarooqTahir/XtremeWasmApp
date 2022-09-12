@@ -267,9 +267,14 @@ namespace XtremeWasmApp.Shared
                 //    await Task.Delay(TimeSpan.FromSeconds(5));
                 //    await _hub.StartAsync();
                 //};
-
-                await _hub.StartAsync().ConfigureAwait(false);
-
+                try
+                {
+                    await _hub.StartAsync().ConfigureAwait(false);
+                }
+                catch
+                {
+                    nav.NavigateTo("/", true);
+                }
             }
             ac = repeatData?.RelationActive == false || repeatData?.Uac == false || repeatData?.DrawCompleted == true;
             MBM = await AuthService.GetMbm().ConfigureAwait(false) ?? "";

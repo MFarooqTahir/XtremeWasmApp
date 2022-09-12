@@ -6,13 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<EmccTotalMemory>16777216</EmccTotalMemory>
 		<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
-		<ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
 	</PropertyGroup>
-	<ItemGroup>
-		<ServiceWorker Include="wwwroot\service-worker.js"
-		  PublishedContent="wwwroot\service-worker.published.js" />
-	</ItemGroup>
-
 	<ItemGroup>
 	  <Compile Remove="Pages\EnableTwoFactor.razor.cs" />
 	</ItemGroup>
