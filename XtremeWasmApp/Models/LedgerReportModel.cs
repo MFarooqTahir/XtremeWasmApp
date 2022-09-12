@@ -1,6 +1,8 @@
-﻿namespace XtremeWasmApp.Models
+﻿using XtremeModels;
+
+namespace XtremeWasmApp.Models
 {
-    public class LedgerModel
+    public class LedgerReportModel
     {
         public LedgerList? Ledger;
         public string? comp;

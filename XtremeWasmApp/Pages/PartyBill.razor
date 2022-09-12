@@ -1,4 +1,25 @@
-﻿@inject WebApiService Api
-<h3>PartyBill</h3>
+﻿@page "/partybill"
+@attribute [Authorize]
+@inject WebApiService Api
+@inject IJSRuntime Js
+<AuthorizeView>
+    <Authorized>
 
+        <div align-center style="max-width:750px;margin: auto;text-align:center" class="mt--3 pt-0">
+            <h3 class="mx-auto">PartyBill</h3>
+            @if(loading)
+            {
+                <h3 class="mx-auto">Loading....</h3>
+            }
+            @if(Errors.Count>0)
+            {
+                @foreach(string error in Errors)
+                {
+                    <MudText Color="Color.Error" Typo="Typo.h5" Class="mx-auto">@error</MudText>
+                }
+            }
+            <MudButton Disabled="@loading" Color="Color.Success" Class="mx-auto mt-4" OnClick="report" Variant="Variant.Filled" StartIcon="@Icons.Custom.FileFormats.FilePdf">PDF Download</MudButton>
+        </div>
+    </Authorized>
+</AuthorizeView>
 

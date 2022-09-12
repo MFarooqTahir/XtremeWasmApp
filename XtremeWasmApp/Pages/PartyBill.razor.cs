@@ -1,154 +1,162 @@
-﻿using System.Data;
+﻿using Microsoft.AspNetCore.Components.Web;
+
+using System.Data;
 using System.Globalization;
 
 using XtremeModels;
+
+using XtremeWasmApp.Helpers;
 
 namespace XtremeWasmApp.Pages
 {
     public partial class PartyBill
     {
+        private readonly List<DataSet> Inds = new(3) { new(), new(), new() };
+        private List<int> Recno = new List<int> { 0, 0, 0, 0, 0 };
+        private int xxkey = 0;
+        private double s_pamt1, s_pamt2, s_pamt3, s_pamt4, s_pqty;
+        private double s_mixamt1, s_mixamt2, s_mixamt3, s_mixamt4, s_mixamt5;
+        private double s_pscamt1, s_pscamt2, s_pscamt3, s_pscamt4, s_scpqty, s_pscqty;
+        private double s_rscamt1, s_rscamt2, s_rscamt3, s_rscamt4;
+        private double s_camt1, s_camt2, s_camt3, s_camt4, s_cqty;
+        private double s_tkamt1, s_tkamt2, s_tkamt3, s_tkamt4, s_tkqty;
+        private double p_pamt1, p_pamt2, p_pamt3, p_pamt4, p_pqty;
+        private double p_mixamt1, p_mixamt2, p_mixamt3, p_mixamt4;
+        private double p_pscamt1, p_pscamt2, p_pscamt3, p_pscamt4, p_pscqty;
+        private double p_rscamt1, p_rscamt2, p_rscamt3, p_rscamt4, p_scpqty;
+        private double p_camt1, p_camt2, p_camt3, p_camt4, p_cqty;
+        private double p_tkamt1, p_tkamt2, p_tkamt3, p_tkamt4, p_tkqty;
+        private double sm_pscamt1, sm_pscamt2, sm_pscamt3, sm_pscamt4, sm_pscqty;
+        private double pm_pscamt1, pm_pscamt2, pm_pscamt3, pm_pscamt4, pm_pscqty;
+        private double xsbo1, xsba1, xsbx1, xsbt1, xsbxx1, xsbf1, xsbd1, xsb61, xsbsp, xsbsr, xpbo1, xpba1, xpbx1, xpbt1, xpbxx1, xpbf1, xpbd1, xpb61, xpbsp, xpbsr;
+        private string str2 = "";
+        private DataTable tab1 = null;
+        private Party? party = null;
+        private CultureInfo numCulture = new CultureInfo("en-IN");
+        private List<string> Errors = new();
+        private bool loading = false;
 
-
-        readonly List<DataSet> Inds = new(3) { new(), new(), new() };
-        List<int> Recno = new List<int> { 0, 0, 0, 0, 0 };
-        int xxkey = 0;
-        double s_pamt1, s_pamt2, s_pamt3, s_pamt4, s_pqty;
-        double s_mixamt1, s_mixamt2, s_mixamt3, s_mixamt4, s_mixamt5;
-        double s_pscamt1, s_pscamt2, s_pscamt3, s_pscamt4, s_scpqty, s_pscqty;
-        double s_rscamt1, s_rscamt2, s_rscamt3, s_rscamt4;
-        double s_camt1, s_camt2, s_camt3, s_camt4, s_cqty;
-        double s_tkamt1, s_tkamt2, s_tkamt3, s_tkamt4, s_tkqty;
-        double p_pamt1, p_pamt2, p_pamt3, p_pamt4, p_pqty;
-        double p_mixamt1, p_mixamt2, p_mixamt3, p_mixamt4;
-        double p_pscamt1, p_pscamt2, p_pscamt3, p_pscamt4, p_pscqty;
-        double p_rscamt1, p_rscamt2, p_rscamt3, p_rscamt4, p_scpqty;
-        double p_camt1, p_camt2, p_camt3, p_camt4, p_cqty;
-        double p_tkamt1, p_tkamt2, p_tkamt3, p_tkamt4, p_tkqty;
-        double sm_pscamt1, sm_pscamt2, sm_pscamt3, sm_pscamt4, sm_pscqty;
-        double pm_pscamt1, pm_pscamt2, pm_pscamt3, pm_pscamt4, pm_pscqty;
-        double xsbo1, xsba1, xsbx1, xsbt1, xsbxx1, xsbf1, xsbd1, xsb61, xsbsp, xsbsr, xpbo1, xpba1, xpbx1, xpbt1, xpbxx1, xpbf1, xpbd1, xpb61, xpbsp, xpbsr;
-        string str2 = "";
-        DataTable tab1 = new DataTable("New Data");
-        Party party;
-        CultureInfo numCulture = new CultureInfo("en-IN");
         protected override void OnInitialized()
         {
             numCulture.NumberFormat.CurrencySymbol = string.Empty;
             base.OnInitialized();
         }
-        public async Task report()
+
+        public async Task report(MouseEventArgs args)
         {
-            tab1.Columns.Add("PID");
-            tab1.Columns.Add("TG");
+            loading = true;
+            tab1 = new DataTable("New Data");
+            tab1.Columns.Add("PID", typeof(string));
+            tab1.Columns.Add("TG", typeof(string));
 
-            tab1.Columns.Add("H2");
-            tab1.Columns.Add("H3");
-            tab1.Columns.Add("H4");
-            tab1.Columns.Add("H5");
-            tab1.Columns.Add("H6");
-            tab1.Columns.Add("H7");
-            tab1.Columns.Add("H8");
-            tab1.Columns.Add("H9");
-            tab1.Columns.Add("H10");
+            tab1.Columns.Add("H2", typeof(string));
+            tab1.Columns.Add("H3", typeof(string));
+            tab1.Columns.Add("H4", typeof(string));
+            tab1.Columns.Add("H5", typeof(string));
+            tab1.Columns.Add("H6", typeof(string));
+            tab1.Columns.Add("H7", typeof(string));
+            tab1.Columns.Add("H8", typeof(string));
+            tab1.Columns.Add("H9", typeof(string));
+            tab1.Columns.Add("H10", typeof(string));
 
-            tab1.Columns.Add("H11");
-            tab1.Columns.Add("H12");
-            tab1.Columns.Add("H13");
-            tab1.Columns.Add("H14");
-            tab1.Columns.Add("H15");
-            tab1.Columns.Add("H16");
-            tab1.Columns.Add("H17");
-            tab1.Columns.Add("H18");
-            tab1.Columns.Add("H19");
-            tab1.Columns.Add("H20");
+            tab1.Columns.Add("H11", typeof(string));
+            tab1.Columns.Add("H12", typeof(string));
+            tab1.Columns.Add("H13", typeof(string));
+            tab1.Columns.Add("H14", typeof(string));
+            tab1.Columns.Add("H15", typeof(string));
+            tab1.Columns.Add("H16", typeof(string));
+            tab1.Columns.Add("H17", typeof(string));
+            tab1.Columns.Add("H18", typeof(string));
+            tab1.Columns.Add("H19", typeof(string));
+            tab1.Columns.Add("H20", typeof(string));
 
-            tab1.Columns.Add("H21");
-            tab1.Columns.Add("H22");
-            tab1.Columns.Add("H23");
-            tab1.Columns.Add("H24");
-            tab1.Columns.Add("H25");
-            tab1.Columns.Add("H26");
-            tab1.Columns.Add("H27");
-            tab1.Columns.Add("H28");
-            tab1.Columns.Add("H29");
-            tab1.Columns.Add("H30");
+            tab1.Columns.Add("H21", typeof(string));
+            tab1.Columns.Add("H22", typeof(string));
+            tab1.Columns.Add("H23", typeof(string));
+            tab1.Columns.Add("H24", typeof(string));
+            tab1.Columns.Add("H25", typeof(string));
+            tab1.Columns.Add("H26", typeof(string));
+            tab1.Columns.Add("H27", typeof(string));
+            tab1.Columns.Add("H28", typeof(string));
+            tab1.Columns.Add("H29", typeof(string));
+            tab1.Columns.Add("H30", typeof(string));
 
-            tab1.Columns.Add("H31");
-            tab1.Columns.Add("H32");
-            tab1.Columns.Add("H33");
-            tab1.Columns.Add("H34");
-            tab1.Columns.Add("H35");
-            tab1.Columns.Add("H36");
-            tab1.Columns.Add("H37");
-            tab1.Columns.Add("H38");
-            tab1.Columns.Add("H39");
-            tab1.Columns.Add("H40");
+            tab1.Columns.Add("H31", typeof(string));
+            tab1.Columns.Add("H32", typeof(string));
+            tab1.Columns.Add("H33", typeof(string));
+            tab1.Columns.Add("H34", typeof(string));
+            tab1.Columns.Add("H35", typeof(string));
+            tab1.Columns.Add("H36", typeof(string));
+            tab1.Columns.Add("H37", typeof(string));
+            tab1.Columns.Add("H38", typeof(string));
+            tab1.Columns.Add("H39", typeof(string));
+            tab1.Columns.Add("H40", typeof(string));
 
-            tab1.Columns.Add("H41");
-            tab1.Columns.Add("H42");
-            tab1.Columns.Add("H43");
-            tab1.Columns.Add("H44");
-            tab1.Columns.Add("H45");
-            tab1.Columns.Add("H46");
-            tab1.Columns.Add("H47");
-            tab1.Columns.Add("H48");
-            tab1.Columns.Add("H49");
-            tab1.Columns.Add("H50");
+            tab1.Columns.Add("H41", typeof(string));
+            tab1.Columns.Add("H42", typeof(string));
+            tab1.Columns.Add("H43", typeof(string));
+            tab1.Columns.Add("H44", typeof(string));
+            tab1.Columns.Add("H45", typeof(string));
+            tab1.Columns.Add("H46", typeof(string));
+            tab1.Columns.Add("H47", typeof(string));
+            tab1.Columns.Add("H48", typeof(string));
+            tab1.Columns.Add("H49", typeof(string));
 
-            tab1.Columns.Add("H51");
-            tab1.Columns.Add("H52");
-            tab1.Columns.Add("H53");
-            tab1.Columns.Add("H54");
-            tab1.Columns.Add("H55");
-            tab1.Columns.Add("H56");
-            tab1.Columns.Add("H57");
-            tab1.Columns.Add("H58");
-            tab1.Columns.Add("H59");
-            tab1.Columns.Add("H60");
+            tab1.Columns.Add("H50", typeof(string));
+            tab1.Columns.Add("H51", typeof(string));
+            tab1.Columns.Add("H52", typeof(string));
+            tab1.Columns.Add("H53", typeof(string));
+            tab1.Columns.Add("H54", typeof(string));
+            tab1.Columns.Add("H55", typeof(string));
+            tab1.Columns.Add("H56", typeof(string));
+            tab1.Columns.Add("H57", typeof(string));
+            tab1.Columns.Add("H58", typeof(string));
+            tab1.Columns.Add("H59", typeof(string));
+            tab1.Columns.Add("H60", typeof(string));
 
-            tab1.Columns.Add("H61");
-            tab1.Columns.Add("H62");
-            tab1.Columns.Add("H63");
-            tab1.Columns.Add("H64");
-            tab1.Columns.Add("H65");
-            tab1.Columns.Add("H66");
-            tab1.Columns.Add("H67");
-            tab1.Columns.Add("H68");
-            tab1.Columns.Add("H69");
-            tab1.Columns.Add("H70");
+            tab1.Columns.Add("H61", typeof(string));
+            tab1.Columns.Add("H62", typeof(string));
+            tab1.Columns.Add("H63", typeof(string));
+            tab1.Columns.Add("H64", typeof(string));
+            tab1.Columns.Add("H65", typeof(string));
+            tab1.Columns.Add("H66", typeof(string));
+            tab1.Columns.Add("H67", typeof(string));
+            tab1.Columns.Add("H68", typeof(string));
+            tab1.Columns.Add("H69", typeof(string));
+            tab1.Columns.Add("H70", typeof(string));
 
-            tab1.Columns.Add("H71");
-            tab1.Columns.Add("H72");
-            tab1.Columns.Add("H73");
-            tab1.Columns.Add("H74");
-            tab1.Columns.Add("H75");
-            tab1.Columns.Add("H76");
-            tab1.Columns.Add("H77");
-            tab1.Columns.Add("H78");
-            tab1.Columns.Add("H79");
-            tab1.Columns.Add("H80");
+            tab1.Columns.Add("H71", typeof(string));
+            tab1.Columns.Add("H72", typeof(string));
+            tab1.Columns.Add("H73", typeof(string));
+            tab1.Columns.Add("H74", typeof(string));
+            tab1.Columns.Add("H75", typeof(string));
+            tab1.Columns.Add("H76", typeof(string));
+            tab1.Columns.Add("H77", typeof(string));
+            tab1.Columns.Add("H78", typeof(string));
+            tab1.Columns.Add("H79", typeof(string));
+            tab1.Columns.Add("H80", typeof(string));
 
-            tab1.Columns.Add("H81");
-            tab1.Columns.Add("H82");
-            tab1.Columns.Add("H83");
-            tab1.Columns.Add("H84");
-            tab1.Columns.Add("H85");
-            tab1.Columns.Add("H86");
-            tab1.Columns.Add("H87");
-            tab1.Columns.Add("H88");
-            tab1.Columns.Add("H89");
-            tab1.Columns.Add("H90");
+            tab1.Columns.Add("H81", typeof(string));
+            tab1.Columns.Add("H82", typeof(string));
+            tab1.Columns.Add("H83", typeof(string));
+            tab1.Columns.Add("H84", typeof(string));
+            tab1.Columns.Add("H85", typeof(string));
+            tab1.Columns.Add("H86", typeof(string));
+            tab1.Columns.Add("H87", typeof(string));
+            tab1.Columns.Add("H88", typeof(string));
+            tab1.Columns.Add("H89", typeof(string));
+            tab1.Columns.Add("H90", typeof(string));
 
-            tab1.Columns.Add("H91");
-            tab1.Columns.Add("H92");
-            tab1.Columns.Add("H93");
-            tab1.Columns.Add("H94");
-            tab1.Columns.Add("H95");
-            tab1.Columns.Add("H96");
-            tab1.Columns.Add("H97");
-            tab1.Columns.Add("H98");
-            tab1.Columns.Add("H99");
-            tab1.Columns.Add("CTIT");
+            tab1.Columns.Add("H91", typeof(string));
+            tab1.Columns.Add("H92", typeof(string));
+            tab1.Columns.Add("H93", typeof(string));
+            tab1.Columns.Add("H94", typeof(string));
+            tab1.Columns.Add("H95", typeof(string));
+            tab1.Columns.Add("H96", typeof(string));
+            tab1.Columns.Add("H97", typeof(string));
+            tab1.Columns.Add("H98", typeof(string));
+            tab1.Columns.Add("H99", typeof(string));
+            tab1.Columns.Add("CTIT", typeof(string));
 
             xsbo1 = 0;
             xsba1 = 0;
@@ -290,11 +298,9 @@ namespace XtremeWasmApp.Pages
                 pktsale();
             }
 
-
             // '************************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Mix Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
-
+            // Main.Ltitle.Text = "Fetching Mix Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(1, party.Code).ConfigureAwait(false);
@@ -310,8 +316,7 @@ namespace XtremeWasmApp.Pages
 
             // '***************************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Mix-Scheme Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
-
+            // Main.Ltitle.Text = "Fetching Mix-Scheme Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(2, party.Code).ConfigureAwait(false);
@@ -325,10 +330,9 @@ namespace XtremeWasmApp.Pages
                 mixschemesale();
             }
 
-
             // '**************************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Scheme Packet Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching Scheme Packet Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(3, party.Code).ConfigureAwait(false);
@@ -345,7 +349,7 @@ namespace XtremeWasmApp.Pages
 
             // ********************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Chart Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching Chart Sale ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(4, party.Code).ConfigureAwait(false);
@@ -390,56 +394,47 @@ namespace XtremeWasmApp.Pages
 
             if ((s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1 + s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2 + s_pamt3 + s_camt3 + s_tkamt3 + s_mixamt3 + s_pscamt3 + s_rscamt3 + sm_pscamt3 + s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4) != 0)
             {
-                tab1.Rows[^1].ItemArray[30] = "⁞⁞ Total Sale";
+                tab1.Rows[^1][30] = "⁞⁞ Total Sale";
+                var str2num = Math.Ceiling(s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1);
+                str2 = Rs(str2num);
 
-
-                str2 = Rs(Math.Ceiling(s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[31] = str2.Trim();
-
-
+                    tab1.Rows[^1][31] = str2.Trim();
                 }
+                str2num = s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1 - (s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2);
+                str2 = Rs0(str2num);
 
-                str2 = Rs0((s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1) - (s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[32] = str2.Trim();
-
-
+                    tab1.Rows[^1][32] = str2.Trim();
                 }
+                str2num = Math.Ceiling(s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Ceiling(s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[33] = str2.Trim();
-
-
+                    tab1.Rows[^1][33] = str2.Trim();
                 }
+                str2num = Math.Round(s_pamt3 + s_camt3 + s_tkamt3 + s_mixamt3 + s_pscamt3 + s_rscamt3 + sm_pscamt3);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Round(s_pamt3 + s_camt3 + s_tkamt3 + s_mixamt3 + s_pscamt3 + s_rscamt3 + sm_pscamt3));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[34] = str2.Trim();
-
+                    tab1.Rows[^1][34] = str2.Trim();
                 }
+                str2num = Math.Ceiling(s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Ceiling(s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[35] = str2.Trim();
-
+                    tab1.Rows[^1][35] = str2.Trim();
                 }
             }
 
             // *********************************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching % Packet Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching % Packet Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(6, party.Code).ConfigureAwait(false);
@@ -456,7 +451,7 @@ namespace XtremeWasmApp.Pages
 
             // '***********************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Mix Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching Mix Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(7, party.Code).ConfigureAwait(false);
@@ -471,11 +466,9 @@ namespace XtremeWasmApp.Pages
                 mixpurchase();
             }
 
-
-
             // ************************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Mix-Scheme Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching Mix-Scheme Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(8, party.Code).ConfigureAwait(false);
@@ -492,7 +485,7 @@ namespace XtremeWasmApp.Pages
 
             // '**************************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Scheme Packet Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching Scheme Packet Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(9, party.Code).ConfigureAwait(false);
@@ -508,7 +501,7 @@ namespace XtremeWasmApp.Pages
 
             // ******************************************************************************************************
 
-            // Main.Ltitle.Text = "Fetching Tukra Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1)) + " )"
+            // Main.Ltitle.Text = "Fetching Tukra Purchase ( " + Trim(Inds[0].Tables[0].Rows[Recno[0]][1)) + " )"
 
             dt.Clear();
             dt = await Api.BillGenerate(10, party.Code).ConfigureAwait(false);
@@ -529,308 +522,301 @@ namespace XtremeWasmApp.Pages
 
             if ((p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + p_pamt2 + p_tkamt1 + pm_pscamt1 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2 + p_pamt3 + p_tkamt1 + p_mixamt3 + p_pscamt3 + p_rscamt3 + pm_pscamt3 + p_pamt4 + p_tkamt1 + pm_pscamt4) != 0)
             {
-                tab1.Rows[^1].ItemArray[30] = "⁞⁞ Total Purchase";
+                tab1.Rows[^1][30] = "⁞⁞ Total Purchase";
+                var str2num = Math.Ceiling(p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Ceiling(p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[31] = str2.Trim();
-
-
+                    tab1.Rows[^1][31] = str2.Trim();
                 }
+                str2num = p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1 - (p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2);
+                str2 = Rs0(str2num);
 
-                str2 = Rs0((p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1) - (p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[32] = str2.Trim();
-
-
+                    tab1.Rows[^1][32] = str2.Trim();
                 }
+                str2num = Math.Ceiling(p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Ceiling(p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[33] = str2.Trim();
-
-
+                    tab1.Rows[^1][33] = str2.Trim();
                 }
+                str2num = Math.Round(p_pamt3 + p_tkamt3 + p_mixamt3 + p_pscamt3 + p_rscamt3 + pm_pscamt3);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Round(p_pamt3 + p_tkamt3 + p_mixamt3 + p_pscamt3 + p_rscamt3 + pm_pscamt3));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[34] = str2.Trim();
-
-
+                    tab1.Rows[^1][34] = str2.Trim();
                 }
+                str2num = Math.Ceiling(p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4);
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Ceiling(p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[35] = str2.Trim();
-
-
+                    tab1.Rows[^1][35] = str2.Trim();
                 }
             }
 
-            // Net Amount 
+            // Net Amount
 
             if ((s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + s_pamt3 + s_camt3 + s_tkamt3 + s_mixamt3 + s_pscamt3 + s_rscamt3 + p_pamt3 + p_tkamt3 + p_mixamt3 + p_pscamt3 + p_rscamt3 + s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt1 + pm_pscamt2 + pm_pscamt3 + pm_pscamt4 + sm_pscamt1 + sm_pscamt2 + sm_pscamt3 + sm_pscamt4) != 0)
             {
-                str2 = Rs(Math.Round((s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1) - (p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1)));
+                var str2num = Math.Round(s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1 - (p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1));
+                str2 = Rs(str2num);
 
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[41] = str2.Trim();
-
-
+                    tab1.Rows[^1][41] = str2.Trim();
                 }
+                str2num = Math.Round(s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1 - (p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1) - (s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2 - (p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2)));
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Round(((s_pamt1 + s_camt1 + s_tkamt1 + s_mixamt1 + s_pscamt1 + s_rscamt1 + sm_pscamt1) - (p_pamt1 + p_tkamt1 + p_mixamt1 + p_pscamt1 + p_rscamt1 + pm_pscamt1)) - ((s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2) - (p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2))));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[42] = str2.Trim();
-
-
+                    tab1.Rows[^1][42] = str2.Trim();
                 }
+                str2num = Math.Round(s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2 - (p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2));
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Round((s_pamt2 + s_camt2 + s_tkamt2 + s_mixamt2 + s_pscamt2 + s_rscamt2 + sm_pscamt2) - (p_pamt2 + p_tkamt2 + p_mixamt2 + p_pscamt2 + p_rscamt2 + pm_pscamt2)));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[43] = str2.Trim();
-
-
+                    tab1.Rows[^1][43] = str2.Trim();
                 }
+                str2num = Math.Round(s_pamt3 + s_camt3 + s_tkamt3 + s_mixamt3 + s_pscamt3 + s_rscamt3 + sm_pscamt3 - (p_pamt3 + p_tkamt3 + p_mixamt3 + p_pscamt3 + p_rscamt3 + pm_pscamt3));
+                str2 = Rs(str2num);
 
-                str2 = Rs(Math.Round((s_pamt3 + s_camt3 + s_tkamt3 + s_mixamt3 + s_pscamt3 + s_rscamt3 + sm_pscamt3) - (p_pamt3 + p_tkamt3 + p_mixamt3 + p_pscamt3 + p_rscamt3 + pm_pscamt3)));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[44] = str2.Trim();
-
+                    tab1.Rows[^1][44] = str2.Trim();
                 }
+                str2num = Math.Round(s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4 - (p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4));
+                str2 = Rs(str2num);
+                var str2x = Math.Round(s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4 - (p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4));
 
-                str2 = Rs(Math.Round((s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4) - (p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4)));
-                var str2x = (Math.Round((s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4) - (p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4)));
-
-                if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+                if (str2num != 0)
                 {
-                    tab1.Rows[^1].ItemArray[45] = str2.Trim();
+                    tab1.Rows[^1][45] = str2.Trim();
                     //if (rlist > 0 & Main.account && bool.Parse(Inds[0].Tables[0].Rows[Recno[0]]["actac"].ToString()) && !bool.Parse(Inds[0].Tables[0].Rows[Recno[0]]["acind"].ToString()))
                     //{
                     //    // Dim xx = Mid(MainMenu.Ld3.Text, 4, 2)
                     //    DateTime xdate = (Right(MainMenu.Ld3.Text, 4) + "-" + Mid(MainMenu.Ld3.Text, 4, 2) + "-" + Left(MainMenu.Ld3.Text, 2));
                     //    string xxdate = (Left(MainMenu.Ld3.Text, 2) + "-" + Mid(MainMenu.Ld3.Text, 4, 2) + "-" + Right(MainMenu.Ld3.Text, 4));
                     //    string xdes = "Rs. " + Trim(MainMenu.Ld1.Text) + " - " + Trim(MainMenu.Ld2.Text) + "  " + Trim(MainMenu.Ld2c.Text) + IIf(MainMenu.Ld2c.Text == "", "", "  ") + Trim(xxdate) + "  " + Trim(MainMenu.Ld4.Text);
-                    //    var xxxxr = await ApiLink.GetRequestAsync<bool>($"api/Data/TransdtlIns/{-1}/D/{Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray["Code"))}/{xdes}/{"0"}/{xdate}/{"0"}/{IIf(int.Parse(str2,CultureInfo.InvariantCulture) < 0, Math.Abs(int.Parse(str2,CultureInfo.InvariantCulture)), 0)}/{IIf(int.Parse(str2,CultureInfo.InvariantCulture) > 0, int.Parse(str2,CultureInfo.InvariantCulture), 0)}/{true}", Config.BaseURLD);
+                    //    var xxxxr = await ApiLink.GetRequestAsync<bool>($"api/Data/TransdtlIns/{-1}/D/{Val(Inds[0].Tables[0].Rows[Recno[0]]["Code"))}/{xdes}/{"0"}/{xdate}/{"0"}/{IIf(int.Parse(str2,CultureInfo.InvariantCulture) < 0, Math.Abs(int.Parse(str2,CultureInfo.InvariantCulture)), 0)}/{IIf(int.Parse(str2,CultureInfo.InvariantCulture) > 0, int.Parse(str2,CultureInfo.InvariantCulture), 0)}/{true}", Config.BaseURLD);
                     //}
-
                 }
             }
 
             str2 = Rs(xsbo1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbo1 != 0)
             {
-                tab1.Rows[^1].ItemArray[61] = str2.Trim();
+                tab1.Rows[^1][61] = str2.Trim();
             }
 
             str2 = Rs(xsba1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsba1 != 0)
             {
-                tab1.Rows[^1].ItemArray[62] = str2.Trim();
+                tab1.Rows[^1][62] = str2.Trim();
             }
 
             str2 = Rs(xsbx1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbx1 != 0)
             {
-                tab1.Rows[^1].ItemArray[63] = str2.Trim();
+                tab1.Rows[^1][63] = str2.Trim();
             }
 
             str2 = Rs(xsbt1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbt1 != 0)
             {
-                tab1.Rows[^1].ItemArray[64] = str2.Trim();
+                tab1.Rows[^1][64] = str2.Trim();
             }
 
             str2 = Rs(xsbxx1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbxx1 != 0)
             {
-                tab1.Rows[^1].ItemArray[65] = str2.Trim();
+                tab1.Rows[^1][65] = str2.Trim();
             }
 
             str2 = Rs(xsbf1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbf1 != 0)
             {
-                tab1.Rows[^1].ItemArray[66] = str2.Trim();
+                tab1.Rows[^1][66] = str2.Trim();
             }
 
             str2 = Rs(xsbd1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbd1 != 0)
             {
-                tab1.Rows[^1].ItemArray[67] = str2.Trim();
+                tab1.Rows[^1][67] = str2.Trim();
             }
 
             str2 = Rs(xsb61);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsb61 != 0)
             {
-                tab1.Rows[^1].ItemArray[68] = str2.Trim();
+                tab1.Rows[^1][68] = str2.Trim();
             }
 
             str2 = Rs(xsbsp);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbsp != 0)
             {
-                tab1.Rows[^1].ItemArray[69] = str2.Trim();
+                tab1.Rows[^1][69] = str2.Trim();
             }
 
             str2 = Rs(xsbsr);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xsbsr != 0)
             {
-                tab1.Rows[^1].ItemArray[70] = str2.Trim();
+                tab1.Rows[^1][70] = str2.Trim();
             }
 
             str2 = Rs(xpbo1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbo1 != 0)
             {
-                tab1.Rows[^1].ItemArray[71] = str2.Trim();
+                tab1.Rows[^1][71] = str2.Trim();
             }
 
             str2 = Rs(xpba1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpba1 != 0)
             {
-                tab1.Rows[^1].ItemArray[72] = str2.Trim();
+                tab1.Rows[^1][72] = str2.Trim();
             }
 
             str2 = Rs(xpbx1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbx1 != 0)
             {
-                tab1.Rows[^1].ItemArray[73] = str2.Trim();
+                tab1.Rows[^1][73] = str2.Trim();
             }
 
             str2 = Rs(xpbt1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbt1 != 0)
             {
-                tab1.Rows[^1].ItemArray[74] = str2.Trim();
+                tab1.Rows[^1][74] = str2.Trim();
             }
 
             str2 = Rs(xpbxx1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbxx1 != 0)
             {
-                tab1.Rows[^1].ItemArray[75] = str2.Trim();
+                tab1.Rows[^1][75] = str2.Trim();
             }
 
             str2 = Rs(xpbf1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbf1 != 0)
             {
-                tab1.Rows[^1].ItemArray[76] = str2.Trim();
+                tab1.Rows[^1][76] = str2.Trim();
             }
 
             str2 = Rs(xpbd1);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbd1 != 0)
             {
-                tab1.Rows[^1].ItemArray[77] = str2.Trim();
+                tab1.Rows[^1][77] = str2.Trim();
             }
 
             str2 = Rs(xpb61);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpb61 != 0)
             {
-                tab1.Rows[^1].ItemArray[78] = str2.Trim();
+                tab1.Rows[^1][78] = str2.Trim();
             }
 
             str2 = Rs(xpbsp);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbsp != 0)
             {
-                tab1.Rows[^1].ItemArray[79] = str2.Trim();
+                tab1.Rows[^1][79] = str2.Trim();
             }
 
             str2 = Rs(xpbsr);
 
-            if (int.Parse(str2, CultureInfo.InvariantCulture) != 0)
+            if (xpbsr != 0)
             {
-                tab1.Rows[^1].ItemArray[80] = str2.Trim();
+                tab1.Rows[^1][80] = str2.Trim();
             }
 
             var XDATE = await Api.GetDateTime().ConfigureAwait(false);
+            var sch = await Api.GetSch().ConfigureAwait(false);
+            var Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture);
+            var Ld2 = sch.BId;
+            var fileName = Trim(party.Code) + " = Party Bill " + Trim(Ld1) + " - " + Trim(Ld2) + " Rs. " + Trim(Rs(Math.Round(s_pamt4 + s_camt4 + s_tkamt4 + s_mixamt4 + s_pscamt4 + s_rscamt4 + sm_pscamt4 - (p_pamt4 + p_tkamt4 + p_mixamt4 + p_pscamt4 + p_rscamt4 + pm_pscamt4)))) + ".pdf";
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            tab1.Clear();
-            Recno[0] += 1;
+            var resultingReport = await Api.GetPartyBillReport(tab1, fileName, XDATE).ConfigureAwait(false);
+            Recno[0]++;
+            if (resultingReport is not null)
+            {
+                if (resultingReport.File is null && resultingReport?.FileName?.Contains("error", StringComparison.CurrentCultureIgnoreCase) == true)
+                {
+                    Errors = new() { "There was an error in server" };
+                }
+                else
+                {
+                    await Js.SaveAs(resultingReport.FileName, resultingReport.File).ConfigureAwait(false);
+                    loading = false;
+                }
+            }
         }
+
         private string Rs(double input)
         {
             return input.ToString("C0", numCulture);
         }
+
         private string Rs0(double input)
         {
             return input.ToString("C2", numCulture);
         }
+
         private string Trim(object? obj)
         {
             return obj?.ToString()?.Trim() ?? "";
         }
+
         private string Str(double val)
         {
             return val.ToString();
         }
+
         private double Val(object? ob)
         {
             return double.Parse(ob?.ToString() ?? "0", CultureInfo.InvariantCulture);
         }
+
         private short ValS(object? ob)
         {
             return short.Parse(ob?.ToString() ?? "0", CultureInfo.InvariantCulture);
         }
+
         public string Left(string input, int count)
         {
             return input.Substring(0, Math.Min(input.Length, count));
         }
+
         public string Right(string input, int count)
         {
             return input.Substring(Math.Max(input.Length - count, 0), Math.Min(count, input.Length));
         }
+
         public string Format(double val, string format)
         {
             return string.Format(CultureInfo.InvariantCulture, format, val);
         }
+
         public void tukrapurchase()
         {
             Recno[1] = 0;
@@ -854,10 +840,10 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                mchl = Trim(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3]);
-                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[1]);
-                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                if (Trim(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[4]) == "Scheme")
+                mchl = Trim(Inds[1].Tables[0].Rows[Recno[1]][3]);
+                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]][1]);
+                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                if (Trim(Inds[1].Tables[0].Rows[Recno[1]][4]) == "Scheme")
                 {
                     cat = "Scheme";
                 }
@@ -872,7 +858,7 @@ namespace XtremeWasmApp.Pages
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
                     MQTY += 1;
-                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
 
                     Recno[1] += 1;
 
@@ -880,7 +866,7 @@ namespace XtremeWasmApp.Pages
                     {
                         break;
                     }
-                    else if (Val(mchl) != Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3]))
+                    else if (Val(mchl) != Val(Inds[1].Tables[0].Rows[Recno[1]][3]))
                     {
                         break;
                     }
@@ -892,97 +878,96 @@ namespace XtremeWasmApp.Pages
                 p_tkamt3 += WAMT;
                 p_tkamt4 += (MQTY * MRATE) - WAMT;
 
-                tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                tab1.Rows[^1].ItemArray[100] = "(( Tukra Purchase ))";
-                tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(Val(mchl))), 5);
-                tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
+                tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                tab1.Rows[^1][100] = "(( Tukra Purchase ))";
+                tab1.Rows[^1][2] = Right("00000" + Trim(Str(Val(mchl))), 5);
+                tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
 
                 str2 = Rs0(MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[5] = Trim(str2);
+                    tab1.Rows[^1][5] = Trim(str2);
                 }
 
                 str2 = Rs(MQTY * MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[6] = Trim(str2);
-                    tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                    tab1.Rows[^1][6] = Trim(str2);
+                    tab1.Rows[^1][10] = Trim(str2);
                 }
-
 
                 if (cat == "" & MCH_PER == 0.25)
                 {
-                    tab1.Rows[^1].ItemArray[7] = "¼ %";
+                    tab1.Rows[^1][7] = "¼ %";
                 }
 
                 if (cat == "" & MCH_PER == 0.5)
                 {
-                    tab1.Rows[^1].ItemArray[7] = "½ %";
+                    tab1.Rows[^1][7] = "½ %";
                 }
 
                 if (cat == "" & MCH_PER >= 1)
                 {
-                    tab1.Rows[^1].ItemArray[7] = Trim(Str(MCH_PER)) + " %";
+                    tab1.Rows[^1][7] = Trim(Str(MCH_PER)) + " %";
                 }
 
                 if (cat == "Scheme")
                 {
-                    tab1.Rows[^1].ItemArray[7] = "Scheme";
+                    tab1.Rows[^1][7] = "Scheme";
                 }
 
                 str2 = Rs(WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                    tab1.Rows[^1][11] = Trim(str2);
                 }
 
-                str2 = Rs0(((MQTY * MRATE) - WAMT));
+                str2 = Rs0((MQTY * MRATE) - WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                    tab1.Rows[^1][12] = Trim(str2);
                 }
 
                 if (p_tkqty > 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(p_tkqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(p_tkqty))), "########"));
                 }
 
                 str2 = Rs(p_tkamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs(p_tkamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(p_tkamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(p_tkamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[51] = "Qty";
-                tab1.Rows[^1].ItemArray[52] = "Tukra Rate";
-                tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                tab1.Rows[^1][51] = "Qty";
+                tab1.Rows[^1][52] = "Tukra Rate";
+                tab1.Rows[^1][53] = "Less Comm %";
             }
         }
 
@@ -992,7 +977,7 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] = "";
+                Inds[1].Tables[0].Rows[Recno[1]][8] = "";
                 Recno[1] += 1;
             }
 
@@ -1014,12 +999,12 @@ namespace XtremeWasmApp.Pages
             double mper = 0;
 
             // 0    1    2    3    4      5     6      7      8
-            // Mkey, Vid, Vno, Ref, pid, sc_rate, pr, win_amt, dlk 
+            // Mkey, Vid, Vno, Ref, pid, sc_rate, pr, win_amt, dlk
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
 
                 // ***************************** Packet *********************************************
 
@@ -1027,17 +1012,17 @@ namespace XtremeWasmApp.Pages
                 mqty = 0;
                 WAMT = 0;
                 xxsc = 0;
-                mper = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[6]);
-                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                mper = Val(Inds[1].Tables[0].Rows[Recno[1]][6]);
+                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) == mper & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Val(Inds[1].Tables[0].Rows[Recno[2]][6]) == mper & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
-                        Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] = "D";
+                        Inds[1].Tables[0].Rows[Recno[2]][8] = "D";
 
                         mqty += 1;
-                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[7]);
+                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][7]);
                     }
 
                     Recno[2] += 1;
@@ -1048,7 +1033,7 @@ namespace XtremeWasmApp.Pages
                     }
                 }
 
-                xpbsp += (xxsc * mqty);
+                xpbsp += xxsc * mqty;
 
                 if (mqty > 0)
                 {
@@ -1058,94 +1043,94 @@ namespace XtremeWasmApp.Pages
                     p_pscamt3 += WAMT;
                     p_pscamt4 += (mqty * xxsc) - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Scheme Packet Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Scheme Packet Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
 
-                    tab1.Rows[^1].ItemArray[5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00"));
+                    tab1.Rows[^1][5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00"));
 
                     str2 = Rs(xxsc * mqty);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     // If xxsc > 0 Then
-                    tab1.Rows[^1].ItemArray[7] = Trim(Format(double.Parse(Trim(Str(mper))), "########.00")) + " %";
+                    tab1.Rows[^1][7] = Trim(Format(double.Parse(Trim(Str(mper))), "########.00")) + " %";
                     // End If
 
-                    str2 = Rs((mqty * xxsc));
+                    str2 = Rs(mqty * xxsc);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
                     str2 = Rs0((mqty * xxsc) - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Qty";
-                    tab1.Rows[^1].ItemArray[52] = "Sch . Rate";
-                    tab1.Rows[^1].ItemArray[53] = "Packet (Per %)";
+                    tab1.Rows[^1][51] = "Qty";
+                    tab1.Rows[^1][52] = "Sch . Rate";
+                    tab1.Rows[^1][53] = "Packet (Per %)";
                 }
 
                 if (Val(pm_pscqty) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(p_pscqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(p_pscqty))), "########"));
                 }
 
                 str2 = Rs(p_pscamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs0(p_pscamt1 - s_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[23] = Trim(str2);
+                    tab1.Rows[^1][23] = Trim(str2);
                 }
 
                 str2 = Rs(p_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(p_pscamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(p_pscamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Inds[1].Tables[0].Rows[Recno[1]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
                         break;
                     }
@@ -1168,7 +1153,7 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] = "";
+                Inds[1].Tables[0].Rows[Recno[1]][8] = "";
                 Recno[1] += 1;
             }
 
@@ -1195,8 +1180,8 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
 
                 // ***************************** Ring *********************************************
 
@@ -1207,19 +1192,19 @@ namespace XtremeWasmApp.Pages
                 mrate1 = 0;
                 xxsc = 0;
                 ms_com = 0;
-                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "3" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "3" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
-                        Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] = "D";
+                        Inds[1].Tables[0].Rows[Recno[2]][8] = "D";
 
-                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[11]);
-                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[7]);
-                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[9]);
-                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[10]);
-                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]);
+                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]][11]);
+                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][7]);
+                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]][9]);
+                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]][10]);
+                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]][6]);
                     }
 
                     Recno[2] += 1;
@@ -1238,57 +1223,57 @@ namespace XtremeWasmApp.Pages
                     pm_pscamt1 += mrate;
                     pm_pscamt2 += mrate1;
                     pm_pscamt3 += WAMT;
-                    pm_pscamt4 += (mrate1) - WAMT;
+                    pm_pscamt4 += mrate1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Scheme Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Scheme Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
 
-                    tab1.Rows[^1].ItemArray[5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-R";
+                    tab1.Rows[^1][5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-R";
 
                     str2 = Rs(mrate);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (ms_com > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
                     }
 
-                    if (((mrate / 100) * ms_com) != 0)
+                    if ((mrate / 100 * ms_com) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mrate / 100) * ms_com)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mrate / 100 * ms_com))), "########.00"));
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com));
+                    str2 = Rs0(mrate - mrate / 100 * ms_com);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com) - WAMT);
+                    str2 = Rs0(mrate - mrate / 100 * ms_com - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Qty";
-                    tab1.Rows[^1].ItemArray[52] = "Pkt / Ring";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Qty";
+                    tab1.Rows[^1][52] = "Pkt / Ring";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Packet *********************************************
@@ -1297,7 +1282,7 @@ namespace XtremeWasmApp.Pages
 
                 while (Recno[2] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]) & Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]) & Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
                         break;
                     }
@@ -1314,24 +1299,23 @@ namespace XtremeWasmApp.Pages
                     }
                 }
 
-
                 mqty = 0;
                 WAMT = 0;
                 mrate = 0;
                 mrate1 = 0;
                 ms_com = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
-                        Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] = "D";
+                        Inds[1].Tables[0].Rows[Recno[2]][8] = "D";
 
-                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[11]);
-                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[7]);
-                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[9]);
-                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[10]);
-                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]);
+                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]][11]);
+                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][7]);
+                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]][9]);
+                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]][10]);
+                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]][6]);
                     }
 
                     Recno[2] += 1;
@@ -1350,102 +1334,102 @@ namespace XtremeWasmApp.Pages
                     pm_pscamt1 += mrate;
                     pm_pscamt2 += mrate1;
                     pm_pscamt3 += WAMT;
-                    pm_pscamt4 += (mrate1) - WAMT;
+                    pm_pscamt4 += mrate1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Scheme Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Scheme Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
 
-                    tab1.Rows[^1].ItemArray[5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-P";
+                    tab1.Rows[^1][5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-P";
 
                     str2 = Rs(mrate);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (ms_com > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
                     }
 
-                    if (((mrate / 100) * ms_com) != 0)
+                    if ((mrate / 100 * ms_com) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mrate / 100) * ms_com)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mrate / 100 * ms_com))), "########.00"));
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com));
+                    str2 = Rs0(mrate - mrate / 100 * ms_com);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com) - WAMT);
+                    str2 = Rs0(mrate - mrate / 100 * ms_com - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Qty";
-                    tab1.Rows[^1].ItemArray[52] = "Pkt / Ring";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Qty";
+                    tab1.Rows[^1][52] = "Pkt / Ring";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 if (Val(pm_pscqty) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(pm_pscqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(pm_pscqty))), "########"));
                 }
 
                 str2 = Rs(pm_pscamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs0(pm_pscamt1 - pm_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[23] = Trim(str2);
+                    tab1.Rows[^1][23] = Trim(str2);
                 }
 
                 str2 = Rs(pm_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(pm_pscamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(pm_pscamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Inds[1].Tables[0].Rows[Recno[1]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
                         break;
                     }
@@ -1481,27 +1465,26 @@ namespace XtremeWasmApp.Pages
             double Xmprize = 0;
             double Xwamt = 0;
 
-
             p_mixamt1 = 0;
             p_mixamt2 = 0;
             p_mixamt3 = 0;
             p_mixamt4 = 0;
 
-            // 0    1     2   3    4      5       6       7       8       9        10      11      12       13       14        15       16   
+            // 0    1     2   3    4      5       6       7       8       9        10      11      12       13       14        15       16
             // Mkey, Vid, Vno, Ref, pid, Op_com, Ak_com, Td_com, Fc_com, Dot_com, D6_com, Xak_com, Xtd_com, Sc_own, s_prize1, s_prize2, win_amt
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
-                mcom1 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
-                mcom2 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[6]);
-                mcom3 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[7]);
-                mcom4 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8]);
-                mcom5 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[9]);
-                mcom6 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[11]);
-                mcom7 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[12]);
-                mcom8 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[10]);
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
+                mcom1 = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
+                mcom2 = Val(Inds[1].Tables[0].Rows[Recno[1]][6]);
+                mcom3 = Val(Inds[1].Tables[0].Rows[Recno[1]][7]);
+                mcom4 = Val(Inds[1].Tables[0].Rows[Recno[1]][8]);
+                mcom5 = Val(Inds[1].Tables[0].Rows[Recno[1]][9]);
+                mcom6 = Val(Inds[1].Tables[0].Rows[Recno[1]][11]);
+                mcom7 = Val(Inds[1].Tables[0].Rows[Recno[1]][12]);
+                mcom8 = Val(Inds[1].Tables[0].Rows[Recno[1]][10]);
 
                 // ***************************** Open *********************************************
 
@@ -1512,19 +1495,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 11)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 11)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -1535,115 +1518,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
+                xpbo1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    p_mixamt2 += mprize - mprize / 100 * mcom1;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Op";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Op";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Op";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Op";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Close *********************************************
@@ -1655,19 +1638,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 12)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 12)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -1678,116 +1661,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xpbo1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    p_mixamt2 += mprize - mprize / 100 * mcom1;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Cz";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Cz";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Cz";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Cz";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Center *********************************************
@@ -1799,19 +1781,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 13)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 13)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -1822,117 +1804,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
-
+                xpbo1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    p_mixamt2 += mprize - mprize / 100 * mcom1;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Cnt";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Cnt";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Cnt";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Cnt";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Center *********************************************
@@ -1944,19 +1924,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 14)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 14)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -1967,117 +1947,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
-
+                xpbo1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    p_mixamt2 += mprize - mprize / 100 * mcom1;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XOp";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XOp";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XOp";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XOp";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Akara *********************************************
@@ -2089,19 +2067,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 22)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 22)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2112,116 +2090,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xpba1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom2;
+                    p_mixamt2 += mprize - mprize / 100 * mcom2;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom2) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom2 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Ak";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Ak";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom2 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom2))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom2))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom2) != 0)
+                    if ((mprize / 100 * mcom2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom2)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom2))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom2));
+                    str2 = Rs0(mprize - mprize / 100 * mcom2);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom2) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom2 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom2);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom2) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Ak";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Ak";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7]) > 0)
+                    if (Val(mcom2) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom2)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])) != 0)
+                    if ((Xmprize / 100 * Val(mcom2)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom2)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom2));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom2) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XAkara *********************************************
@@ -2233,19 +2210,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 23)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 23)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2256,116 +2233,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xpbx1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom6;
+                    p_mixamt2 += mprize - mprize / 100 * mcom6;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom6) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom6 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XAk";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom6 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom6) != 0)
+                    if ((mprize / 100 * mcom6) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom6)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom6))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6));
+                    str2 = Rs0(mprize - mprize / 100 * mcom6);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom6 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom6);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XAk";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]) > 0)
+                    if (Val(mcom6) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom6)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) != 0)
+                    if ((Xmprize / 100 * Val(mcom6)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom6)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XXAkara *********************************************
@@ -2377,19 +2353,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 24)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 24)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2400,116 +2376,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xpbx1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom6;
+                    p_mixamt2 += mprize - mprize / 100 * mcom6;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom6) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom6 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XXAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XXAk";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom6 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom6) != 0)
+                    if ((mprize / 100 * mcom6) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom6)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom6))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6));
+                    str2 = Rs0(mprize - mprize / 100 * mcom6);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom6 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom6);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XXAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XXAk";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]) > 0)
+                    if (Val(mcom6) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom6)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) != 0)
+                    if ((Xmprize / 100 * Val(mcom6)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom6)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Tandela *********************************************
@@ -2521,19 +2496,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 33)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 33)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2544,116 +2519,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xpbt1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom3;
+                    p_mixamt2 += mprize - mprize / 100 * mcom3;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom3) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom3 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Td";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Td";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom3 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom3))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom3))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom3) != 0)
+                    if ((mprize / 100 * mcom3) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom3)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom3))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom3));
+                    str2 = Rs0(mprize - mprize / 100 * mcom3);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom3) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom3 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom3);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom3) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Td";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Td";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9]) > 0)
+                    if (Val(mcom3) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom3)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])) != 0)
+                    if ((Xmprize / 100 * Val(mcom3)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom3)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom3));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom3) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XTandela *********************************************
@@ -2665,19 +2639,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 34)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 34)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2688,118 +2662,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
-
-
+                xpbxx1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom7;
+                    p_mixamt2 += mprize - mprize / 100 * mcom7;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom7) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom7 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XTd";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XTd";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom7 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom7))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom7))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom7) != 0)
+                    if ((mprize / 100 * mcom7) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom7)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom7))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom7));
+                    str2 = Rs0(mprize - mprize / 100 * mcom7);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom7) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom7 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom7);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom7) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XTd";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XTd";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10]) > 0)
+                    if (Val(mcom7) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom7)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])) != 0)
+                    if ((Xmprize / 100 * Val(mcom7)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom7)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom7));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom7) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Fourcast *********************************************
@@ -2811,19 +2782,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 44)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 44)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2835,117 +2806,116 @@ namespace XtremeWasmApp.Pages
                     }
                 }
 
-                xpbf1 += (mprize + Xmprize);
+                xpbf1 += mprize + Xmprize;
 
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom4;
+                    p_mixamt2 += mprize - mprize / 100 * mcom4;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom4) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom4 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Fc";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Fc";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom4 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom4))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom4))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom4) != 0)
+                    if ((mprize / 100 * mcom4) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom4)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom4))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom4));
+                    str2 = Rs0(mprize - mprize / 100 * mcom4);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom4) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom4 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom4);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom4) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Fc";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Fc";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11]) > 0)
+                    if (Val(mcom4) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom4)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])) != 0)
+                    if ((Xmprize / 100 * Val(mcom4)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom4)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom4));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom4) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Five - Dot *********************************************
@@ -2957,19 +2927,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 52)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 52)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -2981,117 +2951,116 @@ namespace XtremeWasmApp.Pages
                     }
                 }
 
-                xpbd1 += (mprize + Xmprize);
+                xpbd1 += mprize + Xmprize;
 
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom5;
+                    p_mixamt2 += mprize - mprize / 100 * mcom5;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom5) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom5 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "5D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "5D";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom5 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom5))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom5))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom5) != 0)
+                    if ((mprize / 100 * mcom5) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom5)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom5))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom5));
+                    str2 = Rs0(mprize - mprize / 100 * mcom5);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom5) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom5 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom5);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom5) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "5D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "5D";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12]) > 0)
+                    if (Val(mcom5) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom5)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])) != 0)
+                    if ((Xmprize / 100 * Val(mcom5)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom5)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom5));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom5) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Six - Dot *********************************************
@@ -3103,19 +3072,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 62)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 62)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -3127,158 +3096,156 @@ namespace XtremeWasmApp.Pages
                     }
                 }
 
-                xpb61 += (mprize + Xmprize);
+                xpb61 += mprize + Xmprize;
 
                 if (mprize != 0)
                 {
                     p_mixamt1 += mprize;
-                    p_mixamt2 += mprize - (mprize / 100) * mcom8;
+                    p_mixamt2 += mprize - mprize / 100 * mcom8;
                     p_mixamt3 += WAMT;
-                    p_mixamt4 += (mprize - (mprize / 100) * mcom8) - WAMT;
+                    p_mixamt4 += mprize - mprize / 100 * mcom8 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "6D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "6D";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom8 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom8))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom8))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom8) != 0)
+                    if ((mprize / 100 * mcom8) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom8)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom8))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom8));
+                    str2 = Rs0(mprize - mprize / 100 * mcom8);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom8) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom8 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     p_mixamt1 += Xmprize;
-                    p_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13]);
+                    p_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom8);
                     p_mixamt3 += Xwamt;
-                    p_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])) - Xwamt;
+                    p_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom8) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Purchase ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "6D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                    tab1.Rows[^1][100] = "(( Mix Purchase ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "6D";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13]) > 0)
+                    if (Val(mcom8) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom8)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])) != 0)
+                    if ((Xmprize / 100 * Val(mcom8)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom8)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom8));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom8) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 str2 = Rs(p_mixamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs0(p_mixamt1 - p_mixamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[23] = Trim(str2);
+                    tab1.Rows[^1][23] = Trim(str2);
                 }
 
                 str2 = Rs(p_mixamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(p_mixamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(p_mixamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]))
+                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]][2]))
                     {
                         Recno[1] += 1;
                     }
@@ -3317,16 +3284,16 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[4]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
-                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]][4]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
+                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
                 Recno[2] = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]][2]))
                 {
                     MQTY += 1;
-                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[6]);
+                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]][6]);
                     Recno[1] += 1;
 
                     if (Recno[1] >= Inds[1].Tables[0].Rows.Count)
@@ -3336,84 +3303,84 @@ namespace XtremeWasmApp.Pages
                 }
 
                 p_pqty += MQTY;
-                p_pamt1 += (MQTY * MRATE);
-                p_pamt2 += (MQTY * MRATE);
+                p_pamt1 += MQTY * MRATE;
+                p_pamt2 += MQTY * MRATE;
                 p_pamt3 += WAMT;
                 p_pamt4 += (MQTY * MRATE) - WAMT;
 
-                tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "P");
-                tab1.Rows[^1].ItemArray[100] = "(( % Packet Purchase ))";
-                tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
+                tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "P");
+                tab1.Rows[^1][100] = "(( % Packet Purchase ))";
+                tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                tab1.Rows[^1][3] = Trim(MREF);
+                tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
 
                 str2 = Rs0(MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[5] = Trim(str2);
+                    tab1.Rows[^1][5] = Trim(str2);
                 }
 
                 str2 = Rs(MQTY * MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[6] = Trim(str2);
-                    tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                    tab1.Rows[^1][6] = Trim(str2);
+                    tab1.Rows[^1][10] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[7] = Trim(Str(MCH_PER)) + " %";
+                tab1.Rows[^1][7] = Trim(Str(MCH_PER)) + " %";
 
                 str2 = Rs(WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                    tab1.Rows[^1][11] = Trim(str2);
                 }
 
-                str2 = Rs0(((MQTY * MRATE) - WAMT));
+                str2 = Rs0((MQTY * MRATE) - WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                    tab1.Rows[^1][12] = Trim(str2);
                 }
 
                 if (s_pqty > 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(p_pqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(p_pqty))), "########"));
                 }
 
                 str2 = Rs(p_pamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs(p_pamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(p_pamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(p_pamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[51] = "Qty";
-                tab1.Rows[^1].ItemArray[52] = "Pkt . Rate";
-                tab1.Rows[^1].ItemArray[53] = "Packet (Per %)";
+                tab1.Rows[^1][51] = "Qty";
+                tab1.Rows[^1][52] = "Pkt . Rate";
+                tab1.Rows[^1][53] = "Packet (Per %)";
             }
         }
 
@@ -3440,10 +3407,10 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                mchl = Trim(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3]);
-                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[1]);
-                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                if (Trim(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[4]) == "Scheme")
+                mchl = Trim(Inds[1].Tables[0].Rows[Recno[1]][3]);
+                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]][1]);
+                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                if (Trim(Inds[1].Tables[0].Rows[Recno[1]][4]) == "Scheme")
                 {
                     cat = "Scheme";
                 }
@@ -3458,7 +3425,7 @@ namespace XtremeWasmApp.Pages
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
                     MQTY += 1;
-                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
 
                     Recno[1] += 1;
 
@@ -3466,7 +3433,7 @@ namespace XtremeWasmApp.Pages
                     {
                         break;
                     }
-                    else if (Val(mchl) != Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3]))
+                    else if (Val(mchl) != Val(Inds[1].Tables[0].Rows[Recno[1]][3]))
                     {
                         break;
                     }
@@ -3478,97 +3445,96 @@ namespace XtremeWasmApp.Pages
                 s_tkamt3 += WAMT;
                 s_tkamt4 += (MQTY * MRATE) - WAMT;
 
-                tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                tab1.Rows[^1].ItemArray[100] = "(( Tukra Sale ))";
-                tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(Val(mchl))), 5);
-                tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
+                tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                tab1.Rows[^1][100] = "(( Tukra Sale ))";
+                tab1.Rows[^1][2] = Right("00000" + Trim(Str(Val(mchl))), 5);
+                tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
 
                 str2 = Rs0(MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[5] = Trim(str2);
+                    tab1.Rows[^1][5] = Trim(str2);
                 }
 
                 str2 = Rs(MQTY * MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[6] = Trim(str2);
-                    tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                    tab1.Rows[^1][6] = Trim(str2);
+                    tab1.Rows[^1][10] = Trim(str2);
                 }
-
 
                 if (cat == "" & MCH_PER == 0.25)
                 {
-                    tab1.Rows[^1].ItemArray[7] = "¼ %";
+                    tab1.Rows[^1][7] = "¼ %";
                 }
 
                 if (cat == "" & MCH_PER == 0.5)
                 {
-                    tab1.Rows[^1].ItemArray[7] = "½ %";
+                    tab1.Rows[^1][7] = "½ %";
                 }
 
                 if (cat == "" & MCH_PER >= 1)
                 {
-                    tab1.Rows[^1].ItemArray[7] = Trim(Str(MCH_PER)) + " %";
+                    tab1.Rows[^1][7] = Trim(Str(MCH_PER)) + " %";
                 }
 
                 if (cat == "Scheme")
                 {
-                    tab1.Rows[^1].ItemArray[7] = "Scheme";
+                    tab1.Rows[^1][7] = "Scheme";
                 }
 
                 str2 = Rs(WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                    tab1.Rows[^1][11] = Trim(str2);
                 }
 
-                str2 = Rs0(((MQTY * MRATE) - WAMT));
+                str2 = Rs0((MQTY * MRATE) - WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                    tab1.Rows[^1][12] = Trim(str2);
                 }
 
                 if (s_tkqty > 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(s_tkqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(s_tkqty))), "########"));
                 }
 
                 str2 = Rs(s_tkamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs(s_tkamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(s_tkamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(s_tkamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[51] = "Qty";
-                tab1.Rows[^1].ItemArray[52] = "Tukra Rate";
-                tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                tab1.Rows[^1][51] = "Qty";
+                tab1.Rows[^1][52] = "Tukra Rate";
+                tab1.Rows[^1][53] = "Less Comm %";
             }
         }
 
@@ -3592,14 +3558,14 @@ namespace XtremeWasmApp.Pages
             // 0      1        2       3     4       5     6
             // Mkey, ch_per, pkt_rate, chl, ctype, ch_no1, dlk
 
-            // 0      1      2        3 
+            // 0      1      2        3
             // Mkey, CType, ch_no1, win_amt
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                mchl = Trim(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3]);
-                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[1]);
-                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
+                mchl = Trim(Inds[1].Tables[0].Rows[Recno[1]][3]);
+                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]][1]);
+                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]][2]);
                 MQTY = 0;
                 WAMT = 0;
 
@@ -3610,9 +3576,9 @@ namespace XtremeWasmApp.Pages
 
                     while (Recno[2] < Inds[2].Tables[0].Rows.Count)
                     {
-                        if (Trim(Trim(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[4])) == Trim(Trim(Inds[2].Tables[0].Rows[Recno[2]].ItemArray[1])) & Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]) == Val(Inds[2].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                        if (Trim(Trim(Inds[1].Tables[0].Rows[Recno[1]][4])) == Trim(Trim(Inds[2].Tables[0].Rows[Recno[2]][1])) & Val(Inds[1].Tables[0].Rows[Recno[1]][5]) == Val(Inds[2].Tables[0].Rows[Recno[2]][2]))
                         {
-                            WAMT += Val(Inds[2].Tables[0].Rows[Recno[2]].ItemArray[3]);
+                            WAMT += Val(Inds[2].Tables[0].Rows[Recno[2]][3]);
                         }
 
                         Recno[2] += 1;
@@ -3624,7 +3590,7 @@ namespace XtremeWasmApp.Pages
                     {
                         break;
                     }
-                    else if (Val(mchl) != Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3]))
+                    else if (Val(mchl) != Val(Inds[1].Tables[0].Rows[Recno[1]][3]))
                     {
                         break;
                     }
@@ -3636,91 +3602,91 @@ namespace XtremeWasmApp.Pages
                 s_camt3 += WAMT;
                 s_camt4 += (MQTY * MRATE) - WAMT;
 
-                tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                tab1.Rows[^1].ItemArray[100] = "(( Chart Sale ))";
-                tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(Val(mchl))), 5);
-                tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
+                tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                tab1.Rows[^1][100] = "(( Chart Sale ))";
+                tab1.Rows[^1][2] = Right("00000" + Trim(Str(Val(mchl))), 5);
+                tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
 
                 str2 = Rs0(MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[5] = Trim(str2);
+                    tab1.Rows[^1][5] = Trim(str2);
                 }
 
                 str2 = Rs(MQTY * MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[6] = Trim(str2);
-                    tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                    tab1.Rows[^1][6] = Trim(str2);
+                    tab1.Rows[^1][10] = Trim(str2);
                 }
 
                 if (MCH_PER == 0.25)
                 {
-                    tab1.Rows[^1].ItemArray[7] = "¼ %";
+                    tab1.Rows[^1][7] = "¼ %";
                 }
 
                 if (MCH_PER == 0.5)
                 {
-                    tab1.Rows[^1].ItemArray[7] = "½ %";
+                    tab1.Rows[^1][7] = "½ %";
                 }
 
                 if (MCH_PER >= 1)
                 {
-                    tab1.Rows[^1].ItemArray[7] = Trim(Str(MCH_PER)) + " %";
+                    tab1.Rows[^1][7] = Trim(Str(MCH_PER)) + " %";
                 }
 
                 str2 = Rs(WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                    tab1.Rows[^1][11] = Trim(str2);
                 }
 
-                str2 = Rs0(((MQTY * MRATE) - WAMT));
+                str2 = Rs0((MQTY * MRATE) - WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                    tab1.Rows[^1][12] = Trim(str2);
                 }
 
                 if (s_cqty > 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(s_cqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(s_cqty))), "########"));
                 }
 
                 str2 = Rs(s_camt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs(s_camt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(s_camt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(s_camt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[51] = "Qty";
-                tab1.Rows[^1].ItemArray[52] = "Chart Rate";
-                tab1.Rows[^1].ItemArray[53] = "Type / Com%";
+                tab1.Rows[^1][51] = "Qty";
+                tab1.Rows[^1][52] = "Chart Rate";
+                tab1.Rows[^1][53] = "Type / Com%";
             }
         }
 
@@ -3730,7 +3696,7 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] = "";
+                Inds[1].Tables[0].Rows[Recno[1]][8] = "";
                 Recno[1] += 1;
             }
 
@@ -3752,12 +3718,12 @@ namespace XtremeWasmApp.Pages
             double mper = 0;
 
             // 0    1    2    3    4      5     6      7      8
-            // Mkey, Vid, Vno, Ref, pid, sc_rate, pr, win_amt, dlk 
+            // Mkey, Vid, Vno, Ref, pid, sc_rate, pr, win_amt, dlk
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
 
                 // ***************************** Packet *********************************************
 
@@ -3765,17 +3731,17 @@ namespace XtremeWasmApp.Pages
                 mqty = 0;
                 WAMT = 0;
                 xxsc = 0;
-                mper = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[6]);
-                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                mper = Val(Inds[1].Tables[0].Rows[Recno[1]][6]);
+                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) == mper & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Val(Inds[1].Tables[0].Rows[Recno[2]][6]) == mper & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
-                        Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] = "D";
+                        Inds[1].Tables[0].Rows[Recno[2]][8] = "D";
 
                         mqty += 1;
-                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[7]);
+                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][7]);
                     }
 
                     Recno[2] += 1;
@@ -3785,7 +3751,7 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbsp += (xxsc * mqty);
                 if (mqty > 0)
                 {
                     s_pscqty += mqty;
@@ -3794,94 +3760,94 @@ namespace XtremeWasmApp.Pages
                     s_pscamt3 += WAMT;
                     s_pscamt4 += (mqty * xxsc) - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Scheme Packet Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Scheme Packet Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
 
-                    tab1.Rows[^1].ItemArray[5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00"));
+                    tab1.Rows[^1][5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00"));
 
                     str2 = Rs(xxsc * mqty);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     // If xxsc > 0 Then
-                    tab1.Rows[^1].ItemArray[7] = Trim(Format(double.Parse(Trim(Str(mper))), "########.00")) + " %";
+                    tab1.Rows[^1][7] = Trim(Format(double.Parse(Trim(Str(mper))), "########.00")) + " %";
                     // End If
 
-                    str2 = Rs((mqty * xxsc));
+                    str2 = Rs(mqty * xxsc);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
                     str2 = Rs0((mqty * xxsc) - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Qty";
-                    tab1.Rows[^1].ItemArray[52] = "Sch . Rate";
-                    tab1.Rows[^1].ItemArray[53] = "Packet (Per %)";
+                    tab1.Rows[^1][51] = "Qty";
+                    tab1.Rows[^1][52] = "Sch . Rate";
+                    tab1.Rows[^1][53] = "Packet (Per %)";
                 }
 
                 if (Val(sm_pscqty) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(s_pscqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(s_pscqty))), "########"));
                 }
 
                 str2 = Rs(s_pscamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs0(s_pscamt1 - s_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[23] = Trim(str2);
+                    tab1.Rows[^1][23] = Trim(str2);
                 }
 
                 str2 = Rs(s_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(s_pscamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(s_pscamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Inds[1].Tables[0].Rows[Recno[1]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
                         break;
                     }
@@ -3904,7 +3870,7 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] = "";
+                Inds[1].Tables[0].Rows[Recno[1]][8] = "";
                 Recno[1] += 1;
             }
 
@@ -3931,8 +3897,8 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
 
                 // ***************************** Ring *********************************************
 
@@ -3943,19 +3909,19 @@ namespace XtremeWasmApp.Pages
                 mrate1 = 0;
                 xxsc = 0;
                 ms_com = 0;
-                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                xxsc = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "3" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "3" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
-                        Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] = "D";
+                        Inds[1].Tables[0].Rows[Recno[2]][8] = "D";
 
-                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[11]);
-                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[7]);
-                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[9]);
-                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[10]);
-                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]);
+                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]][11]);
+                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][7]);
+                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]][9]);
+                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]][10]);
+                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]][6]);
                     }
 
                     Recno[2] += 1;
@@ -3965,65 +3931,64 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
-
+                xsbsr += mrate;
                 if (mrate > 0)
                 {
                     sm_pscqty += mqty;
                     sm_pscamt1 += mrate;
                     sm_pscamt2 += mrate1;
                     sm_pscamt3 += WAMT;
-                    sm_pscamt4 += (mrate1) - WAMT;
+                    sm_pscamt4 += mrate1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Scheme Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Scheme Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
 
-                    tab1.Rows[^1].ItemArray[5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-R";
+                    tab1.Rows[^1][5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-R";
 
                     str2 = Rs(mrate);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (ms_com > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
                     }
 
-                    if (((mrate / 100) * ms_com) != 0)
+                    if ((mrate / 100 * ms_com) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mrate / 100) * ms_com)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mrate / 100 * ms_com))), "########.00"));
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com));
+                    str2 = Rs0(mrate - mrate / 100 * ms_com);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com) - WAMT);
+                    str2 = Rs0(mrate - mrate / 100 * ms_com - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Qty";
-                    tab1.Rows[^1].ItemArray[52] = "Pkt / Ring";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Qty";
+                    tab1.Rows[^1][52] = "Pkt / Ring";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Packet *********************************************
@@ -4032,7 +3997,7 @@ namespace XtremeWasmApp.Pages
 
                 while (Recno[2] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]) & Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]) & Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
                         break;
                     }
@@ -4049,24 +4014,23 @@ namespace XtremeWasmApp.Pages
                     }
                 }
 
-
                 mqty = 0;
                 WAMT = 0;
                 mrate = 0;
                 mrate1 = 0;
                 ms_com = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Trim(Inds[1].Tables[0].Rows[Recno[2]][4]) == "4" & Val(Inds[1].Tables[0].Rows[Recno[2]][5]) == xxsc & Inds[1].Tables[0].Rows[Recno[2]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
-                        Inds[1].Tables[0].Rows[Recno[2]].ItemArray[8] = "D";
+                        Inds[1].Tables[0].Rows[Recno[2]][8] = "D";
 
-                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[11]);
-                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[7]);
-                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[9]);
-                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[10]);
-                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]);
+                        mqty += ValS(Inds[1].Tables[0].Rows[Recno[2]][11]);
+                        WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][7]);
+                        mrate += Val(Inds[1].Tables[0].Rows[Recno[2]][9]);
+                        mrate1 += Val(Inds[1].Tables[0].Rows[Recno[2]][10]);
+                        ms_com = Val(Inds[1].Tables[0].Rows[Recno[2]][6]);
                     }
 
                     Recno[2] += 1;
@@ -4076,109 +4040,109 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbsp += mrate;
                 if (mrate > 0)
                 {
                     sm_pscqty += mqty;
                     sm_pscamt1 += mrate;
                     sm_pscamt2 += mrate1;
                     sm_pscamt3 += WAMT;
-                    sm_pscamt4 += (mrate1) - WAMT;
+                    sm_pscamt4 += mrate1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Scheme Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Scheme Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(mqty))), "########"));
 
-                    tab1.Rows[^1].ItemArray[5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-P";
+                    tab1.Rows[^1][5] = Trim(Format(double.Parse(Trim(Str(xxsc))), "########.00")) + "-P";
 
                     str2 = Rs(mrate);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (ms_com > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(ms_com))), "########.00")) + "%";
                     }
 
-                    if (((mrate / 100) * ms_com) != 0)
+                    if ((mrate / 100 * ms_com) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mrate / 100) * ms_com)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mrate / 100 * ms_com))), "########.00"));
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com));
+                    str2 = Rs0(mrate - mrate / 100 * ms_com);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mrate - (mrate / 100) * ms_com) - WAMT);
+                    str2 = Rs0(mrate - mrate / 100 * ms_com - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Qty";
-                    tab1.Rows[^1].ItemArray[52] = "Pkt / Ring";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Qty";
+                    tab1.Rows[^1][52] = "Pkt / Ring";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 if (Val(sm_pscqty) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(sm_pscqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(sm_pscqty))), "########"));
                 }
 
                 str2 = Rs(sm_pscamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs0(sm_pscamt1 - sm_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[23] = Trim(str2);
+                    tab1.Rows[^1][23] = Trim(str2);
                 }
 
                 str2 = Rs(sm_pscamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(sm_pscamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(sm_pscamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8] == null/* TODO Change to default(_) if this is not a reference type */ )
+                    if (Inds[1].Tables[0].Rows[Recno[1]][8] == null/* TODO Change to default(_) if this is not a reference type */ )
                     {
                         break;
                     }
@@ -4214,32 +4178,29 @@ namespace XtremeWasmApp.Pages
             double Xmprize = 0;
             double Xwamt = 0;
 
-
             s_mixamt1 = 0;
             s_mixamt2 = 0;
             s_mixamt3 = 0;
             s_mixamt4 = 0;
             s_mixamt5 = 0;
 
-            // 0    1     2   3    4      5       6       7       8       9        10      11      12       13       14        15       16   
+            // 0    1     2   3    4      5       6       7       8       9        10      11      12       13       14        15       16
             // Mkey, Vid, Vno, Ref, pid, Op_com, Ak_com, Td_com, Fc_com, Dot_com, D6_com, Xak_com, Xtd_com, Sc_own, s_prize1, s_prize2, win_amt
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
-                mcom1 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
-                mcom2 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[6]);
-                mcom3 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[7]);
-                mcom4 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[8]);
-                mcom5 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[9]);
-                mcom6 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[11]);
-                mcom7 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[12]);
-                mcom8 = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[10]);
-
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
+                mcom1 = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
+                mcom2 = Val(Inds[1].Tables[0].Rows[Recno[1]][6]);
+                mcom3 = Val(Inds[1].Tables[0].Rows[Recno[1]][7]);
+                mcom4 = Val(Inds[1].Tables[0].Rows[Recno[1]][8]);
+                mcom5 = Val(Inds[1].Tables[0].Rows[Recno[1]][9]);
+                mcom6 = Val(Inds[1].Tables[0].Rows[Recno[1]][11]);
+                mcom7 = Val(Inds[1].Tables[0].Rows[Recno[1]][12]);
+                mcom8 = Val(Inds[1].Tables[0].Rows[Recno[1]][10]);
 
                 // ***************************** Open *********************************************
-
 
                 Recno[2] = Recno[1];
 
@@ -4248,19 +4209,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 11)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 11)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -4271,116 +4232,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbo1 += mprize + Xmprize;
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    s_mixamt2 += mprize - mprize / 100 * mcom1;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Op";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Op";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Op";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Op";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Close *********************************************
@@ -4392,19 +4352,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 12)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 12)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -4415,115 +4375,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
+                xsbo1 += mprize + Xmprize;
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    s_mixamt2 += mprize - mprize / 100 * mcom1;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Cz";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Cz";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Cz";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Cz";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Center *********************************************
@@ -4535,19 +4495,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 13)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 13)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -4558,115 +4518,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
+                xsbo1 += mprize + Xmprize;
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    s_mixamt2 += mprize - (mprize / 100 * mcom1);
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Cnt";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Cnt";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Cnt";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Cnt";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XOpen *********************************************
@@ -4678,19 +4638,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 14)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 14)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -4701,117 +4661,116 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
+                xsbo1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom1;
+                    s_mixamt2 += mprize - mprize / 100 * mcom1;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom1) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom1 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XOp";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XOp";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom1 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom1))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom1) != 0)
+                    if ((mprize / 100 * mcom1) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom1)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom1))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1));
+                    str2 = Rs0(mprize - mprize / 100 * mcom1);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom1) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom1 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom1);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XOp";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XOp";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]) > 0)
+                    if (Val(mcom1) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom1)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) != 0)
+                    if ((Xmprize / 100 * Val(mcom1)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom1)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[6])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom1) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 // ***************************** Akara *********************************************
 
@@ -4822,19 +4781,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 22)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 22)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -4845,117 +4804,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
-
+                xsba1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom2;
+                    s_mixamt2 += mprize - mprize / 100 * mcom2;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom2) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom2 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Ak";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Ak";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom2 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom2))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom2))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom2) != 0)
+                    if ((mprize / 100 * mcom2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom2)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom2))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom2));
+                    str2 = Rs0(mprize - mprize / 100 * mcom2);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom2) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom2 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom2);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom2) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Ak";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Ak";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7]) > 0)
+                    if (Val(mcom2) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom2)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])) != 0)
+                    if ((Xmprize / 100 * Val(mcom2)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom2)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom2));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[7])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom2) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XAkara *********************************************
@@ -4967,19 +4924,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 23)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 23)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -4990,117 +4947,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
-
+                xsbx1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom6;
+                    s_mixamt2 += mprize - mprize / 100 * mcom6;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom6) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom6 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XAk";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom6 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom6) != 0)
+                    if ((mprize / 100 * mcom6) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom6)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom6))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6));
+                    str2 = Rs0(mprize - mprize / 100 * mcom6);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom6 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom6);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XAk";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]) > 0)
+                    if (Val(mcom6) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom6)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) != 0)
+                    if ((Xmprize / 100 * Val(mcom6)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom6)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XXAkara *********************************************
@@ -5112,19 +5067,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 24)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 24)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -5135,116 +5090,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbx1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom6;
+                    s_mixamt2 += mprize - mprize / 100 * mcom6;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom6) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom6 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XXAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XXAk";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom6 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom6))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom6) != 0)
+                    if ((mprize / 100 * mcom6) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom6)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom6))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6));
+                    str2 = Rs0(mprize - mprize / 100 * mcom6);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom6) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom6 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom6);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XXAk";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XXAk";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]) > 0)
+                    if (Val(mcom6) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom6)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) != 0)
+                    if ((Xmprize / 100 * Val(mcom6)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom6)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[8])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom6) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Tandela *********************************************
@@ -5256,19 +5210,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 33)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 33)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -5279,116 +5233,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbt1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom3;
+                    s_mixamt2 += mprize - mprize / 100 * mcom3;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom3) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom3 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Td";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Td";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom3 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom3))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom3))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom3) != 0)
+                    if ((mprize / 100 * mcom3) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom3)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom3))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom3));
+                    str2 = Rs0(mprize - mprize / 100 * mcom3);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom3) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom3 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom3);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom3) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Td";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Td";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9]) > 0)
+                    if (Val(mcom3) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom3)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])) != 0)
+                    if ((Xmprize / 100 * Val(mcom3)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom3)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom3));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[9])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom3) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** XTandela *********************************************
@@ -5400,19 +5353,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 34)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 34)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -5423,115 +5376,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
+                xsbxx1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom7;
+                    s_mixamt2 += mprize - mprize / 100 * mcom7;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom7) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom7 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "XTd";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "XTd";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom7 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom7))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom7))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom7) != 0)
+                    if ((mprize / 100 * mcom7) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom7)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom7))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom7));
+                    str2 = Rs0(mprize - mprize / 100 * mcom7);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom7) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom7 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom7);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom7) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "XTd";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "XTd";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10]) > 0)
+                    if (Val(mcom7) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom7)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])) != 0)
+                    if ((Xmprize / 100 * Val(mcom7)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom7)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom7));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[10])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom7) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Fourcast *********************************************
@@ -5543,19 +5496,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 44)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 44)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -5566,116 +5519,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbf1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom4;
+                    s_mixamt2 += mprize - mprize / 100 * mcom4;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom4) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom4 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "Fc";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "Fc";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom4 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom4))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom4))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom4) != 0)
+                    if ((mprize / 100 * mcom4) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom4)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom4))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom4));
+                    str2 = Rs0(mprize - mprize / 100 * mcom4);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom4) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom4 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom4);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom4) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "Fc";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "Fc";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11]) > 0)
+                    if (Val(mcom4) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom4)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])) != 0)
+                    if ((Xmprize / 100 * Val(mcom4)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom4)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom4));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[11])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom4) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Five - Dot *********************************************
@@ -5687,19 +5639,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 52)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 52)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -5710,116 +5662,115 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsbd1 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom5;
+                    s_mixamt2 += mprize - mprize / 100 * mcom5;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom5) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom5 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "5D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "5D";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom5 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom5))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom5))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom5) != 0)
+                    if ((mprize / 100 * mcom5) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom5)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom5))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom5));
+                    str2 = Rs0(mprize - mprize / 100 * mcom5);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom5) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom5 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom5);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom5) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "5D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "5D";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12]) > 0)
+                    if (Val(mcom5) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom5)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])) != 0)
+                    if ((Xmprize / 100 * Val(mcom5)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom5)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom5));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[12])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom5) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
 
                 // ***************************** Six - Dot *********************************************
@@ -5831,19 +5782,19 @@ namespace XtremeWasmApp.Pages
                 Xmprize = 0;
                 Xwamt = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[2]][2]))
                 {
-                    if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[4]) == 62)
+                    if (Val(Inds[1].Tables[0].Rows[Recno[2]][4]) == 62)
                     {
-                        if (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[6]) != 88)
+                        if (Val(Inds[1].Tables[0].Rows[Recno[2]][6]) != 88)
                         {
-                            mprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            mprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            WAMT += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                         else
                         {
-                            Xmprize += (Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[14]) + Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[15]));
-                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]].ItemArray[16]);
+                            Xmprize += Val(Inds[1].Tables[0].Rows[Recno[2]][14]) + Val(Inds[1].Tables[0].Rows[Recno[2]][15]);
+                            Xwamt += Val(Inds[1].Tables[0].Rows[Recno[2]][16]);
                         }
                     }
 
@@ -5854,157 +5805,155 @@ namespace XtremeWasmApp.Pages
                         break;
                     }
                 }
-
+                xsb61 += (mprize + Xmprize);
                 if (mprize != 0)
                 {
                     s_mixamt1 += mprize;
-                    s_mixamt2 += mprize - (mprize / 100) * mcom8;
+                    s_mixamt2 += mprize - mprize / 100 * mcom8;
                     s_mixamt3 += WAMT;
-                    s_mixamt4 += (mprize - (mprize / 100) * mcom8) - WAMT;
+                    s_mixamt4 += mprize - mprize / 100 * mcom8 - WAMT;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                    tab1.Rows[^1].ItemArray[4] = "6D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = Trim(MREF);
+                    tab1.Rows[^1][4] = "6D";
 
                     str2 = Rs(mprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
                     if (mcom8 > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(mcom8))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(mcom8))), "########.00")) + "%";
                     }
 
-                    if (((mprize / 100) * mcom8) != 0)
+                    if ((mprize / 100 * mcom8) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((mprize / 100) * mcom8)))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(mprize / 100 * mcom8))), "########.00"));
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom8));
+                    str2 = Rs0(mprize - mprize / 100 * mcom8);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((mprize - (mprize / 100) * mcom8) - WAMT);
+                    str2 = Rs0(mprize - mprize / 100 * mcom8 - WAMT);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 if (Xmprize != 0)
                 {
                     s_mixamt1 += Xmprize;
-                    s_mixamt2 += Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13]);
+                    s_mixamt2 += Xmprize - Xmprize / 100 * Val(mcom8);
                     s_mixamt3 += Xwamt;
-                    s_mixamt4 += (Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])) - Xwamt;
+                    s_mixamt4 += Xmprize - Xmprize / 100 * Val(mcom8) - Xwamt;
 
-                    tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                    tab1.Rows[^1].ItemArray[100] = "(( Mix Sale ))";
-                    tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                    tab1.Rows[^1].ItemArray[3] = "Diversion";
-                    tab1.Rows[^1].ItemArray[4] = "6D";
+                    tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                    tab1.Rows[^1][100] = "(( Mix Sale ))";
+                    tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                    tab1.Rows[^1][3] = "Diversion";
+                    tab1.Rows[^1][4] = "6D";
 
                     str2 = Rs(Xmprize);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[6] = Trim(str2);
+                        tab1.Rows[^1][6] = Trim(str2);
                     }
 
-                    if (Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13]) > 0)
+                    if (Val(mcom8) > 0)
                     {
-                        tab1.Rows[^1].ItemArray[8] = Trim(Format(double.Parse(Trim(Str(Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])))), "########.00")) + "%";
+                        tab1.Rows[^1][8] = Trim(Format(double.Parse(Trim(Str(Val(mcom8)))), "########.00")) + "%";
                     }
 
-                    if (((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])) != 0)
+                    if ((Xmprize / 100 * Val(mcom8)) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[9] = Trim(Format(double.Parse(Trim(Str(((Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13]))))), "########.00"));
+                        tab1.Rows[^1][9] = Trim(Format(double.Parse(Trim(Str(Xmprize / 100 * Val(mcom8)))), "########.00"));
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])));
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom8));
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                        tab1.Rows[^1][10] = Trim(str2);
                     }
 
                     str2 = Rs(Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                        tab1.Rows[^1][11] = Trim(str2);
                     }
 
-                    str2 = Rs0((Xmprize - (Xmprize / 100) * Val(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[13])) - Xwamt);
+                    str2 = Rs0(Xmprize - Xmprize / 100 * Val(mcom8) - Xwamt);
 
                     if (Val(str2) != 0)
                     {
-                        tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                        tab1.Rows[^1][12] = Trim(str2);
                     }
 
-                    tab1.Rows[^1].ItemArray[51] = "Digit";
-                    tab1.Rows[^1].ItemArray[53] = "Less Comm %";
+                    tab1.Rows[^1][51] = "Digit";
+                    tab1.Rows[^1][53] = "Less Comm %";
                 }
-
 
                 str2 = Rs(s_mixamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs0(s_mixamt1 - s_mixamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[23] = Trim(str2);
+                    tab1.Rows[^1][23] = Trim(str2);
                 }
 
                 str2 = Rs(s_mixamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(s_mixamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(s_mixamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
                 while (Recno[1] < Inds[1].Tables[0].Rows.Count)
                 {
-                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]))
+                    if (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]][2]))
                     {
                         Recno[1] += 1;
                     }
@@ -6043,16 +5992,16 @@ namespace XtremeWasmApp.Pages
 
             while (Recno[1] < Inds[1].Tables[0].Rows.Count)
             {
-                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]);
-                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[4]);
-                MREF = Inds[1].Tables[0].Rows[Recno[1]].ItemArray[3].ToString();
-                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[5]);
+                MVNO = ValS(Inds[1].Tables[0].Rows[Recno[1]][2]);
+                MCH_PER = Val(Inds[1].Tables[0].Rows[Recno[1]][4]);
+                MREF = Inds[1].Tables[0].Rows[Recno[1]][3].ToString();
+                MRATE = Val(Inds[1].Tables[0].Rows[Recno[1]][5]);
                 Recno[2] = 0;
 
-                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[2]))
+                while (MVNO == Val(Inds[1].Tables[0].Rows[Recno[1]][2]))
                 {
                     MQTY += 1;
-                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]].ItemArray[6]);
+                    WAMT += Val(Inds[1].Tables[0].Rows[Recno[1]][6]);
                     Recno[1] += 1;
                     if (Recno[1] >= Inds[1].Tables[0].Rows.Count)
                     {
@@ -6061,86 +6010,85 @@ namespace XtremeWasmApp.Pages
                 }
 
                 s_pqty += MQTY;
-                s_pamt1 += (MQTY * MRATE);
-                s_pamt2 += (MQTY * MRATE);
+                s_pamt1 += MQTY * MRATE;
+                s_pamt2 += MQTY * MRATE;
                 s_pamt3 += WAMT;
                 s_pamt4 += (MQTY * MRATE) - WAMT;
 
-                tab1.Rows.Add("((( " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[1]) + " - " + Trim(Inds[0].Tables[0].Rows[Recno[0]].ItemArray[2]) + " )))", "S");
-                tab1.Rows[^1].ItemArray[100] = "(( % Packet Sale ))";
-                tab1.Rows[^1].ItemArray[2] = Right("00000" + Trim(Str(MVNO)), 5);
-                tab1.Rows[^1].ItemArray[3] = Trim(MREF);
-                tab1.Rows[^1].ItemArray[4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
+                tab1.Rows.Add("((( " + Trim(party.Code) + " - " + Trim(party.Name) + " )))", "S");
+                tab1.Rows[^1][100] = "(( % Packet Sale ))";
+                tab1.Rows[^1][2] = Right("00000" + Trim(Str(MVNO)), 5);
+                tab1.Rows[^1][3] = Trim(MREF);
+                tab1.Rows[^1][4] = Trim(Format(double.Parse(Trim(Str(MQTY))), "########"));
 
                 str2 = Rs0(MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[5] = Trim(str2);
+                    tab1.Rows[^1][5] = Trim(str2);
                 }
 
                 str2 = Rs(MQTY * MRATE);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[6] = Trim(str2);
-                    tab1.Rows[^1].ItemArray[10] = Trim(str2);
+                    tab1.Rows[^1][6] = Trim(str2);
+                    tab1.Rows[^1][10] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[7] = Trim(Str(MCH_PER)) + " %";
+                tab1.Rows[^1][7] = Trim(Str(MCH_PER)) + " %";
 
                 str2 = Rs(WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[11] = Trim(str2);
+                    tab1.Rows[^1][11] = Trim(str2);
                 }
 
-                str2 = Rs0(((MQTY * MRATE) - WAMT));
+                str2 = Rs0((MQTY * MRATE) - WAMT);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[12] = Trim(str2);
+                    tab1.Rows[^1][12] = Trim(str2);
                 }
 
                 if (s_pqty > 0)
                 {
-                    tab1.Rows[^1].ItemArray[21] = Trim(Format(double.Parse(Trim(Str(s_pqty))), "########"));
+                    tab1.Rows[^1][21] = Trim(Format(double.Parse(Trim(Str(s_pqty))), "########"));
                 }
 
                 str2 = Rs(s_pamt1);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[22] = Trim(str2);
+                    tab1.Rows[^1][22] = Trim(str2);
                 }
 
                 str2 = Rs(s_pamt2);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[24] = Trim(str2);
+                    tab1.Rows[^1][24] = Trim(str2);
                 }
 
                 str2 = Rs(s_pamt3);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[25] = Trim(str2);
+                    tab1.Rows[^1][25] = Trim(str2);
                 }
 
                 str2 = Rs(s_pamt4);
 
                 if (Val(str2) != 0)
                 {
-                    tab1.Rows[^1].ItemArray[26] = Trim(str2);
+                    tab1.Rows[^1][26] = Trim(str2);
                 }
 
-                tab1.Rows[^1].ItemArray[51] = "Qty";
-                tab1.Rows[^1].ItemArray[52] = "Pkt . Rate";
-                tab1.Rows[^1].ItemArray[53] = "Packet (Per %)";
+                tab1.Rows[^1][51] = "Qty";
+                tab1.Rows[^1][52] = "Pkt . Rate";
+                tab1.Rows[^1][53] = "Packet (Per %)";
             }
         }
-
     }
 }

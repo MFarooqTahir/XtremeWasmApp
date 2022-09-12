@@ -224,7 +224,7 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    var ed = Editmode || ((Prize1 ?? 0) != 0 || (Prize2 ?? 0) != 0);
+                    var ed = Editmode || (Prize1 ?? 0) != 0 || (Prize2 ?? 0) != 0;
                     var currbalance = await Api.GetCurrentBalance();
                     var inbal = currbalance - ((Prize1 ?? 0) + (Prize2 ?? 0));
                     var inballess = inbal < 0;

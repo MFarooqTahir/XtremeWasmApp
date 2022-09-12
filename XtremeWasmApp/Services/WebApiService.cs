@@ -6,10 +6,12 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 using Newtonsoft.Json;
 
+using System.Data;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
+using System.Web;
 
 using XtremeModels;
 
@@ -190,7 +192,8 @@ namespace XtremeWasmApp.Services
                 }
                 if (response?.IsSuccessStatusCode == true)
                 {
-                    return await (response?.Content?.ReadFromJsonAsync<T>()).ConfigureAwait(false);
+                    var res = await (response.Content?.ReadAsStringAsync()).ConfigureAwait(false);
+                    return JsonConvert.DeserializeObject<T>(res);
                 }
                 else if (response?.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
@@ -297,6 +300,76 @@ namespace XtremeWasmApp.Services
                     mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
                 };
                 return await SendHttpRequest<FileReturnModel?>("api/Reporting/MixInvSerialBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<FileReturnModel?> GetPartyBillReport(DataTable dt, string fileName, DateTime xdateI)
+        {
+            try
+            {
+                var comp = await GetCompany().ConfigureAwait(false);
+                var cdRel = await GetCdrel().ConfigureAwait(false);
+                var party = await GetParty().ConfigureAwait(false);
+                var sch = await GetSch().ConfigureAwait(false);
+                PartyBillModel? model = new()
+                {
+                    DReturn = DtReturn.FromTable(dt).ToStringArrayRows(),
+                    Code = party.Code,
+                    Name = party.Name,
+                    Ld1 = sch.DId.ToString(CultureInfo.InvariantCulture),
+                    Ld2 = sch.BId,
+                    Ld2c = sch.Cat,
+                    Ld3 = sch.Date.ToShortDateString(),
+                    Ld4 = sch.City,
+                    Osver = "Web Application { PBTS.Net } Version 1.1.2022",
+                    mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
+                    xdate = xdateI,
+                    uid = cdRel.UName,
+                    comp = comp?.Pcode,
+                    FileName = fileName,
+                };
+                return await SendHttpRequest<FileReturnModel?>("api/Reporting/PartyBillBytes", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        public async Task<FileReturnModel?> GetLedgerReport(int PartyCode, DateTime From, DateTime To)
+        {
+            try
+            {
+                var comp = await GetCompany().ConfigureAwait(false);
+                var cdRel = await GetCdrel().ConfigureAwait(false);
+                var party = await GetParty().ConfigureAwait(false);
+                var fromEncoded = HttpUtility.HtmlEncode(From.ToString("o"));
+                var toEncoded = HttpUtility.HtmlEncode(To.ToString("o"));
+                var ledRes = await SendHttpRequest<ResultSet<LedgerList?>?>($"api/Data/GetLedger/{fromEncoded}/{toEncoded}/{PartyCode}", RequestType.Get, LinkType.Data).ConfigureAwait(false);
+                if (ledRes?.ResultObj is null)
+                {
+                    return new()
+                    {
+                        FileName = ledRes.Status,
+                    };
+                }
+                LedgerReportModel? model = new()
+                {
+                    code = PartyCode.ToString(CultureInfo.InvariantCulture),
+                    From = From,
+                    To = To,
+                    Ledger = ledRes.ResultObj,
+                    Name = party.Name,
+                    Osver = "Web Application { PBTS.Net } Version 1.1.2022",
+                    mmptit = "R.M Developer System ( azarnishom05@gmail.com )",
+                    uid = cdRel.UName,
+                    comp = comp?.Pcode,
+                };
+                return await SendHttpRequest<FileReturnModel?>("api/Reporting/Ledger", RequestType.Post, model, LinkType.Reporting).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -862,7 +935,7 @@ namespace XtremeWasmApp.Services
 
         public async Task<bool> IsQtyUser()
         {
-            var res = (await GetCompany().ConfigureAwait(false));
+            var res = await GetCompany().ConfigureAwait(false);
             return res?.Qtyuser ?? false;
         }
 

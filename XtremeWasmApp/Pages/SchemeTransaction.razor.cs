@@ -132,13 +132,13 @@ namespace XtremeWasmApp.Pages
             {
                 if (Company.Qtyuser)
                 {
-                    Xwin2 = ((Math.Ceiling(Company.Sfc2) * 3) / (sch.Prz2));
-                    Xwin4 = ((Math.Ceiling(Company.Std2) * 3) / (sch.Prz2));
+                    Xwin2 = Math.Ceiling(Company.Sfc2) * 3 / sch.Prz2;
+                    Xwin4 = Math.Ceiling(Company.Std2) * 3 / sch.Prz2;
                 }
                 else
                 {
-                    Xwin2 = ((Company.Sfc1) / (sch.Prz2));
-                    Xwin4 = ((Company.Std1) / (sch.Prz2));
+                    Xwin2 = Company.Sfc1 / sch.Prz2;
+                    Xwin4 = Company.Std1 / sch.Prz2;
                 }
             }
             else
@@ -197,7 +197,7 @@ namespace XtremeWasmApp.Pages
                 AddEntryDisabled = true;
                 try
                 {
-                    var ed = Editmode || ((Prize1 ?? 0) != 0 || (Prize2 ?? 0) != 0);
+                    var ed = Editmode || (Prize1 ?? 0) != 0 || (Prize2 ?? 0) != 0;
                     var currbalance = await Api.GetCurrentBalance();
                     var inbal = currbalance - ((Prize1 ?? 0) + (Prize2 ?? 0));
                     var inballess = inbal < 0;

@@ -267,7 +267,9 @@ namespace XtremeWasmApp.Shared
                 //    await Task.Delay(TimeSpan.FromSeconds(5));
                 //    await _hub.StartAsync();
                 //};
+
                 await _hub.StartAsync().ConfigureAwait(false);
+
             }
             ac = repeatData?.RelationActive == false || repeatData?.Uac == false || repeatData?.DrawCompleted == true;
             MBM = await AuthService.GetMbm().ConfigureAwait(false) ?? "";
@@ -346,7 +348,7 @@ namespace XtremeWasmApp.Shared
                 var newRepeat = await Auth.GetRepeatData().ConfigureAwait(false);
 
                 //var newMarq = (await Auth.GetTopMarqData().ConfigureAwait(false));
-                var newMarq = (await Auth.GetMarqData().ConfigureAwait(false));// (await Auth.GetTopMarqData().ConfigureAwait(false)) ??
+                var newMarq = await Auth.GetMarqData().ConfigureAwait(false);// (await Auth.GetTopMarqData().ConfigureAwait(false)) ??
 
                 var r = newMarq != MarqData;
                 MarqData = newMarq;
