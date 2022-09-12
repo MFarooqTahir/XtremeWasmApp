@@ -11,12 +11,12 @@
                 <h3>Account Statement</h3>
                 <MudGrid Spacing="0" Justify="Justify.Center">
                     <MudItem xs="12">
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="From date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-Date="From" Editable="true">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="From date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-Date="From">
 
                         </MudDatePicker>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="To date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-Date="To" Editable="true">
+                        <MudDatePicker PickerVariant="PickerVariant.Dialog" HelperText="To date" Disabled="@loading" Culture="System.Globalization.CultureInfo.InvariantCulture" DateFormat="dd-MMM-yyyy" TitleDateFormat="dd-MMM-yyyy" MaxDate="@DateTime.Now" @bind-Date="To">
 
                         </MudDatePicker>
                     </MudItem>

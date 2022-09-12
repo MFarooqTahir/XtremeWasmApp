@@ -346,8 +346,6 @@ namespace XtremeWasmApp.Services
                 var comp = await GetCompany().ConfigureAwait(false);
                 var cdRel = await GetCdrel().ConfigureAwait(false);
                 var party = await GetParty().ConfigureAwait(false);
-                //var fromEncoded = HttpUtility.HtmlEncode(From.ToString("o"));
-                //var toEncoded = HttpUtility.HtmlEncode(To.ToString("o"));
                 var ledRes = await SendHttpRequest<ResultSet<LedgerList?>?>($"api/Data/GetLedger/{From:yyyy-MM-dd}/{To:yyyy-MM-dd}/{party.Code}", RequestType.Get, LinkType.Data).ConfigureAwait(false);
                 if (ledRes?.ResultObj is null)
                 {
